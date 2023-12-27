@@ -62,14 +62,11 @@ class Space(game_state.GameState):
                 case pygame.Event(type=pygame.QUIT):
                     self.game.quit()
                 case pygame.Event(type=pygame.MOUSEMOTION, rel=motion):
-                    self.camera.rotation.y -= motion[0]
+                    self.camera.rotation.y += motion[0]
                     self.camera.rotation.x -= motion[1]
                     print(self.camera.rotation)
                 case pygame.Event(type=pygame.MOUSEWHEEL, y=motion):
-                    if buttons[0]:
-                        self.camera.near_z += motion
-                    if buttons[2]:
-                        self.camera.far_z += motion
+                    self.camera.rotation.z += motion * 10
         if keys[pygame.K_UP]:
             self.camera.pos.z += 100 * dt
         if keys[pygame.K_DOWN]:
@@ -112,8 +109,8 @@ class Space(game_state.GameState):
             numpy.float64
         )
         translate = numpy.array((
-            (1, 0, 0, -self.camera.pos.x - self.camera.center.x),
-            (0, 1, 0, -self.camera.pos.y - self.camera.center.y),
+            (1, 0, 0, -self.camera.pos.x),
+            (0, 1, 0, -self.camera.pos.y),
             (0, 0, 1, -self.camera.pos.z),
             (0, 0, 0, 1)),
             numpy.float64
@@ -125,7 +122,7 @@ class Space(game_state.GameState):
             (0, 0, 1, 0)),
             numpy.float64
         )
-        transformation = project @ rotate_x @ rotate_y @ rotate_z @ translate
+        transformation = project @ rotate_z @ rotate_y @ rotate_x @ translate
         for sprite in self.sprites:
             new_point = tuple(transformation @ numpy.array((*sprite.pos, 1), numpy.float64))
             new_point = pygame.Vector3(new_point[0], new_point[1], new_point[2]) / new_point[3]
