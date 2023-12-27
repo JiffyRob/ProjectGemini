@@ -24,7 +24,6 @@ class Game:
             self.size,
             sdl2.WINDOWPOS_CENTERED,
             resizable=True,
-            fullscreen=True,
         )
         self.stack.appendleft(space.Space(self))
         dt = 0

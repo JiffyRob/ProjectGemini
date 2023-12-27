@@ -5,13 +5,13 @@ from dataclasses import dataclass
 import numpy
 import pygame
 
-from scripts import game_state, loader
+from scripts import game_state, loader, math3d
 
 
 @dataclass
 class Camera:
     pos: pygame.Vector3
-    rotation: pygame.Vector3
+    rotation: math3d.Quaternion
     center: pygame.Vector2
     fov: pygame.Vector2
     near_z: int
@@ -35,7 +35,7 @@ class Space(game_state.GameState):
         # on screen with no rotation x is left-right, y is up-down, and z is depth
         self.camera = Camera(
             pygame.Vector3(),
-            pygame.Vector3(),
+            math3d.Quaternion(),
             pygame.Vector2(self.renderer.logical_size) / 2,
             pygame.Vector2(60, 60),
             200,
@@ -69,69 +69,36 @@ class Space(game_state.GameState):
             match event:
                 case pygame.Event(type=pygame.QUIT):
                     self.game.quit()
-                case pygame.Event(type=pygame.MOUSEMOTION, rel=motion):
-                    self.camera.rotation.y += motion[0]
-                    self.camera.rotation.x -= motion[1]
-                    print(self.camera.rotation)
+                case pygame.Event(type=pygame.MOUSEMOTION, rel=motion) if buttons[0]:
+                    self.camera.rotation *= math3d.Quaternion(-motion[0] * dt / 30, (0, 1, 0)) * math3d.Quaternion(motion[1] * dt / 30, (1, 0, 0))
                 case pygame.Event(type=pygame.MOUSEWHEEL, y=motion):
-                    self.camera.rotation.z += motion * 10
+                    rotation = math3d.Quaternion(motion * dt, (0, 0, 1))
+                    print(rotation)
+                    self.camera.rotation *= rotation
+                    pass
+        motion = pygame.Vector3()
         if keys[pygame.K_UP]:
-            self.camera.pos.z += 100 * dt
+            motion.z += 100 * dt
         if keys[pygame.K_DOWN]:
-            self.camera.pos.z -= 100 * dt
+            motion.z -= 100 * dt
         if keys[pygame.K_LEFT]:
-            self.camera.pos.x -= 100 * dt
+            motion.x -= 100 * dt
         if keys[pygame.K_RIGHT]:
-            self.camera.pos.x += 100 * dt
+            motion.x += 100 * dt
         if keys[pygame.K_SPACE]:
-            self.camera.pos.y -= 100 * dt
+            motion.y -= 100 * dt
         if keys[pygame.K_LSHIFT]:
-            self.camera.pos.y += 100 * dt
+            motion.y += 100 * dt
         if keys[pygame.K_LCTRL]:
-            self.camera.rotation *= 0
+            self.camera.rotation = math3d.Quaternion()
+        self.camera.pos += self.camera.rotation * motion
         if keys[pygame.K_ESCAPE]:
             self.game.quit()
+        self.game.window.title = f"FPS: {round(self.game.clock.get_fps())} ROTATION: {self.camera.rotation}"
 
     def draw(self):
         self.renderer.clear()
-        rotation = -self.camera.rotation * math.pi / 180
-        rotate_x = numpy.array(
-            (
-                (1, 0, 0, 0),
-                (0, math.cos(rotation.x), -math.sin(rotation.x), 0),
-                (0, math.sin(rotation.x), math.cos(rotation.x), 0),
-                (0, 0, 0, 1),
-            ),
-            numpy.float64,
-        )
-        rotate_y = numpy.array(
-            (
-                (math.cos(rotation.y), 0, math.sin(rotation.y), 0),
-                (0, 1, 0, 0),
-                (-math.sin(rotation.y), 0, math.cos(rotation.y), 0),
-                (0, 0, 0, 1),
-            ),
-            numpy.float64,
-        )
-        rotate_z = numpy.array(
-            (
-                (math.cos(rotation.z), -math.sin(rotation.z), 0, 0),
-                (math.sin(rotation.z), math.cos(rotation.z), 0, 0),
-                (0, 0, 1, 0),
-                (0, 0, 0, 1),
-            ),
-            numpy.float64,
-        )
-        translate = numpy.array(
-            (
-                (1, 0, 0, -self.camera.pos.x),
-                (0, 1, 0, -self.camera.pos.y),
-                (0, 0, 1, -self.camera.pos.z),
-                (0, 0, 0, 1),
-            ),
-            numpy.float64,
-        )
-        project = numpy.array(
+        projection_matrix = numpy.array(
             (
                 (self.camera.near_z, 0, 0, 0),
                 (0, self.camera.near_z, 0, 0),
@@ -145,18 +112,18 @@ class Space(game_state.GameState):
             ),
             numpy.float64,
         )
-        transformation = project @ rotate_z @ rotate_y @ rotate_x @ translate
         for sprite in self.sprites:
-            new_point = tuple(
-                transformation @ numpy.array((*sprite.pos, 1), numpy.float64)
-            )
-            new_point = (
-                pygame.Vector3(new_point[0], new_point[1], new_point[2]) / new_point[3]
-            )
-            scale_factor = self.camera.near_z / new_point.z
+            # TODO: Proper FOV??
+            # translate and rotate (relative position * relative rotation)
+            relative_pos = -self.camera.rotation * (sprite.pos - self.camera.pos)
+            # scale (cheating)
+            scale_factor = self.camera.near_z / relative_pos.z
             sprite.rect.width = sprite.width * scale_factor
             sprite.rect.height = sprite.height * scale_factor
-            sprite.rect.center = new_point.xy + self.camera.center
-            if self.camera.near_z <= new_point[2] <= self.camera.far_z:
+            # project
+            screen_pos = math3d.to_simple(projection_matrix @ math3d.to_homogenous(relative_pos))
+            # draw
+            if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
+                sprite.rect.center = screen_pos.xy + self.camera.center
                 self.renderer.blit(sprite.image, sprite.rect)
         self.renderer.present()
