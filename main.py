@@ -1,23 +1,7 @@
 import pygame
 import pygame._sdl2 as sdl2
 from collections import deque
-
-
-class GameState:
-    def __init__(self, game, color='gray', vsync=True):
-        self.game = game
-        self.renderer = sdl2.Renderer(game.window, -1, -1, vsync)
-        self.renderer.draw_color = color
-
-    def update(self, dt):
-        for event in pygame.event.get():
-            match event:
-                case pygame.Event(type=pygame.QUIT):
-                    self.game.quit()
-
-    def draw(self):
-        self.renderer.clear()
-        self.renderer.present()
+from scripts import space
 
 
 class Game:
@@ -33,8 +17,8 @@ class Game:
 
     def run(self):
         self.running = True
-        self.window = sdl2.Window(self.title, self.size, sdl2.WINDOWPOS_CENTERED)
-        self.stack.appendleft(GameState(self))
+        self.window = sdl2.Window(self.title, self.size, sdl2.WINDOWPOS_CENTERED, resizable=True, fullscreen=True)
+        self.stack.appendleft(space.Space(self))
         dt = 0
 
         while self.running:
