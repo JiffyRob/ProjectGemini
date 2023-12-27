@@ -1,12 +1,11 @@
-import random
 import math
-import numpy
+import random
 from dataclasses import dataclass
 
+import numpy
 import pygame
 
-from scripts import game_state
-from scripts import loader
+from scripts import game_state, loader
 
 
 @dataclass
@@ -26,9 +25,10 @@ class SpaceParticle:
         self.rect = pygame.Rect((-1, -1), size)
         self.width, self.height = size
 
+
 class Space(game_state.GameState):
     def __init__(self, game):
-        super().__init__(game, color='navy')
+        super().__init__(game, color="navy")
         self.loader = loader.TextureLoader(self.renderer)
         self.renderer.logical_size = (800, 600)
         # in world space y is vertical, and x and z are horizontal
@@ -39,18 +39,26 @@ class Space(game_state.GameState):
             pygame.Vector2(self.renderer.logical_size) / 2,
             pygame.Vector2(60, 60),
             200,
-            500
+            500,
         )
         self.sprites = []
 
         for i in range(3000):
             self.sprites.append(
                 SpaceParticle(
-                    pygame.Vector3(random.uniform(-self.renderer.logical_size[0], self.renderer.logical_size[0]),
-                                   random.uniform(-self.renderer.logical_size[1], self.renderer.logical_size[1]),
-                                   random.uniform(-500, 500)),
+                    pygame.Vector3(
+                        random.uniform(
+                            -self.renderer.logical_size[0],
+                            self.renderer.logical_size[0],
+                        ),
+                        random.uniform(
+                            -self.renderer.logical_size[1],
+                            self.renderer.logical_size[1],
+                        ),
+                        random.uniform(-500, 500),
+                    ),
                     self.loader.get("stars", "blue4a"),
-                    (16, 16)
+                    (16, 16),
                 )
             )
 
@@ -87,45 +95,64 @@ class Space(game_state.GameState):
     def draw(self):
         self.renderer.clear()
         rotation = -self.camera.rotation * math.pi / 180
-        rotate_x = numpy.array((
-            (1, 0, 0, 0),
-            (0, math.cos(rotation.x), -math.sin(rotation.x), 0),
-            (0, math.sin(rotation.x), math.cos(rotation.x), 0),
-            (0, 0, 0, 1)),
-            numpy.float64
+        rotate_x = numpy.array(
+            (
+                (1, 0, 0, 0),
+                (0, math.cos(rotation.x), -math.sin(rotation.x), 0),
+                (0, math.sin(rotation.x), math.cos(rotation.x), 0),
+                (0, 0, 0, 1),
+            ),
+            numpy.float64,
         )
-        rotate_y = numpy.array((
-            (math.cos(rotation.y), 0, math.sin(rotation.y), 0),
-            (0, 1, 0, 0),
-            (-math.sin(rotation.y), 0, math.cos(rotation.y), 0),
-            (0, 0, 0, 1)),
-            numpy.float64
+        rotate_y = numpy.array(
+            (
+                (math.cos(rotation.y), 0, math.sin(rotation.y), 0),
+                (0, 1, 0, 0),
+                (-math.sin(rotation.y), 0, math.cos(rotation.y), 0),
+                (0, 0, 0, 1),
+            ),
+            numpy.float64,
         )
-        rotate_z = numpy.array((
-            (math.cos(rotation.z), -math.sin(rotation.z), 0, 0),
-            (math.sin(rotation.z), math.cos(rotation.z), 0, 0),
-            (0, 0, 1, 0),
-            (0, 0, 0, 1)),
-            numpy.float64
+        rotate_z = numpy.array(
+            (
+                (math.cos(rotation.z), -math.sin(rotation.z), 0, 0),
+                (math.sin(rotation.z), math.cos(rotation.z), 0, 0),
+                (0, 0, 1, 0),
+                (0, 0, 0, 1),
+            ),
+            numpy.float64,
         )
-        translate = numpy.array((
-            (1, 0, 0, -self.camera.pos.x),
-            (0, 1, 0, -self.camera.pos.y),
-            (0, 0, 1, -self.camera.pos.z),
-            (0, 0, 0, 1)),
-            numpy.float64
+        translate = numpy.array(
+            (
+                (1, 0, 0, -self.camera.pos.x),
+                (0, 1, 0, -self.camera.pos.y),
+                (0, 0, 1, -self.camera.pos.z),
+                (0, 0, 0, 1),
+            ),
+            numpy.float64,
         )
-        project = numpy.array((
-            (self.camera.near_z, 0, 0, 0),
-            (0, self.camera.near_z, 0, 0),
-            (0, 0, self.camera.far_z + self.camera.near_z, -self.camera.far_z * self.camera.near_z),
-            (0, 0, 1, 0)),
-            numpy.float64
+        project = numpy.array(
+            (
+                (self.camera.near_z, 0, 0, 0),
+                (0, self.camera.near_z, 0, 0),
+                (
+                    0,
+                    0,
+                    self.camera.far_z + self.camera.near_z,
+                    -self.camera.far_z * self.camera.near_z,
+                ),
+                (0, 0, 1, 0),
+            ),
+            numpy.float64,
         )
         transformation = project @ rotate_z @ rotate_y @ rotate_x @ translate
         for sprite in self.sprites:
-            new_point = tuple(transformation @ numpy.array((*sprite.pos, 1), numpy.float64))
-            new_point = pygame.Vector3(new_point[0], new_point[1], new_point[2]) / new_point[3]
+            new_point = tuple(
+                transformation @ numpy.array((*sprite.pos, 1), numpy.float64)
+            )
+            new_point = (
+                pygame.Vector3(new_point[0], new_point[1], new_point[2]) / new_point[3]
+            )
             scale_factor = self.camera.near_z / new_point.z
             sprite.rect.width = sprite.width * scale_factor
             sprite.rect.height = sprite.height * scale_factor

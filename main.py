@@ -1,11 +1,13 @@
+from collections import deque
+
 import pygame
 import pygame._sdl2 as sdl2
-from collections import deque
+
 from scripts import space
 
 
 class Game:
-    def __init__(self, title='Project Gemini', size=(640, 480), fps=60):
+    def __init__(self, title="Project Gemini", size=(640, 480), fps=60):
         self.title = title
         self.size = size
         self.window = None
@@ -17,7 +19,13 @@ class Game:
 
     def run(self):
         self.running = True
-        self.window = sdl2.Window(self.title, self.size, sdl2.WINDOWPOS_CENTERED, resizable=True, fullscreen=True)
+        self.window = sdl2.Window(
+            self.title,
+            self.size,
+            sdl2.WINDOWPOS_CENTERED,
+            resizable=True,
+            fullscreen=True,
+        )
         self.stack.appendleft(space.Space(self))
         dt = 0
 
