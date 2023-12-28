@@ -78,12 +78,26 @@ class StaticSpriteGroup:
         term = numpy.multiply(term, 2, term)
         numpy.add(self.screen_positions, term, self.screen_positions)
 
-    def scale(self, camera):
+    def project(self, camera):
         scale_factors = numpy.divide(camera.near_z, self.screen_positions[:, 2]).reshape(self.sprites, 1)
         self.screen_sizes *= scale_factors
         self.screen_positions[:, :2] *= scale_factors
 
+    def center(self, camera):
+        numpy.add(self.screen_positions, (*camera.center, 0), self.screen_positions)
+
     def draw(self, camera):
+        [self.textures[i].draw(
+            None, (
+                (position := self.screen_positions[i])[0] - (size := self.screen_sizes[i])[0] / 2,
+                position[1] - size[1] / 2,
+                size[0] * (camera.near_z <= position[2] <= camera.far_z),
+                size[1]
+            ))
+            for i in range(self.next_id)
+        ]
+
+    def dirty_draw(self, camera):
         # copy
         numpy.copyto(self.screen_positions, self.global_positions)
         numpy.copyto(self.screen_sizes, self.global_sizes)
@@ -92,12 +106,11 @@ class StaticSpriteGroup:
         # rotate
         self.rotate(camera)
         # project and scaling
-        self.scale(camera)
-        for i in range(self.next_id):
-            pos = self.screen_positions[i] + [*camera.center, 0]
-            size = self.screen_sizes[i]
-            if camera.near_z < pos[2] < camera.far_z:
-                self.textures[i].draw(None, (pos[0] - size[0] / 2, pos[1] - size[1] / 2, size[0], size[1]))
+        self.project(camera)
+        # center of camera is center of screen
+        self.center(camera)
+        # now that positions are nice, draw properly
+        self.draw(camera)
 
 
 class SpaceParticle:
@@ -110,7 +123,7 @@ class SpaceParticle:
 
 class Space(game_state.GameState):
     def __init__(self, game):
-        super().__init__(game, color="navy")
+        super().__init__(game, color="navy", vsync=False)
         self.loader = loader.TextureLoader(self.renderer)
         self.renderer.logical_size = (1920, 1080)
         # in world space y is vertical, and x and z are horizontal
@@ -119,14 +132,13 @@ class Space(game_state.GameState):
             pygame.Vector3(),
             math3d.Quaternion(),
             pygame.Vector2(self.renderer.logical_size) / 2,
-            pygame.Vector2(60, 60),
+            pygame.Vector2(60, 60),  # TODO : FOV
             500,
             1000,
         )
         self.sprites = []
         self.static_sprites = StaticSpriteGroup(3000)
         self.static_sprites.add_texture("star", self.loader.get("stars", "blue4a"), (16, 16))
-
         for i in range(3000):
             self.static_sprites.add_sprite(
                 pygame.Vector3(
@@ -179,7 +191,7 @@ class Space(game_state.GameState):
 
     def draw(self):
         self.renderer.clear()
-        self.static_sprites.draw(self.camera)
+        self.static_sprites.dirty_draw(self.camera)
         projection_matrix = numpy.array(
             (
                 (self.camera.near_z, 0, 0, 0),

@@ -7,7 +7,7 @@ from scripts import space
 
 
 class Game:
-    def __init__(self, title="Project Gemini", size=(640, 480), fps=60):
+    def __init__(self, title="Project Gemini", size=(640, 480), fps=0):
         self.title = title
         self.size = size
         self.window = None
