@@ -1,9 +1,11 @@
 import math
+import gc
 import random
 from dataclasses import dataclass
 
 import numpy
 import pygame
+import pygame._sdl2 as sdl2
 
 from scripts import game_state, loader, math3d
 
@@ -18,6 +20,86 @@ class Camera:
     far_z: int
 
 
+class StaticSpriteGroup:
+    def __init__(self, sprites=1000):
+        self.sprites = sprites
+        self.global_positions = numpy.zeros((self.sprites, 3), dtype=numpy.float64)  # x, y, z
+        self.global_sizes = numpy.zeros((self.sprites, 2), dtype=numpy.float64)  # width, height
+
+        self.screen_positions = numpy.zeros((self.sprites, 3), dtype=numpy.float64)  # x, y, z
+        self.screen_sizes = numpy.zeros((self.sprites, 2), dtype=numpy.float64)  # width, height
+
+        self.images = numpy.zeros((self.sprites, ), dtype=int)
+        self.textures = numpy.zeros((self.sprites, ), dtype=sdl2.Image)
+        # preallocate memory for transform data
+        self.cross_buffer = numpy.zeros((self.sprites, ), dtype=numpy.float64)
+        self.mod_array = numpy.zeros((6, ), dtype=numpy.float64)
+        self.mod_matrix = numpy.zeros((6, 6), dtype=numpy.float64)
+
+        self.loaded_textures = {}
+        self.next_id = 0
+        self.next_texture_id = 0
+
+    def add_texture(self, name, texture, default_size=(16, 16)):
+        self.loaded_textures[name] = texture, default_size
+
+    def add_sprite(self, position, texture, size=None):
+        if isinstance(texture, str):
+            if size is None:
+                size = self.loaded_textures[texture][1]
+            texture = self.loaded_textures[texture][0]
+
+        self.textures[self.next_id] = texture
+        self.global_positions[self.next_id] = pygame.Vector3(position)
+        self.global_sizes[self.next_id] = size
+        self.next_id += 1
+        return self.next_id - 1
+
+    def translate(self, camera):
+        numpy.add(self.screen_positions, -camera.pos, self.screen_positions)
+
+    def rotate(self, camera):
+        # this one's a little hairy
+        # cache the opposite rotation
+        rotation = -camera.rotation
+
+        # Equation:
+        # sprite_pos + 2 * rot_real * (rot_vec X sprite_pos) + 2 * (rot_vec X (rot_vec X sprite_pos))
+        # rot_vec X sprite_pos is used twice, so let's grab that and call it "cross"
+        crosses = numpy.cross(rotation.vector, self.screen_positions)
+
+        # add 2 * rot_real * cross
+        term = numpy.multiply(crosses, 2)
+        numpy.multiply(term, rotation.real, term)
+        numpy.add(self.screen_positions, term, self.screen_positions)
+
+        # add 2 * (camera_vector x (camera_vector x position))
+        term = numpy.cross(rotation.vector, crosses)  # dirty double crosser ;)
+        term = numpy.multiply(term, 2, term)
+        numpy.add(self.screen_positions, term, self.screen_positions)
+
+    def scale(self, camera):
+        scale_factors = numpy.divide(camera.near_z, self.screen_positions[:, 2]).reshape(self.sprites, 1)
+        self.screen_sizes *= scale_factors
+        self.screen_positions[:, :2] *= scale_factors
+
+    def draw(self, camera):
+        # copy
+        numpy.copyto(self.screen_positions, self.global_positions)
+        numpy.copyto(self.screen_sizes, self.global_sizes)
+        # translate
+        self.translate(camera)
+        # rotate
+        self.rotate(camera)
+        # project and scaling
+        self.scale(camera)
+        for i in range(self.next_id):
+            pos = self.screen_positions[i] + [*camera.center, 0]
+            size = self.screen_sizes[i]
+            if camera.near_z < pos[2] < camera.far_z:
+                self.textures[i].draw(None, (pos[0] - size[0] / 2, pos[1] - size[1] / 2, size[0], size[1]))
+
+
 class SpaceParticle:
     def __init__(self, pos, image, size):
         self.pos = pos
@@ -30,7 +112,7 @@ class Space(game_state.GameState):
     def __init__(self, game):
         super().__init__(game, color="navy")
         self.loader = loader.TextureLoader(self.renderer)
-        self.renderer.logical_size = (800, 600)
+        self.renderer.logical_size = (1920, 1080)
         # in world space y is vertical, and x and z are horizontal
         # on screen with no rotation x is left-right, y is up-down, and z is depth
         self.camera = Camera(
@@ -38,28 +120,27 @@ class Space(game_state.GameState):
             math3d.Quaternion(),
             pygame.Vector2(self.renderer.logical_size) / 2,
             pygame.Vector2(60, 60),
-            200,
             500,
+            1000,
         )
         self.sprites = []
+        self.static_sprites = StaticSpriteGroup(3000)
+        self.static_sprites.add_texture("star", self.loader.get("stars", "blue4a"), (16, 16))
 
         for i in range(3000):
-            self.sprites.append(
-                SpaceParticle(
-                    pygame.Vector3(
-                        random.uniform(
-                            -self.renderer.logical_size[0],
-                            self.renderer.logical_size[0],
-                        ),
-                        random.uniform(
-                            -self.renderer.logical_size[1],
-                            self.renderer.logical_size[1],
-                        ),
-                        random.uniform(-500, 500),
+            self.static_sprites.add_sprite(
+                pygame.Vector3(
+                    random.uniform(
+                        -self.renderer.logical_size[0],
+                        self.renderer.logical_size[0],
                     ),
-                    self.loader.get("stars", "blue4a"),
-                    (16, 16),
-                )
+                    random.uniform(
+                        -self.renderer.logical_size[1],
+                        self.renderer.logical_size[1],
+                    ),
+                    random.uniform(-500, 500),
+                ),
+                "star"
             )
 
     def update(self, dt):
@@ -98,6 +179,7 @@ class Space(game_state.GameState):
 
     def draw(self):
         self.renderer.clear()
+        self.static_sprites.draw(self.camera)
         projection_matrix = numpy.array(
             (
                 (self.camera.near_z, 0, 0, 0),
@@ -112,16 +194,18 @@ class Space(game_state.GameState):
             ),
             numpy.float64,
         )
+        negated_rotation = -self.camera.rotation
         for sprite in self.sprites:
             # TODO: Proper FOV??
             # translate and rotate (relative position * relative rotation)
-            relative_pos = -self.camera.rotation * (sprite.pos - self.camera.pos)
+            relative_pos = negated_rotation * (sprite.pos - self.camera.pos)
             # scale (cheating)
             scale_factor = self.camera.near_z / relative_pos.z
             sprite.rect.width = sprite.width * scale_factor
             sprite.rect.height = sprite.height * scale_factor
             # project
-            screen_pos = math3d.to_simple(projection_matrix @ math3d.to_homogenous(relative_pos))
+            screen_pos = projection_matrix @ numpy.array((relative_pos.x, relative_pos.y, relative_pos.z, 1))
+            screen_pos = pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2]) / screen_pos[3]
             # draw
             if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
                 sprite.rect.center = screen_pos.xy + self.camera.center

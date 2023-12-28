@@ -3,12 +3,10 @@ import pygame
 import numpy
 
 
-def to_homogenous(simple):
-    return numpy.array((*simple, 1), numpy.float64)
 
 
 def to_simple(homogenous):
-    return pygame.Vector3(tuple(homogenous[:3])) / homogenous[3]
+    return pygame.Vector3(homogenous[0], homogenous[1], homogenous[2]) / homogenous[3]
 
 
 class Quaternion:
@@ -48,12 +46,14 @@ class Quaternion:
             )
         if isinstance(other, pygame.Vector3):
             cross_product = self.vector.cross(other)
-            return other + cross_product * (2 * self.real) + self.vector.cross(cross_product) * 2
+            return other + (cross_product * 2 * self.real) + 2 * self.vector.cross(cross_product)
         if isinstance(other, numpy.ndarray):
-            return self * to_simple(other)
+            new_array = numpy.copy(other)
+            new_array[0:3] = self * pygame.Vector3(other[0], other[1], other[2])
+            return new_array
         raise TypeError(f"No multiplication between Quaternions and '{type(other)}' allowed")
 
     def __repr__(self):
-        return f"Quaternion <{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}> |{self.magnitude()}|"
+        return f"<{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}>"
 
 
