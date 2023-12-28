@@ -31,10 +31,13 @@ class StaticSpriteGroup:
 
         self.images = numpy.zeros((self.sprites, ), dtype=int)
         self.textures = numpy.zeros((self.sprites, ), dtype=sdl2.Image)
+
+        self.draw_indices = None
+
         # preallocate memory for transform data
         self.cross_buffer = numpy.zeros((self.sprites, ), dtype=numpy.float64)
         self.mod_array = numpy.zeros((6, ), dtype=numpy.float64)
-        self.mod_matrix = numpy.zeros((6, 6), dtype=numpy.float64)
+        self.ids = numpy.arange(self.sprites)
 
         self.loaded_textures = {}
         self.next_id = 0
@@ -78,23 +81,34 @@ class StaticSpriteGroup:
         term = numpy.multiply(term, 2, term)
         numpy.add(self.screen_positions, term, self.screen_positions)
 
+
     def project(self, camera):
         scale_factors = numpy.divide(camera.near_z, self.screen_positions[:, 2]).reshape(self.sprites, 1)
         self.screen_sizes *= scale_factors
         self.screen_positions[:, :2] *= scale_factors
 
-    def center(self, camera):
+    def finalize(self, camera):
+        # move to camera center
         numpy.add(self.screen_positions, (*camera.center, 0), self.screen_positions)
+        # top left positioning
+        numpy.subtract(self.screen_positions[:, :2], self.screen_sizes / 2, self.screen_positions[:, :2])
+        # don't draw things outside view area
+        xs = self.screen_sizes[:, 0]
+        ys = self.screen_sizes[:, 1]
+        zs = self.screen_positions[:, 2]
+        self.draw_indices = self.ids[
+            (zs >= camera.near_z)
+            & (zs <= camera.far_z)
+            & (xs >= 0)
+            & (ys >= 0)
+            & (xs <= camera.center.x * 2)
+            & (ys <= camera.center.y * 2)
+        ]
 
     def draw(self, camera):
         [self.textures[i].draw(
-            None, (
-                (position := self.screen_positions[i])[0] - (size := self.screen_sizes[i])[0] / 2,
-                position[1] - size[1] / 2,
-                size[0] * (camera.near_z <= position[2] <= camera.far_z),
-                size[1]
-            ))
-            for i in range(self.next_id)
+            None, (self.screen_positions[i][:2], self.screen_sizes[i]))
+            for i in self.draw_indices
         ]
 
     def dirty_draw(self, camera):
@@ -107,8 +121,8 @@ class StaticSpriteGroup:
         self.rotate(camera)
         # project and scaling
         self.project(camera)
-        # center of camera is center of screen
-        self.center(camera)
+        # center on screen + culling
+        self.finalize(camera)
         # now that positions are nice, draw properly
         self.draw(camera)
 

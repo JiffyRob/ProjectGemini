@@ -34,6 +34,9 @@ class Quaternion:
     def invert(self):
         return Quaternion.from_standard(self.real, *-self.vector)
 
+    def __bool__(self):
+        return bool(self.vector)
+
     def __mul__(self, other):
         if isinstance(other, Quaternion):
             r1, i1, j1, k1 = self.real, *self.vector
@@ -47,10 +50,6 @@ class Quaternion:
         if isinstance(other, pygame.Vector3):
             cross_product = self.vector.cross(other)
             return other + (cross_product * 2 * self.real) + 2 * self.vector.cross(cross_product)
-        if isinstance(other, numpy.ndarray):
-            new_array = numpy.copy(other)
-            new_array[0:3] = self * pygame.Vector3(other[0], other[1], other[2])
-            return new_array
         raise TypeError(f"No multiplication between Quaternions and '{type(other)}' allowed")
 
     def __repr__(self):
