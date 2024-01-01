@@ -96,7 +96,7 @@ class StaticSpriteGroup:
         xs = self.screen_sizes[:, 0]
         ys = self.screen_sizes[:, 1]
         zs = self.screen_positions[:, 2]
-        self.draw_indices = self.ids[
+        self.draw_indices = numpy.argsort(self.ids)[
             (zs >= camera.near_z)
             & (zs <= camera.far_z)
             & (xs >= 0)
