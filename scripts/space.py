@@ -22,22 +22,22 @@ class Camera:
 
 class StaticSpriteGroup:
     def __init__(self, sprites=1000):
-        self.sprites = sprites
-        self.global_positions = numpy.zeros((self.sprites, 3), dtype=numpy.float64)  # x, y, z
-        self.global_sizes = numpy.zeros((self.sprites, 2), dtype=numpy.float64)  # width, height
+        self.sprite_count = sprites
 
-        self.screen_positions = numpy.zeros((self.sprites, 3), dtype=numpy.float64)  # x, y, z
-        self.screen_sizes = numpy.zeros((self.sprites, 2), dtype=numpy.float64)  # width, height
+        self.global_positions = numpy.zeros((self.sprite_count, 3), dtype=numpy.float64)  # x, y, z
+        self.global_sizes = numpy.zeros((self.sprite_count, 2), dtype=numpy.float64)  # width, height
 
-        self.images = numpy.zeros((self.sprites, ), dtype=int)
-        self.textures = numpy.zeros((self.sprites, ), dtype=sdl2.Image)
+        self.screen_positions = numpy.zeros((self.sprite_count, 3), dtype=numpy.float64)  # x, y, z
+        self.screen_sizes = numpy.zeros((self.sprite_count, 2), dtype=numpy.float64)  # width, height
+
+        self.textures = numpy.zeros((self.sprite_count,), dtype=sdl2.Image)
 
         self.draw_indices = None
 
         # preallocate memory for transform data
-        self.cross_buffer = numpy.zeros((self.sprites, ), dtype=numpy.float64)
-        self.mod_array = numpy.zeros((6, ), dtype=numpy.float64)
-        self.ids = numpy.arange(self.sprites)
+        self.cross_buffer = numpy.zeros((self.sprite_count,), dtype=numpy.float64)
+        self.mod_array = numpy.zeros((6,), dtype=numpy.float64)
+        self.ids = numpy.arange(self.sprite_count)
 
         self.loaded_textures = {}
         self.next_id = 0
@@ -81,9 +81,8 @@ class StaticSpriteGroup:
         term = numpy.multiply(term, 2, term)
         numpy.add(self.screen_positions, term, self.screen_positions)
 
-
     def project(self, camera):
-        scale_factors = numpy.divide(camera.near_z, self.screen_positions[:, 2]).reshape(self.sprites, 1)
+        scale_factors = numpy.divide(camera.near_z, self.screen_positions[:, 2]).reshape(self.sprite_count, 1)
         self.screen_sizes *= scale_factors
         self.screen_positions[:, :2] *= scale_factors
 
@@ -93,22 +92,23 @@ class StaticSpriteGroup:
         # top left positioning
         numpy.subtract(self.screen_positions[:, :2], self.screen_sizes / 2, self.screen_positions[:, :2])
         # don't draw things outside view area
-        xs = self.screen_sizes[:, 0]
-        ys = self.screen_sizes[:, 1]
         zs = self.screen_positions[:, 2]
-        self.draw_indices = numpy.argsort(self.ids)[
-            (zs >= camera.near_z)
-            & (zs <= camera.far_z)
-            & (xs >= 0)
-            & (ys >= 0)
-            & (xs <= camera.center.x * 2)
-            & (ys <= camera.center.y * 2)
-        ]
+        indices = numpy.argsort(zs)
+        zs = zs[indices]
+        xs = self.screen_sizes[:, 0][indices]
+        ys = self.screen_sizes[:, 1][indices]
+
+        self.draw_indices = self.ids[indices][(zs >= camera.near_z)
+                             & (zs <= camera.far_z)
+                             & (xs >= 0)
+                             & (ys >= 0)
+                             & (xs <= camera.center.x * 2)
+                             & (ys <= camera.center.y * 2)]
 
     def draw(self, camera):
         [self.textures[i].draw(
             None, (self.screen_positions[i][:2], self.screen_sizes[i]))
-            for i in self.draw_indices
+            for i in self.ids[self.draw_indices]
         ]
 
     def dirty_draw(self, camera):
@@ -152,7 +152,8 @@ class Space(game_state.GameState):
         )
         self.sprites = []
         self.static_sprites = StaticSpriteGroup(3000)
-        self.static_sprites.add_texture("star", self.loader.get("stars", "blue4a"), (16, 16))
+        self.static_sprites.add_texture("star0", self.loader.get("stars", "blue4a"), (16, 16))
+        self.static_sprites.add_texture("star1", self.loader.get("stars", "yellow4a"), (16, 16))
         for i in range(3000):
             self.static_sprites.add_sprite(
                 pygame.Vector3(
@@ -166,7 +167,7 @@ class Space(game_state.GameState):
                     ),
                     random.uniform(-500, 500),
                 ),
-                "star"
+                f"star{i % 2}"
             )
 
     def update(self, dt):
@@ -177,7 +178,8 @@ class Space(game_state.GameState):
                 case pygame.Event(type=pygame.QUIT):
                     self.game.quit()
                 case pygame.Event(type=pygame.MOUSEMOTION, rel=motion) if buttons[0]:
-                    self.camera.rotation *= math3d.Quaternion(-motion[0] * dt / 30, (0, 1, 0)) * math3d.Quaternion(motion[1] * dt / 30, (1, 0, 0))
+                    self.camera.rotation *= math3d.Quaternion(-motion[0] * dt / 30, (0, 1, 0)) * math3d.Quaternion(
+                        motion[1] * dt / 30, (1, 0, 0))
                 case pygame.Event(type=pygame.MOUSEWHEEL, y=motion):
                     rotation = math3d.Quaternion(motion * dt, (0, 0, 1))
                     print(rotation)
