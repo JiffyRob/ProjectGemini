@@ -3,7 +3,7 @@ from collections import deque
 import pygame
 import pygame._sdl2 as sdl2
 
-from scripts import space
+from scripts import space, platformer
 
 
 class Game:
@@ -16,6 +16,7 @@ class Game:
         self.stack = deque()
         self.dt_mult = 1
         self.running = False
+        self.renderer = None
 
     def run(self):
         self.running = True
@@ -26,7 +27,7 @@ class Game:
             resizable=True,
             maximized=True,
         )
-        self.stack.appendleft(space.Space(self))
+        self.stack.appendleft(platformer.Level(self))
         dt = 0
 
         while self.running:
