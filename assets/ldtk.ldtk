@@ -267,7 +267,7 @@
 		{
 			"__cWid": 2,
 			"__cHei": 2,
-			"identifier": "Placeholder_tiles",
+			"identifier": "Placeholder_tiles2",
 			"uid": 3,
 			"relPath": "../aseprite/placeholder-tiles.ase",
 			"embedAtlas": null,
@@ -281,7 +281,7 @@
 			"enumTags": [],
 			"customData": [],
 			"savedSelections": [],
-			"cachedPixelData": null
+			"cachedPixelData": { "opaqueTiles": "1111", "averageColors": "fa33ffe3f6b3f223" }
 		}
 	], "enums": [], "externalEnums": [], "levelFields": [] },
 	"levels": [
@@ -374,7 +374,7 @@
 					"__pxTotalOffsetX": 0,
 					"__pxTotalOffsetY": 0,
 					"__tilesetDefUid": 3,
-					"__tilesetRelPath": "aseprite/placeholder-tiles.ase",
+					"__tilesetRelPath": "../aseprite/placeholder-tiles.ase",
 					"iid": "4fcf46a0-b0a0-11ee-8b2e-31fd1d5e91af",
 					"levelId": 0,
 					"layerDefUid": 2,
