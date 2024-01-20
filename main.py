@@ -27,6 +27,7 @@ class Game:
             resizable=True,
             maximized=True,
         )
+        self.stack.appendleft(space.Space(self))
         self.stack.appendleft(platformer.Level(self))
         dt = 0
 
