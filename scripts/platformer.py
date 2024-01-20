@@ -7,11 +7,14 @@ from scripts import game_state, sprite, util_draw
 
 GRAVITY = pygame.Vector2(0, 5)  # TODO: sideways gravity?????
 WALK_SPEED = 64
-JUMP_SPEED = 1000
+JUMP_SPEED = 800
+LERP_SPEED = 1
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10):
+    def __init__(
+        self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10
+    ):
         super().__init__(level, image=image, rect=rect, src_rect=src_rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -32,28 +35,44 @@ class PhysicsSprite(sprite.Sprite):
             self.dead = True
             return False
         if vel.x < 0:
-            for collided in sorted(self.level.groups["collision"], key=lambda sprite: -sprite.rect.x):
+            for collided in sorted(
+                self.level.groups["collision"], key=lambda sprite: -sprite.rect.x
+            ):
                 if self.collision_rect.colliderect(collided.collision_rect):
-                    self.rect.x += collided.collision_rect.right - self.collision_rect.left
+                    self.rect.x += (
+                        collided.collision_rect.right - self.collision_rect.left
+                    )
                     self.velocity.x = 0
                     break
         else:
-            for collided in sorted(self.level.groups["collision"], key=lambda sprite: sprite.rect.x):
+            for collided in sorted(
+                self.level.groups["collision"], key=lambda sprite: sprite.rect.x
+            ):
                 if self.collision_rect.colliderect(collided.collision_rect):
-                    self.rect.x += collided.collision_rect.left - self.collision_rect.right
+                    self.rect.x += (
+                        collided.collision_rect.left - self.collision_rect.right
+                    )
                     self.velocity.x = 0
                     break
         self.rect.y += vel.y
         if vel.y < 0:
-            for collided in sorted(self.level.groups["collision"], key=lambda sprite: -sprite.rect.y):
+            for collided in sorted(
+                self.level.groups["collision"], key=lambda sprite: -sprite.rect.y
+            ):
                 if self.collision_rect.colliderect(collided.collision_rect):
-                    self.rect.y += collided.collision_rect.bottom - self.collision_rect.top
+                    self.rect.y += (
+                        collided.collision_rect.bottom - self.collision_rect.top
+                    )
                     self.velocity.y = 0
                     break
         else:
-            for collided in sorted(self.level.groups["collision"], key=lambda sprite: sprite.rect.y):
+            for collided in sorted(
+                self.level.groups["collision"], key=lambda sprite: sprite.rect.y
+            ):
                 if self.collision_rect.colliderect(collided.collision_rect):
-                    self.rect.y += collided.collision_rect.top - self.collision_rect.bottom
+                    self.rect.y += (
+                        collided.collision_rect.top - self.collision_rect.bottom
+                    )
                     self.velocity.y = 0
                     self.on_ground = True
                     break
@@ -109,10 +128,12 @@ class Level(game_state.GameState):
             self.player.jump()
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
-        self.camera_offset = self.camera_offset.lerp(-pygame.Vector2(self.player.pos) + self.screen_rect.center, 0.7)
+        self.camera_offset = self.camera_offset.lerp(
+            -pygame.Vector2(self.player.pos) + self.screen_rect.center, LERP_SPEED
+        )
 
     def draw(self):
         super().draw()
-        for sprite in sorted(self.sprites, key = lambda sprite: sprite.z):
+        for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             sprite.image.draw(sprite.src_rect, sprite.rect.move(self.camera_offset))
         self.renderer.present()

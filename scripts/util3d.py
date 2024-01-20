@@ -148,10 +148,10 @@ class Model:
         # face format: [[polygon-vertexes, face-normals, uv-texture-coordinates, material (An SDL2 Texture)
         self.face_count = len(faces)
         self.vertexes = numpy.zeros((self.face_count, 4, 3), numpy.float64)
-        self.is_quad = numpy.zeros((self.face_count, ), numpy.bool_)
+        self.is_quad = numpy.zeros((self.face_count,), numpy.bool_)
         # TODO: Normal implementation
         self.uvs = numpy.zeros((self.face_count, 2), numpy.float64)
-        self.materials = numpy.zeros((self.face_count, ), sdl2.Image)
+        self.materials = numpy.zeros((self.face_count,), sdl2.Image)
         spare = [[numpy.nan, numpy.nan, numpy.nan]]
 
         for i, (vertexes, normals, uvs, material) in enumerate(faces):
@@ -191,11 +191,17 @@ class Model:
                     case ["newmtl", name]:
                         materials[name] = Material()
                     case ["Ka", r, g, b] if current_key is not None:
-                        materials[current_key].ambient_color = denormalize_color(r, g, b)
+                        materials[current_key].ambient_color = denormalize_color(
+                            r, g, b
+                        )
                     case ["Kd", r, g, b] if current_key is not None:
-                        materials[current_key].diffuse_color = denormalize_color(r, g, b)
+                        materials[current_key].diffuse_color = denormalize_color(
+                            r, g, b
+                        )
                     case ["Ks", r, g, b] if current_key is not None:
-                        materials[current_key].specular_color = denormalize_color(r, g, b)
+                        materials[current_key].specular_color = denormalize_color(
+                            r, g, b
+                        )
                     case ["d", n] if current_key is not None:
                         materials[current_key].transparency = 1 - n
                     case ["Tr", n] if current_key is not None:

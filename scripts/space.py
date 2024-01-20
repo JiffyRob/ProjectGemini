@@ -120,7 +120,9 @@ class StaticSpriteGroup:
         # copy
         numpy.copyto(self.screen_positions, self.global_positions)
         numpy.copyto(self.screen_sizes, self.global_sizes)
-        util3d.inverse_camera_transform_points_sizes(self.screen_positions, self.screen_sizes, camera)
+        util3d.inverse_camera_transform_points_sizes(
+            self.screen_positions, self.screen_sizes, camera
+        )
         # center on screen + culling
         self.finalize(camera)
         # now that positions are nice, draw properly
