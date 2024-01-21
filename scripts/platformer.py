@@ -1,3 +1,4 @@
+import functools
 from collections import defaultdict
 
 import pygame
@@ -83,7 +84,7 @@ class PhysicsSprite(sprite.Sprite):
 class CollisionSprite(sprite.Sprite):
     def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0):
         if image is None:
-            image = util_draw.square_image(level.renderer, "blue")
+            image = util_draw.square_image(level.game.renderer, "blue")
         super().__init__(level, image=image, rect=rect, src_rect=src_rect, z=z)
         self.level.groups["collision"].add(self)
 
@@ -94,7 +95,9 @@ class CollisionSprite(sprite.Sprite):
 
 class Player(PhysicsSprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(level, rect=rect, image=util_draw.square_image(level.renderer))
+        super().__init__(
+            level, rect=rect, image=util_draw.square_image(level.game.renderer)
+        )
 
     def walk_left(self):
         self.velocity.x -= WALK_SPEED
@@ -117,6 +120,12 @@ class Level(game_state.GameState):
         self.sprites = [self.player, CollisionSprite(self, rect=(0, 200, 600, 16))]
         self.camera_offset = pygame.Vector2()
 
+    @classmethod
+    @functools.cache
+    def from_file(cls, path, name):
+        # TODO
+        ...
+
     def update(self, dt):
         super().update(dt)
         keys = pygame.key.get_pressed()
@@ -136,4 +145,3 @@ class Level(game_state.GameState):
         super().draw()
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             sprite.image.draw(sprite.src_rect, sprite.rect.move(self.camera_offset))
-        self.renderer.present()

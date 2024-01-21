@@ -140,14 +140,14 @@ class SpaceParticle:
 class Space(game_state.GameState):
     def __init__(self, game):
         super().__init__(game, color="navy", vsync=False)
-        self.loader = loader.Loader(self.renderer)
-        self.renderer.logical_size = (1920, 1080)
+        self.loader = loader.Loader(self.game.renderer)
+        # self.game.renderer.logical_size = (1920, 1080)
         # in world space y is vertical, and x and z are horizontal
         # on screen with no rotation x is left-right, y is up-down, and z is depth
         self.camera = util3d.Camera(
             pygame.Vector3(),
             util3d.Quaternion(),
-            pygame.Vector2(self.renderer.logical_size) / 2,
+            pygame.Vector2(self.game.renderer.logical_size) / 2,
             pygame.Vector2(60, 60),  # TODO : FOV
             450,
             800,
@@ -164,12 +164,12 @@ class Space(game_state.GameState):
             self.static_sprites.add_sprite(
                 pygame.Vector3(
                     random.uniform(
-                        -self.renderer.logical_size[0],
-                        self.renderer.logical_size[0],
+                        -self.game.renderer.logical_size[0],
+                        self.game.renderer.logical_size[0],
                     ),
                     random.uniform(
-                        -self.renderer.logical_size[1],
-                        self.renderer.logical_size[1],
+                        -self.game.renderer.logical_size[1],
+                        self.game.renderer.logical_size[1],
                     ),
                     random.uniform(-500, 500),
                 ),
@@ -214,7 +214,6 @@ class Space(game_state.GameState):
         )
 
     def draw(self):
-        self.renderer.clear()
         self.static_sprites.dirty_draw(self.camera)
         projection_matrix = numpy.array(
             (
@@ -250,5 +249,4 @@ class Space(game_state.GameState):
             # draw
             if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
                 sprite.rect.center = screen_pos.xy + self.camera.center
-                self.renderer.blit(sprite.image, sprite.rect)
-        self.renderer.present()
+                self.game.renderer.blit(sprite.image, sprite.rect)
