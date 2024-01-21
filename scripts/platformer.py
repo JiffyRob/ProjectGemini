@@ -22,6 +22,8 @@ class PhysicsSprite(sprite.Sprite):
         self.velocity = pygame.Vector2()
         self.desired_velocity = pygame.Vector2()
         self.on_ground = False
+        self.on_downer = False
+        self.ducking = False
 
     @property
     def collision_rect(self):
@@ -29,9 +31,11 @@ class PhysicsSprite(sprite.Sprite):
 
     def update(self, dt):
         # physics
+        old_rect = self.collision_rect.copy()
         self.velocity += GRAVITY * self.weight
         vel = self.velocity * dt
         self.rect.x += vel.x
+        self.on_ground = False
         # bottom of the map
         if self.collision_rect.bottom > self.level.map_rect.bottom:
             self.dead = True
@@ -78,7 +82,20 @@ class PhysicsSprite(sprite.Sprite):
                     self.velocity.y = 0
                     self.on_ground = True
                     break
+            if not self.ducking:
+                for collided in sorted(
+                    self.level.down_rects, key=lambda rect: rect.y
+                ):
+                    if old_rect.bottom <= collided.top and self.collision_rect.colliderect(collided):
+                        self.rect.y += (
+                            collided.top - self.collision_rect.bottom
+                        )
+                        self.velocity.y = 0
+                        self.on_ground = True
+                        self.on_downer = True
+                        break
         self.velocity.x = 0
+        self.ducking = False
         return True
 
 
@@ -114,6 +131,13 @@ class Player(PhysicsSprite):
         if self.on_ground:
             self.velocity.y = -JUMP_SPEED
             self.on_ground = False
+            self.on_downer = False
+
+    def unjump(self):
+        self.velocity.y = max(0, self.velocity.y)
+
+    def duck(self):
+        self.ducking = True
 
 
 class Level(game_state.GameState):
@@ -128,7 +152,9 @@ class Level(game_state.GameState):
         self.player.rect.center = player_pos
         self.sprites = [self.player]
         self.collision_rects = []
+        self.down_rects = []
         self.map_rect = pygame.Rect((0, 0), map_size)
+        self.viewport_rect = pygame.FRect(self.game.screen_rect)
         self.camera_offset = pygame.Vector2()
 
     def add_sprite(self, sprite):
@@ -159,8 +185,10 @@ class Level(game_state.GameState):
                 value = int(value)
                 if value == 1:
                     rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                    print(rect)
                     level.collision_rects.append(rect)
+                if value == 2:
+                    rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                    level.down_rects.append(rect)
         level.player.z = entity_layer
         return level
 
@@ -173,13 +201,18 @@ class Level(game_state.GameState):
             self.player.walk_right()
         if keys[pygame.K_UP]:
             self.player.jump()
+        else:
+            self.player.unjump()
+        if keys[pygame.K_DOWN]:
+            self.player.duck()
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
-        self.camera_offset = self.camera_offset.lerp(
-            -pygame.Vector2(self.player.pos) + self.screen_rect.center, LERP_SPEED
+        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
+            self.player.pos, LERP_SPEED
         )
+        self.viewport_rect.clamp_ip(self.map_rect)
 
     def draw(self):
         super().draw()
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
-            sprite.image.draw(sprite.src_rect, sprite.rect.move(self.camera_offset))
+            sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))

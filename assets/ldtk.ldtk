@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 13,
+	"nextUid": 15,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -114,6 +114,38 @@
 					"isOptional": false,
 					"rules": [
 						{
+							"uid": 14,
+							"active": true,
+							"size": 1,
+							"tileRectsIds": [[1]],
+							"alpha": 1,
+							"chance": 1,
+							"breakOnMatch": true,
+							"pattern": [2],
+							"flipX": false,
+							"flipY": false,
+							"xModulo": 1,
+							"yModulo": 1,
+							"xOffset": 0,
+							"yOffset": 0,
+							"tileXOffset": 0,
+							"tileYOffset": 0,
+							"tileRandomXMin": 0,
+							"tileRandomXMax": 0,
+							"tileRandomYMin": 0,
+							"tileRandomYMax": 0,
+							"checker": "None",
+							"tileMode": "Single",
+							"pivotX": 0,
+							"pivotY": 0,
+							"outOfBoundsValue": null,
+							"invalidated": false,
+							"perlinActive": false,
+							"perlinSeed": 3716491,
+							"perlinScale": 0.2,
+							"perlinOctaves": 2
+						},
+						{
 							"uid": 5,
 							"active": true,
 							"size": 1,
@@ -183,7 +215,10 @@
 			"autoTilesKilledByOtherLayerUid": null,
 			"uiFilterTags": [],
 			"useAsyncRender": false,
-			"intGridValues": [{ "value": 1, "identifier": null, "color": "#000000", "tile": null, "groupUid": 0 }],
+			"intGridValues": [
+				{ "value": 1, "identifier": "ALL", "color": "#000000", "tile": null, "groupUid": 0 },
+				{ "value": 2, "identifier": "GRAV_ONLY", "color": "#BE4A2F", "tile": null, "groupUid": 0 }
+			],
 			"intGridValuesGroups": [],
 			"autoRuleGroups": [],
 			"autoSourceLayerDefUid": null,
@@ -318,7 +353,7 @@
 			"savedSelections": [],
 			"cachedPixelData": { "opaqueTiles": "1111", "averageColors": "fa33ffe3f6b3f223" }
 		}
-	], "enums": [], "externalEnums": [], "levelFields": [
+	], "enums": [{ "identifier": "Direction", "uid": 13, "values": [], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [
 		{
 			"identifier": "start",
 			"doc": null,
@@ -573,7 +608,11 @@
 						{ "px": [192,240], "src": [0,0], "f": 0, "t": 0, "d": [5,252], "a": 1 },
 						{ "px": [208,240], "src": [0,0], "f": 0, "t": 0, "d": [5,253], "a": 1 },
 						{ "px": [224,240], "src": [0,0], "f": 0, "t": 0, "d": [5,254], "a": 1 },
-						{ "px": [240,240], "src": [0,0], "f": 0, "t": 0, "d": [5,255], "a": 1 }
+						{ "px": [240,240], "src": [0,0], "f": 0, "t": 0, "d": [5,255], "a": 1 },
+						{ "px": [176,96], "src": [16,0], "f": 0, "t": 1, "d": [14,107], "a": 1 },
+						{ "px": [192,96], "src": [16,0], "f": 0, "t": 1, "d": [14,108], "a": 1 },
+						{ "px": [208,96], "src": [16,0], "f": 0, "t": 1, "d": [14,109], "a": 1 },
+						{ "px": [224,96], "src": [16,0], "f": 0, "t": 1, "d": [14,110], "a": 1 }
 					],
 					"seed": 6468706,
 					"overrideTilesetUid": null,
@@ -602,7 +641,7 @@
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,
 						0,1,1,1,1,1,1,1,1,0,0,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,1,1,
-						1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						1,1,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,
