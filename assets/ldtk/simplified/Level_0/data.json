@@ -1,0 +1,68 @@
+{
+	"identifier": "Level_0",
+	"uniqueIdentifer": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
+	"x": 0,
+	"y": 0,
+	"width": 256,
+	"height": 256,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"start": [
+			128,
+			128
+		],
+		"entity_layer": 0
+	},
+	"layers": [
+		"AutoLayer.png"
+	],
+	"entities": {
+		"Coin2": [
+			{
+				"id": "Coin2",
+				"iid": "423a73c0-b0a0-11ee-83ba-937e1af7615d",
+				"layer": "Entities",
+				"x": 64,
+				"y": 16,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Coin2",
+				"iid": "42e4e490-b0a0-11ee-83ba-33b4b894555d",
+				"layer": "Entities",
+				"x": 80,
+				"y": 16,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Coin2",
+				"iid": "4359c670-b0a0-11ee-83ba-693a1aa54098",
+				"layer": "Entities",
+				"x": 112,
+				"y": 16,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			},
+			{
+				"id": "Coin2",
+				"iid": "43d18e80-b0a0-11ee-83ba-cd6e96c2457b",
+				"layer": "Entities",
+				"x": 96,
+				"y": 16,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields" : {}
+			}
+		]
+	}
+}

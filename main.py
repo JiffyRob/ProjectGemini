@@ -32,7 +32,7 @@ class Game:
         self.renderer.logical_size = util_draw.RESOLUTION
         self.loader = loader.Loader(self.renderer)
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(platformer.Level(self))
+        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
 
         while self.running and len(self.stack):

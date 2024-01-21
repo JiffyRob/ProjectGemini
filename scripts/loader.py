@@ -1,4 +1,5 @@
 import json
+import csv
 import pathlib
 
 import pygame
@@ -21,15 +22,32 @@ class Loader:
         return json.load((self.base_path / path).open())
 
     @functools.cache
+    def get_csv(self, path, item_delimiter=",", line_delimiter="\n"):
+        text = self.get_text(path)
+        lines = []
+        for line in text.split(line_delimiter):
+            if not line:
+                continue
+            lines.append(line.rstrip(item_delimiter).split(item_delimiter))
+        return lines
+
+    @functools.cache
     def get_surface(self, path):
         return pygame.image.load(pathlib.Path(self.base_path, path))
 
     @functools.cache
-    def get_texture(self, path, name):
+    def get_texture(self, path):
         path = pathlib.Path(path)
-        key = f"{path}$+${name}"  # if a file path follows THIS format it's the developer's problem
         texture = sdl2.Texture.from_surface(
             self.renderer,
             self.get_surface(path.with_suffix(".png")),
         )
-        return sdl2.Image(texture, self.get_json(path.with_suffix(".json"))[name])
+        return texture
+
+    @functools.cache
+    def get_image(self, path, area=None):
+        path = pathlib.Path(path)
+        texture = self.get_texture(path)
+        if isinstance(area, str):
+            area = self.get_json(path.with_suffix(".json"))[area]
+        return sdl2.Image(texture, area)

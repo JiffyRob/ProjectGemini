@@ -124,10 +124,10 @@ class Space(game_state.GameState):
         self.sprites = []
         self.static_sprites = StaticSpriteGroup(3000)
         self.static_sprites.add_texture(
-            "star0", self.game.loader.get_texture("stars", "blue4a"), (16, 16)
+            "star0", self.game.loader.get_image("stars", "blue4a"), (16, 16)
         )
         self.static_sprites.add_texture(
-            "star1", self.game.loader.get_texture("stars", "yellow4a"), (16, 16)
+            "star1", self.game.loader.get_image("stars", "yellow4a"), (16, 16)
         )
         for i in range(3000):
             self.static_sprites.add_sprite(
