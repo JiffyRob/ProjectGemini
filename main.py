@@ -3,14 +3,13 @@ from collections import deque
 import pygame
 import pygame._sdl2 as sdl2
 
-from scripts import space, platformer, util_draw
+from scripts import space, platformer, util_draw, loader
 
 
 class Game:
     def __init__(self, title="Project Gemini", fps=0):
         self.title = title
         self.window = None
-        self.renderer = None
         self.clock = pygame.time.Clock()
         self.screen_rect = pygame.Rect((0, 0), util_draw.RESOLUTION)
         self.fps = fps
@@ -18,6 +17,7 @@ class Game:
         self.dt_mult = 1
         self.running = False
         self.renderer = None
+        self.loader = None
 
     def run(self):
         self.running = True
@@ -30,6 +30,7 @@ class Game:
         )
         self.renderer = sdl2.Renderer(self.window, -1, -1, True)
         self.renderer.logical_size = util_draw.RESOLUTION
+        self.loader = loader.Loader(self.renderer)
         self.stack.appendleft(space.Space(self))
         self.stack.appendleft(platformer.Level(self))
         dt = 0
@@ -44,10 +45,11 @@ class Game:
             self.renderer.fill_rect(self.screen_rect)
             self.stack[0].draw()
             self.renderer.present()
-            dt = self.clock.tick(self.fps) / 1000
+            dt = self.clock.tick(self.fps) * self.dt_mult / 1000
 
         self.window.destroy()
         self.renderer = None
+        self.loader = None
 
     def quit(self):
         self.running = False

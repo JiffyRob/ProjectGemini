@@ -53,36 +53,6 @@ class StaticSpriteGroup:
         self.next_id += 1
         return self.next_id - 1
 
-    def translate(self, camera):
-        numpy.add(self.screen_positions, -camera.pos, self.screen_positions)
-
-    def rotate(self, camera):
-        # this one's a little hairy
-        # cache the opposite rotation
-        rotation = -camera.rotation
-
-        # Equation:
-        # sprite_pos + 2 * rot_real * (rot_vec X sprite_pos) + 2 * (rot_vec X (rot_vec X sprite_pos))
-        # rot_vec X sprite_pos is used twice, so let's grab that and call it "cross"
-        crosses = numpy.cross(rotation.vector, self.screen_positions)
-
-        # add 2 * rot_real * cross
-        term = numpy.multiply(crosses, 2)
-        numpy.multiply(term, rotation.real, term)
-        numpy.add(self.screen_positions, term, self.screen_positions)
-
-        # add 2 * (camera_vector x (camera_vector x position))
-        term = numpy.cross(rotation.vector, crosses)  # dirty double crosser ;)
-        term = numpy.multiply(term, 2, term)
-        numpy.add(self.screen_positions, term, self.screen_positions)
-
-    def project(self, camera):
-        scale_factors = numpy.divide(
-            camera.near_z, self.screen_positions[:, 2]
-        ).reshape(self.sprite_count, 1)
-        self.screen_sizes *= scale_factors
-        self.screen_positions[:, :2] *= scale_factors
-
     def finalize(self, camera):
         # move to camera center
         numpy.add(self.screen_positions, (*camera.center, 0), self.screen_positions)
@@ -140,7 +110,6 @@ class SpaceParticle:
 class Space(game_state.GameState):
     def __init__(self, game):
         super().__init__(game, color="navy", vsync=False)
-        self.loader = loader.Loader(self.game.renderer)
         # self.game.renderer.logical_size = (1920, 1080)
         # in world space y is vertical, and x and z are horizontal
         # on screen with no rotation x is left-right, y is up-down, and z is depth
@@ -155,10 +124,10 @@ class Space(game_state.GameState):
         self.sprites = []
         self.static_sprites = StaticSpriteGroup(3000)
         self.static_sprites.add_texture(
-            "star0", self.loader.get_texture("stars", "blue4a"), (16, 16)
+            "star0", self.game.loader.get_texture("stars", "blue4a"), (16, 16)
         )
         self.static_sprites.add_texture(
-            "star1", self.loader.get_texture("stars", "yellow4a"), (16, 16)
+            "star1", self.game.loader.get_texture("stars", "yellow4a"), (16, 16)
         )
         for i in range(3000):
             self.static_sprites.add_sprite(
