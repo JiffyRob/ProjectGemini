@@ -15,7 +15,9 @@
 		"entity_layer": 0
 	},
 	"layers": [
-		"AutoLayer.png"
+		"Collision.png",
+		"AutoLayer.png",
+		"Tiles.png"
 	],
 	"entities": {
 		"Coin2": [
