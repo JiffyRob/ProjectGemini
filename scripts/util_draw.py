@@ -2,7 +2,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import functools
 
-RESOLUTION = (320, 240)
+RESOLUTION = (256, 224)
 
 
 @functools.cache
