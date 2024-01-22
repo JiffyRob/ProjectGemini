@@ -169,6 +169,7 @@ class Level(game_state.GameState):
         map_rect = pygame.Rect((0, 0), size)
         entity_layer = data["customFields"]["entity_layer"]
         level = cls(game, player_pos=data["customFields"]["start"], map_size=size)
+        level.bg_color = data["bgColor"]
         for layer_ind, layer in enumerate(data["layers"]):
             level.add_sprite(
                 sprite.Sprite(level, game.loader.get_texture(folder / layer), pygame.FRect(map_rect), z=layer_ind)
