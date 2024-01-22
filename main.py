@@ -1,3 +1,4 @@
+import asyncio
 from collections import deque
 
 import pygame
@@ -19,7 +20,7 @@ class Game:
         self.renderer = None
         self.loader = None
 
-    def run(self):
+    async def run(self):
         self.running = True
         self.window = sdl2.Window(
             self.title,
@@ -46,6 +47,7 @@ class Game:
             self.stack[0].draw()
             self.renderer.present()
             dt = self.clock.tick(self.fps) * self.dt_mult / 1000
+            await asyncio.sleep(0)
 
         self.window.destroy()
         self.renderer = None
@@ -55,4 +57,4 @@ class Game:
         self.running = False
 
 
-Game().run()
+asyncio.run(Game().run())
