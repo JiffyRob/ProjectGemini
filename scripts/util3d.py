@@ -5,8 +5,6 @@ from dataclasses import dataclass
 import pygame
 import pygame._sdl2 as sdl2
 import numpy
-import pywavefront
-
 
 class Quaternion:
     def __init__(self, theta=0.0, axis=(0, 0, 1)):
