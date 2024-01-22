@@ -1,6 +1,7 @@
 import asyncio
 from collections import deque
 
+import numpy
 import pygame
 import pygame._sdl2 as sdl2
 
