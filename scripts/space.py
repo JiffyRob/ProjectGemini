@@ -11,19 +11,11 @@ class StaticSpriteGroup:
     def __init__(self, sprites=1000):
         self.sprite_count = sprites
 
-        self.global_positions = numpy.zeros(
-            (self.sprite_count, 3), dtype=numpy.float64
-        )  # x, y, z
-        self.global_sizes = numpy.zeros(
-            (self.sprite_count, 2), dtype=numpy.float64
-        )  # width, height
+        self.global_positions = numpy.zeros((self.sprite_count, 3), dtype=numpy.float64)  # x, y, z
+        self.global_sizes = numpy.zeros((self.sprite_count, 2), dtype=numpy.float64)  # width, height
 
-        self.screen_positions = numpy.zeros(
-            (self.sprite_count, 3), dtype=numpy.float64
-        )  # x, y, z
-        self.screen_sizes = numpy.zeros(
-            (self.sprite_count, 2), dtype=numpy.float64
-        )  # width, height
+        self.screen_positions = numpy.zeros((self.sprite_count, 3), dtype=numpy.float64)  # x, y, z
+        self.screen_sizes = numpy.zeros((self.sprite_count, 2), dtype=numpy.float64)  # width, height
 
         self.textures = numpy.zeros((self.sprite_count,), dtype=sdl2.Image)
 
@@ -79,20 +71,13 @@ class StaticSpriteGroup:
         ]
 
     def draw(self, camera):
-        [
-            self.textures[i].draw(
-                None, (self.screen_positions[i][:2], self.screen_sizes[i])
-            )
-            for i in self.ids[self.draw_indices]
-        ]
+        [self.textures[i].draw(None, (self.screen_positions[i][:2], self.screen_sizes[i])) for i in self.ids[self.draw_indices]]
 
     def dirty_draw(self, camera):
         # copy
         numpy.copyto(self.screen_positions, self.global_positions)
         numpy.copyto(self.screen_sizes, self.global_sizes)
-        util3d.inverse_camera_transform_points_sizes(
-            self.screen_positions, self.screen_sizes, camera
-        )
+        util3d.inverse_camera_transform_points_sizes(self.screen_positions, self.screen_sizes, camera)
         # center on screen + culling
         self.finalize(camera)
         # now that positions are nice, draw properly
@@ -123,12 +108,8 @@ class Space(game_state.GameState):
         )
         self.sprites = []
         self.static_sprites = StaticSpriteGroup(3000)
-        self.static_sprites.add_texture(
-            "star0", self.game.loader.get_image("stars", "blue4a"), (16, 16)
-        )
-        self.static_sprites.add_texture(
-            "star1", self.game.loader.get_image("stars", "yellow4a"), (16, 16)
-        )
+        self.static_sprites.add_texture("star0", self.game.loader.get_image("stars", "blue4a"), (16, 16))
+        self.static_sprites.add_texture("star1", self.game.loader.get_image("stars", "yellow4a"), (16, 16))
         for i in range(3000):
             self.static_sprites.add_sprite(
                 pygame.Vector3(
@@ -153,9 +134,9 @@ class Space(game_state.GameState):
                 case pygame.Event(type=pygame.QUIT):
                     self.game.quit()
                 case pygame.Event(type=pygame.MOUSEMOTION, rel=motion) if buttons[0]:
-                    self.camera.rotation *= util3d.Quaternion(
-                        -motion[0] * dt / 30, (0, 1, 0)
-                    ) * util3d.Quaternion(motion[1] * dt / 30, (1, 0, 0))
+                    self.camera.rotation *= util3d.Quaternion(-motion[0] * dt / 30, (0, 1, 0)) * util3d.Quaternion(
+                        motion[1] * dt / 30, (1, 0, 0)
+                    )
                 case pygame.Event(type=pygame.MOUSEWHEEL, y=motion):
                     rotation = util3d.Quaternion(motion * dt, (0, 0, 1))
                     self.camera.rotation *= rotation
@@ -178,9 +159,7 @@ class Space(game_state.GameState):
         self.camera.pos += self.camera.rotation * motion
         if keys[pygame.K_ESCAPE]:
             self.game.quit()
-        self.game.window.title = (
-            f"FPS: {round(self.game.clock.get_fps())} ROTATION: {self.camera.rotation}"
-        )
+        self.game.window.title = f"FPS: {round(self.game.clock.get_fps())} ROTATION: {self.camera.rotation}"
 
     def draw(self):
         self.static_sprites.dirty_draw(self.camera)
@@ -208,13 +187,8 @@ class Space(game_state.GameState):
             sprite.rect.width = sprite.width * scale_factor
             sprite.rect.height = sprite.height * scale_factor
             # project
-            screen_pos = projection_matrix @ numpy.array(
-                (relative_pos.x, relative_pos.y, relative_pos.z, 1)
-            )
-            screen_pos = (
-                pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2])
-                / screen_pos[3]
-            )
+            screen_pos = projection_matrix @ numpy.array((relative_pos.x, relative_pos.y, relative_pos.z, 1))
+            screen_pos = pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2]) / screen_pos[3]
             # draw
             if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
                 sprite.rect.center = screen_pos.xy + self.camera.center

@@ -10,13 +10,11 @@ from scripts import game_state, sprite, util_draw
 GRAVITY = pygame.Vector2(0, 2)  # TODO: sideways gravity?????
 WALK_SPEED = 64
 JUMP_SPEED = 400
-LERP_SPEED = .3
+LERP_SPEED = 0.3
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(
-        self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10
-    ):
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10):
         super().__init__(level, image=image, rect=rect, src_rect=src_rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -41,55 +39,35 @@ class PhysicsSprite(sprite.Sprite):
             self.dead = True
             return False
         if vel.x < 0:
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: -rect.x
-            ):
+            for collided in sorted(self.level.collision_rects, key=lambda rect: -rect.x):
                 if self.collision_rect.colliderect(collided):
-                    self.rect.x += (
-                        collided.right - self.collision_rect.left
-                    )
+                    self.rect.x += collided.right - self.collision_rect.left
                     self.velocity.x = 0
                     break
         else:
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: rect.x
-            ):
+            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
                 if self.collision_rect.colliderect(collided):
-                    self.rect.x += (
-                        collided.left - self.collision_rect.right
-                    )
+                    self.rect.x += collided.left - self.collision_rect.right
                     self.velocity.x = 0
                     break
         self.rect.y += vel.y
         if vel.y < 0:
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: -rect.y
-            ):
+            for collided in sorted(self.level.collision_rects, key=lambda rect: -rect.y):
                 if self.collision_rect.colliderect(collided):
-                    self.rect.y += (
-                        collided.bottom - self.collision_rect.top
-                    )
+                    self.rect.y += collided.bottom - self.collision_rect.top
                     self.velocity.y = 0
                     break
         else:
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: rect.y
-            ):
+            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
                 if self.collision_rect.colliderect(collided):
-                    self.rect.y += (
-                        collided.top - self.collision_rect.bottom
-                    )
+                    self.rect.y += collided.top - self.collision_rect.bottom
                     self.velocity.y = 0
                     self.on_ground = True
                     break
             if not self.ducking:
-                for collided in sorted(
-                    self.level.down_rects, key=lambda rect: rect.y
-                ):
+                for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):
                     if old_rect.bottom <= collided.top and self.collision_rect.colliderect(collided):
-                        self.rect.y += (
-                            collided.top - self.collision_rect.bottom
-                        )
+                        self.rect.y += collided.top - self.collision_rect.bottom
                         self.velocity.y = 0
                         self.on_ground = True
                         self.on_downer = True
@@ -117,9 +95,7 @@ class CollisionSprite(sprite.Sprite):
 
 class Player(PhysicsSprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(
-            level, rect=rect, image=util_draw.square_image(level.game.renderer)
-        )
+        super().__init__(level, rect=rect, image=util_draw.square_image(level.game.renderer))
 
     def walk_left(self):
         self.velocity.x -= WALK_SPEED
@@ -171,9 +147,7 @@ class Level(game_state.GameState):
         level = cls(game, player_pos=data["customFields"]["start"], map_size=size)
         level.bg_color = data["bgColor"]
         for layer_ind, layer in enumerate(data["layers"]):
-            level.add_sprite(
-                sprite.Sprite(level, game.loader.get_texture(folder / layer), pygame.FRect(map_rect), z=layer_ind)
-            )
+            level.add_sprite(sprite.Sprite(level, game.loader.get_texture(folder / layer), pygame.FRect(map_rect), z=layer_ind))
         for key, value in data["entities"].items():
             sprite_cls = cls.sprite_classes[key]
             if sprite_cls is None:
@@ -208,9 +182,7 @@ class Level(game_state.GameState):
             self.player.duck()
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
-        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
-            self.player.pos, LERP_SPEED
-        )
+        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
         self.viewport_rect.clamp_ip(self.map_rect)
 
     def draw(self):

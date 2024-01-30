@@ -5,14 +5,15 @@
 	"y": 0,
 	"width": 256,
 	"height": 256,
-	"bgColor": "#AB6F3B",
+	"bgColor": "#F8CD7C",
 	"neighbourLevels": [],
 	"customFields": {
 		"start": [
 			128,
 			128
 		],
-		"entity_layer": 0
+		"entity_layer": 0,
+		"Background": "bg-mushroom.png"
 	},
 	"layers": [
 		"Collision.png",

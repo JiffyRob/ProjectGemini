@@ -23,7 +23,7 @@ class Game:
 
     async def run(self):
         self.running = True
-        self.window = sdl2.Window(
+        self.window = pygame.Window(
             self.title,
             util_draw.RESOLUTION,
             sdl2.WINDOWPOS_CENTERED,
