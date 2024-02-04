@@ -4,6 +4,7 @@ from collections import deque
 import numpy
 import pygame
 import pygame._sdl2 as sdl2
+import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 from scripts import space, platformer, util_draw, loader
 
@@ -23,7 +24,7 @@ class Game:
 
     async def run(self):
         self.running = True
-        self.window = pygame.Window(
+        self.window = sdl2.Window(
             self.title,
             util_draw.RESOLUTION,
             sdl2.WINDOWPOS_CENTERED,

@@ -1,16 +1,23 @@
 import functools
 import pathlib
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 
 import pygame
 import pygame._sdl2 as sdl2
+
 
 from scripts import game_state, sprite, util_draw
 
 GRAVITY = pygame.Vector2(0, 2)  # TODO: sideways gravity?????
 WALK_SPEED = 64
 JUMP_SPEED = 400
-LERP_SPEED = 0.3
+LERP_SPEED = 0.15
+
+Parallax = namedtuple(
+    "Parallax",
+    ("image", "rect", "mult", "loop_x", "loop_y"),
+    defaults=(pygame.FRect((0, 0), util_draw.RESOLUTION), (1, 1), True, True),
+)
 
 
 class PhysicsSprite(sprite.Sprite):
@@ -123,6 +130,7 @@ class Level(game_state.GameState):
 
     def __init__(self, game, player_pos=(0, 0), map_size=(256, 256)):
         super().__init__(game)
+        self.backgrounds = []
         self.groups = defaultdict(set)
         self.player = Player(self)
         self.player.rect.center = player_pos
@@ -131,7 +139,6 @@ class Level(game_state.GameState):
         self.down_rects = []
         self.map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(self.game.screen_rect)
-        self.camera_offset = pygame.Vector2()
 
     def add_sprite(self, sprite):
         self.sprites.append(sprite)
@@ -139,22 +146,48 @@ class Level(game_state.GameState):
     @classmethod
     @functools.cache
     def load(cls, game, name):
+        # basic metadata
         folder = pathlib.Path("ldtk/simplified", name)
         data = game.loader.get_json(folder / "data.json")
         size = data["width"], data["height"]
         map_rect = pygame.Rect((0, 0), size)
-        entity_layer = data["customFields"]["entity_layer"]
+        # level initialization
         level = cls(game, player_pos=data["customFields"]["start"], map_size=size)
         level.bg_color = data["bgColor"]
+        # background creation
+        background_source = data["customFields"]["Background"]
+        images = game.loader.get_spritesheet(background_source, (256, 256))
+        multipliers = zip(
+            data["customFields"]["BackgroundXMult"],
+            data["customFields"]["BackgroundYMult"],
+        )
+        for image, multiplier in zip(images, multipliers):
+            level.backgrounds.append(
+                Parallax(
+                    image,
+                    mult=multiplier,
+                    loop_x=data["customFields"]["LoopX"],
+                    loop_y=data["customFields"]["LoopY"],
+                )
+            )
+        # layer and entity creation
+        entity_layer = data["customFields"]["entity_layer"]
         for layer_ind, layer in enumerate(data["layers"]):
-            level.add_sprite(sprite.Sprite(level, game.loader.get_texture(folder / layer), pygame.FRect(map_rect), z=layer_ind))
+            level.add_sprite(
+                sprite.Sprite(
+                    level,
+                    game.loader.get_texture(folder / layer),
+                    pygame.FRect(map_rect),
+                    z=layer_ind + entity_layer,
+                )
+            )
         for key, value in data["entities"].items():
             sprite_cls = cls.sprite_classes[key]
             if sprite_cls is None:
                 continue
             # TODO: Sprite creation
             ...
-
+        # collision data creation
         for row, line in enumerate(game.loader.get_csv(folder / "Collision.csv")):
             for col, value in enumerate(line):
                 value = int(value)
@@ -187,5 +220,14 @@ class Level(game_state.GameState):
 
     def draw(self):
         super().draw()
+        for background in self.backgrounds:
+            offset = (-pygame.Vector2(self.viewport_rect.topleft)).elementwise() * background.mult
+            offset.y += self.map_rect.height - background.rect.height
+            if background.loop_x:
+                offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
+                while offset.x < util_draw.RESOLUTION[0]:
+                    background.image.draw(None, background.rect.move(offset))
+                    offset.x += background.rect.width
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))
+        #    sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))

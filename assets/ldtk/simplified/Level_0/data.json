@@ -3,7 +3,7 @@
 	"uniqueIdentifer": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
 	"x": 0,
 	"y": 0,
-	"width": 256,
+	"width": 384,
 	"height": 256,
 	"bgColor": "#F8CD7C",
 	"neighbourLevels": [],
@@ -13,7 +13,18 @@
 			128
 		],
 		"entity_layer": 0,
-		"Background": "bg-mushroom.png"
+		"Background": "bg-mushroom.png",
+		"Maptype": "Platformer_M",
+		"BackgroundXMult": [
+			0.3,
+			0.6
+		],
+		"LoopX": true,
+		"LoopY": true,
+		"BackgroundYMult": [
+			0.5,
+			0.5
+		]
 	},
 	"layers": [
 		"Collision.png",

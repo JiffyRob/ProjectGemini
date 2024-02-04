@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 39,
+	"nextUid": 38,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -730,9 +730,9 @@
 		{
 			"identifier": "BackgroundYMult",
 			"doc": null,
-			"__type": "Array<Float>",
-			"uid": 38,
-			"type": "F_Float",
+			"__type": "Array<Int>",
+			"uid": 35,
+			"type": "F_Int",
 			"isArray": true,
 			"canBeNull": false,
 			"arrayMinLength": null,
@@ -871,7 +871,7 @@
 					"params": ["Platformer_M"]
 				}] },
 				{ "__identifier": "BackgroundXMult", "__type": "Array<Float>", "__value": [0.3,0.6], "__tile": null, "defUid": 34, "realEditorValues": [ { "id": "V_Float", "params": [0.3] }, { "id": "V_Float", "params": [0.6] } ] },
-				{ "__identifier": "BackgroundYMult", "__type": "Array<Float>", "__value": [0.5,0.5], "__tile": null, "defUid": 38, "realEditorValues": [ { "id": "V_Float", "params": [0.5] }, { "id": "V_Float", "params": [0.5] } ] },
+				{ "__identifier": "BackgroundYMult", "__type": "Array<Float>", "__value": [1,1], "__tile": null, "defUid": 35, "realEditorValues": [ { "id": "V_Float", "params": [1] }, { "id": "V_Float", "params": [1] } ] },
 				{ "__identifier": "LoopX", "__type": "Bool", "__value": true, "__tile": null, "defUid": 36, "realEditorValues": [{
 					"id": "V_Bool",
 					"params": [ true ]

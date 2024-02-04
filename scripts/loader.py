@@ -4,6 +4,8 @@ import pathlib
 
 import pygame
 import pygame._sdl2 as sdl2
+import pygame._sdl2.video as sdl2  # needed for WASM compat
+
 import functools
 
 
@@ -43,6 +45,23 @@ class Loader:
             self.get_surface(path.with_suffix(".png")),
         )
         return texture
+
+    @functools.cache
+    def get_spritesheet(self, path, size=(16, 16)):
+        texture = self.get_texture(path)
+        rect = pygame.Rect(0, 0, size[0], size[1])
+        size_rect = texture.get_rect()
+        images = []
+        while True:
+            images.append(sdl2.Image(texture, rect))
+            print(rect)
+            rect.left += size[0]
+            if not size_rect.contains(rect):
+                rect.left = 0
+                rect.top += size[1]
+            if not size_rect.contains(rect):
+                break
+        return images
 
     @functools.cache
     def get_image(self, path, area=None):

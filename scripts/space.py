@@ -3,6 +3,8 @@ import random
 import numpy
 import pygame
 import pygame._sdl2 as sdl2
+import pygame._sdl2.video as sdl2  # needed for WASM compat
+
 
 from scripts import game_state, loader, util3d
 
