@@ -156,7 +156,7 @@ class Level(game_state.GameState):
         level.bg_color = data["bgColor"]
         # background creation
         background_source = data["customFields"]["Background"]
-        images = game.loader.get_spritesheet(background_source, (256, 256))
+        images = game.loader.get_spritesheet(background_source, (64, 64))
         multipliers = zip(
             data["customFields"]["BackgroundXMult"],
             data["customFields"]["BackgroundYMult"],
