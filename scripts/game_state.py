@@ -19,6 +19,5 @@ class GameState:
                 self.game.quit()
             self.handle_event(event)
 
-
     def draw(self):
         pass

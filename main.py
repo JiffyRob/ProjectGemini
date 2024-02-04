@@ -37,7 +37,7 @@ class Game:
         self.renderer.logical_size = util_draw.RESOLUTION
         self.loader = loader.Loader(self.renderer)
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
+        # self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 

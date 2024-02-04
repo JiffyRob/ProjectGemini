@@ -109,24 +109,10 @@ class Space(game_state.GameState):
             800,
         )
         self.sprites = []
+        self.ship_overlay = self.game.loader.get_texture("ship-inside.png")
         self.static_sprites = StaticSpriteGroup(3000)
         self.static_sprites.add_texture("star0", self.game.loader.get_image("stars", "blue4a"), (16, 16))
         self.static_sprites.add_texture("star1", self.game.loader.get_image("stars", "yellow4a"), (16, 16))
-        for i in range(3000):
-            self.static_sprites.add_sprite(
-                pygame.Vector3(
-                    random.uniform(
-                        -self.game.renderer.logical_size[0],
-                        self.game.renderer.logical_size[0],
-                    ),
-                    random.uniform(
-                        -self.game.renderer.logical_size[1],
-                        self.game.renderer.logical_size[1],
-                    ),
-                    random.uniform(-500, 500),
-                ),
-                f"star{i % 2}",
-            )
 
     def update(self, dt):
         buttons = pygame.mouse.get_pressed()
@@ -195,3 +181,6 @@ class Space(game_state.GameState):
             if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
                 sprite.rect.center = screen_pos.xy + self.camera.center
                 self.game.renderer.blit(sprite.image, sprite.rect)
+        # ship image
+        self.ship_overlay.draw(None, None)
+        # TODO: GUI over ship controls
