@@ -8,6 +8,8 @@ import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 from scripts import space, platformer, util_draw, loader
 
+pygame.init()
+
 
 class Game:
     def __init__(self, title="Project Gemini", fps=0):
@@ -37,6 +39,7 @@ class Game:
         self.stack.appendleft(space.Space(self))
         self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
+        pygame.key.set_repeat(0, 0)
 
         while self.running and len(self.stack):
             self.stack[0].update(dt * self.dt_mult)

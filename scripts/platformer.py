@@ -8,9 +8,9 @@ import pygame._sdl2 as sdl2
 
 from scripts import game_state, sprite, util_draw
 
-GRAVITY = pygame.Vector2(0, 2)  # TODO: sideways gravity?????
+GRAVITY = pygame.Vector2(0, 1)  # TODO: sideways gravity?????
 WALK_SPEED = 64
-JUMP_SPEED = 400
+JUMP_SPEED = 260
 LERP_SPEED = 0.15
 
 Parallax = namedtuple(
@@ -207,9 +207,7 @@ class Level(game_state.GameState):
             self.player.walk_left()
         if keys[pygame.K_RIGHT]:
             self.player.walk_right()
-        if keys[pygame.K_UP]:
-            self.player.jump()
-        else:
+        if not keys[pygame.K_UP]:
             self.player.unjump()
         if keys[pygame.K_DOWN]:
             self.player.duck()
@@ -217,6 +215,11 @@ class Level(game_state.GameState):
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
         self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
         self.viewport_rect.clamp_ip(self.map_rect)
+
+    def handle_event(self, event):
+        match event:
+            case pygame.Event(type=pygame.KEYDOWN, key=pygame.K_UP):
+                self.player.jump()
 
     def draw(self):
         super().draw()
