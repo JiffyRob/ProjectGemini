@@ -1,6 +1,7 @@
 import functools
 import pathlib
 from collections import defaultdict, namedtuple
+from itertools import cycle
 
 import pygame
 import pygame._sdl2 as sdl2
@@ -102,19 +103,56 @@ class CollisionSprite(sprite.Sprite):
 
 class Player(PhysicsSprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(level, rect=rect, image=util_draw.square_image(level.game.renderer))
+        super().__init__(level, rect=rect, image=None)
+        images = level.game.loader.get_spritesheet("me-Sheet.png")
+        self.anim_dict = {
+            "walk": cycle(images[8:12]),
+            "idle": cycle((images[9],)),
+            "jump": cycle((images[12],)),
+        }
+        self.anim_speed = .2
+        self.anim_time = 0
+        self.state = "jump"
+        self.image = next(self.anim_dict[self.state])
+
+    def swap_state(self, new):
+        if self.state != new:
+            self.state = new
+            self.anim_time = 0
+            self.image = next(self.anim_dict[self.state])
+
+    def update(self, dt):
+        if self.state == "jump" and self.on_ground:
+            print("jump swap")
+            self.swap_state("idle")
+        self.anim_time += dt
+        if self.anim_time > self.anim_speed:
+            self.image = next(self.anim_dict[self.state])
+            self.anim_time = 0
+        return super().update(dt)
 
     def walk_left(self):
         self.velocity.x -= WALK_SPEED
+        self.image.flip_x = True
+        if self.on_ground:
+            self.swap_state("walk")
 
     def walk_right(self):
         self.velocity.x += WALK_SPEED
+        self.image.flip_x = False
+        if self.on_ground:
+            self.swap_state("walk")
+
+    def unwalk(self):
+        if self.on_ground:
+            self.swap_state("idle")
 
     def jump(self):
         if self.on_ground:
             self.velocity.y = -JUMP_SPEED
             self.on_ground = False
             self.on_downer = False
+            self.swap_state("jump")
 
     def unjump(self):
         self.velocity.y = max(0, self.velocity.y)
@@ -205,21 +243,20 @@ class Level(game_state.GameState):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
             self.player.walk_left()
-        if keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT]:
             self.player.walk_right()
+        else:
+            self.player.unwalk()
         if not keys[pygame.K_UP]:
             self.player.unjump()
         if keys[pygame.K_DOWN]:
             self.player.duck()
+        if keys[pygame.K_UP]:
+            self.player.jump()
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
         self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
         self.viewport_rect.clamp_ip(self.map_rect)
-
-    def handle_event(self, event):
-        match event:
-            case pygame.Event(type=pygame.KEYDOWN, key=pygame.K_UP):
-                self.player.jump()
 
     def draw(self):
         super().draw()
@@ -232,5 +269,5 @@ class Level(game_state.GameState):
                     background.image.draw(None, background.rect.move(offset))
                     offset.x += background.rect.width
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
-            sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))
-        #    sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))
+            if sprite.image is not None:
+                sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))

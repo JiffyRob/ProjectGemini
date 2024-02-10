@@ -54,7 +54,6 @@ class Loader:
         images = []
         while True:
             images.append(sdl2.Image(texture, rect))
-            print(rect)
             rect.left += size[0]
             if not size_rect.contains(rect):
                 rect.left = 0
