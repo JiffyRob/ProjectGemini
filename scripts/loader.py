@@ -1,12 +1,11 @@
-import json
 import csv
+import functools
+import json
 import pathlib
 
 import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
-
-import functools
 
 
 class Loader:

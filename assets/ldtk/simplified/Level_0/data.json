@@ -32,49 +32,49 @@
 		"Tiles.png"
 	],
 	"entities": {
-		"Coin2": [
+		"Emerald": [
 			{
-				"id": "Coin2",
+				"id": "Emerald",
 				"iid": "423a73c0-b0a0-11ee-83ba-937e1af7615d",
 				"layer": "Entities",
 				"x": 64,
 				"y": 16,
 				"width": 16,
 				"height": 16,
-				"color": 14120515,
+				"color": 4098376,
 				"customFields" : {}
 			},
 			{
-				"id": "Coin2",
+				"id": "Emerald",
 				"iid": "42e4e490-b0a0-11ee-83ba-33b4b894555d",
 				"layer": "Entities",
 				"x": 80,
 				"y": 16,
 				"width": 16,
 				"height": 16,
-				"color": 14120515,
+				"color": 4098376,
 				"customFields" : {}
 			},
 			{
-				"id": "Coin2",
+				"id": "Emerald",
 				"iid": "4359c670-b0a0-11ee-83ba-693a1aa54098",
 				"layer": "Entities",
 				"x": 112,
 				"y": 16,
 				"width": 16,
 				"height": 16,
-				"color": 14120515,
+				"color": 4098376,
 				"customFields" : {}
 			},
 			{
-				"id": "Coin2",
+				"id": "Emerald",
 				"iid": "43d18e80-b0a0-11ee-83ba-cd6e96c2457b",
 				"layer": "Entities",
 				"x": 96,
 				"y": 16,
 				"width": 16,
 				"height": 16,
-				"color": 14120515,
+				"color": 4098376,
 				"customFields" : {}
 			}
 		]

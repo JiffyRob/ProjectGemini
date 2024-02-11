@@ -1,11 +1,12 @@
 import functools
 import pathlib
+import random
 from collections import defaultdict, namedtuple
 from itertools import cycle
+from math import sin
 
 import pygame
 import pygame._sdl2 as sdl2
-
 
 from scripts import game_state, sprite, util_draw
 
@@ -22,7 +23,9 @@ Parallax = namedtuple(
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10):
+    def __init__(
+        self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10
+    ):
         super().__init__(level, image=image, rect=rect, src_rect=src_rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -47,7 +50,9 @@ class PhysicsSprite(sprite.Sprite):
             self.dead = True
             return False
         if vel.x < 0:
-            for collided in sorted(self.level.collision_rects, key=lambda rect: -rect.x):
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: -rect.x
+            ):
                 if self.collision_rect.colliderect(collided):
                     self.rect.x += collided.right - self.collision_rect.left
                     self.velocity.x = 0
@@ -60,7 +65,9 @@ class PhysicsSprite(sprite.Sprite):
                     break
         self.rect.y += vel.y
         if vel.y < 0:
-            for collided in sorted(self.level.collision_rects, key=lambda rect: -rect.y):
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: -rect.y
+            ):
                 if self.collision_rect.colliderect(collided):
                     self.rect.y += collided.bottom - self.collision_rect.top
                     self.velocity.y = 0
@@ -74,7 +81,10 @@ class PhysicsSprite(sprite.Sprite):
                     break
             if not self.ducking:
                 for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):
-                    if old_rect.bottom <= collided.top and self.collision_rect.colliderect(collided):
+                    if (
+                        old_rect.bottom <= collided.top
+                        and self.collision_rect.colliderect(collided)
+                    ):
                         self.rect.y += collided.top - self.collision_rect.bottom
                         self.velocity.y = 0
                         self.on_ground = True
@@ -82,6 +92,32 @@ class PhysicsSprite(sprite.Sprite):
                         break
         self.velocity.x = 0
         self.ducking = False
+        return True
+
+
+class Emerald(sprite.Sprite):
+    def __init__(self, level, rect=(0, 0, 16, 16)):
+        super().__init__(level, image=None, rect=rect, src_rect=None, z=0)
+        self.anim_speed = 0.08
+        self.anim_time = 0
+        self.anim = cycle(
+            self.level.game.loader.get_spritesheet("platformer-sprites.png")[0:5]
+        )
+        self.age = random.randint(0, 10)
+        self.y = self.rect.top
+        self.collision_rect = self.rect.inflate(-8, -4)
+
+    def update(self, dt):
+        if not super().update(dt):
+            return False
+        if self.collision_rect.colliderect(self.level.player.collision_rect):
+            return False
+        self.anim_time += dt
+        if self.anim_time >= self.anim_speed:
+            self.anim_time = 0
+            self.image = next(self.anim)
+        self.rect.top = self.y + 1.5 * sin(self.age * 2)
+        self.age += dt
         return True
 
 
@@ -110,7 +146,7 @@ class Player(PhysicsSprite):
             "idle": cycle((images[9],)),
             "jump": cycle((images[12],)),
         }
-        self.anim_speed = .2
+        self.anim_speed = 0.2
         self.anim_time = 0
         self.state = "jump"
         self.image = next(self.anim_dict[self.state])
@@ -163,7 +199,7 @@ class Player(PhysicsSprite):
 
 class Level(game_state.GameState):
     sprite_classes = {
-        "Coin2": None,
+        "Emerald": Emerald,
     }
 
     def __init__(self, game, player_pos=(0, 0), map_size=(256, 256)):
@@ -223,8 +259,13 @@ class Level(game_state.GameState):
             sprite_cls = cls.sprite_classes[key]
             if sprite_cls is None:
                 continue
-            # TODO: Sprite creation
-            ...
+            for entity in value:
+                level.add_sprite(
+                    sprite_cls(
+                        level,
+                        (entity["x"], entity["y"], entity["width"], entity["height"]),
+                    )
+                )
         # collision data creation
         for row, line in enumerate(game.loader.get_csv(folder / "Collision.csv")):
             for col, value in enumerate(line):
@@ -255,13 +296,17 @@ class Level(game_state.GameState):
             self.player.jump()
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
-        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
+        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
+            self.player.pos, LERP_SPEED
+        )
         self.viewport_rect.clamp_ip(self.map_rect)
 
     def draw(self):
         super().draw()
         for background in self.backgrounds:
-            offset = (-pygame.Vector2(self.viewport_rect.topleft)).elementwise() * background.mult
+            offset = (
+                -pygame.Vector2(self.viewport_rect.topleft)
+            ).elementwise() * background.mult
             offset.y += self.map_rect.height - background.rect.height
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
@@ -270,4 +315,7 @@ class Level(game_state.GameState):
                     offset.x += background.rect.width
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             if sprite.image is not None:
-                sprite.image.draw(sprite.src_rect, sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)))
+                sprite.image.draw(
+                    sprite.src_rect,
+                    sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)),
+                )

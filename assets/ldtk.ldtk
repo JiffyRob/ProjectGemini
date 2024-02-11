@@ -462,7 +462,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Coin2",
+			"identifier": "Emerald",
 			"uid": 12,
 			"tags": [],
 			"exportToToc": false,
@@ -481,8 +481,8 @@
 			"fillOpacity": 1,
 			"lineOpacity": 1,
 			"hollow": false,
-			"color": "#D77643",
-			"renderMode": "Ellipse",
+			"color": "#3E8948",
+			"renderMode": "Rectangle",
 			"showName": true,
 			"tilesetId": null,
 			"tileRenderMode": "FitInside",
@@ -964,12 +964,12 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Coin2",
+							"__identifier": "Emerald",
 							"__grid": [4,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#D77643",
+							"__smartColor": "#3E8948",
 							"iid": "423a73c0-b0a0-11ee-83ba-937e1af7615d",
 							"width": 16,
 							"height": 16,
@@ -980,12 +980,12 @@
 							"__worldY": 16
 						},
 						{
-							"__identifier": "Coin2",
+							"__identifier": "Emerald",
 							"__grid": [5,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#D77643",
+							"__smartColor": "#3E8948",
 							"iid": "42e4e490-b0a0-11ee-83ba-33b4b894555d",
 							"width": 16,
 							"height": 16,
@@ -996,12 +996,12 @@
 							"__worldY": 16
 						},
 						{
-							"__identifier": "Coin2",
+							"__identifier": "Emerald",
 							"__grid": [7,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#D77643",
+							"__smartColor": "#3E8948",
 							"iid": "4359c670-b0a0-11ee-83ba-693a1aa54098",
 							"width": 16,
 							"height": 16,
@@ -1012,12 +1012,12 @@
 							"__worldY": 16
 						},
 						{
-							"__identifier": "Coin2",
+							"__identifier": "Emerald",
 							"__grid": [6,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#D77643",
+							"__smartColor": "#3E8948",
 							"iid": "43d18e80-b0a0-11ee-83ba-cd6e96c2457b",
 							"width": 16,
 							"height": 16,
