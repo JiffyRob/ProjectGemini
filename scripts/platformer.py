@@ -121,6 +121,32 @@ class Emerald(sprite.Sprite):
         return True
 
 
+class BustedParts(sprite.Sprite):
+    def __init__(self, level, rect=(0, 0, 16, 16)):
+        super().__init__(level, image=None, rect=rect, src_rect=None, z=0)
+        self.anim_speed = 0.2
+        self.anim_time = 0
+        self.anim = cycle(
+            self.level.game.loader.get_spritesheet("platformer-sprites.png")[16:20]
+        )
+        self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[20]
+        self.collision_rect = self.rect.inflate(-2, -12)
+        self.collision_rect.bottom = self.rect.bottom
+
+    def update(self, dt):
+        if not super().update(dt):
+            return False
+        if self.collision_rect.colliderect(self.level.player.collision_rect):
+            self.image = self.hit_image
+            self.anim_time = 0
+            self.level.player.jump(True)
+        self.anim_time += dt
+        if self.anim_time >= self.anim_speed:
+            self.anim_time = 0
+            self.image = next(self.anim)
+        return True
+
+
 class CollisionSprite(sprite.Sprite):
     def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0):
         if image is None:
@@ -149,6 +175,7 @@ class Player(PhysicsSprite):
         self.anim_speed = 0.2
         self.anim_time = 0
         self.state = "jump"
+        self.jump_forced = False
         self.image = next(self.anim_dict[self.state])
 
     def swap_state(self, new):
@@ -158,8 +185,14 @@ class Player(PhysicsSprite):
             self.image = next(self.anim_dict[self.state])
 
     def update(self, dt):
-        if self.state == "jump" and self.on_ground:
-            print("jump swap")
+        if self.state == "jump":
+            if self.on_ground:
+                print("jump swap")
+                self.swap_state("idle")
+        elif self.velocity.x:
+            self.swap_state("walk")
+            self.image.flip_x = self.velocity.x < 0
+        else:
             self.swap_state("idle")
         self.anim_time += dt
         if self.anim_time > self.anim_speed:
@@ -169,29 +202,23 @@ class Player(PhysicsSprite):
 
     def walk_left(self):
         self.velocity.x -= WALK_SPEED
-        self.image.flip_x = True
-        if self.on_ground:
-            self.swap_state("walk")
 
     def walk_right(self):
         self.velocity.x += WALK_SPEED
-        self.image.flip_x = False
-        if self.on_ground:
-            self.swap_state("walk")
 
     def unwalk(self):
-        if self.on_ground:
-            self.swap_state("idle")
+        pass
 
-    def jump(self):
-        if self.on_ground:
+    def jump(self, pain=False):
+        if self.on_ground or pain:
             self.velocity.y = -JUMP_SPEED
             self.on_ground = False
             self.on_downer = False
-            self.swap_state("jump")
+            self.jump_forced = pain
 
     def unjump(self):
-        self.velocity.y = max(0, self.velocity.y)
+        if not self.jump_forced:
+            self.velocity.y = max(0, self.velocity.y)
 
     def duck(self):
         self.ducking = True
@@ -200,6 +227,7 @@ class Player(PhysicsSprite):
 class Level(game_state.GameState):
     sprite_classes = {
         "Emerald": Emerald,
+        "BustedParts": BustedParts,
     }
 
     def __init__(self, game, player_pos=(0, 0), map_size=(256, 256)):

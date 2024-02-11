@@ -77,6 +77,41 @@
 				"color": 4098376,
 				"customFields" : {}
 			}
+		],
+		"BustedParts": [
+			{
+				"id": "BustedParts",
+				"iid": "c348fe80-b0a0-11ee-bbef-0369ef83fe9b",
+				"layer": "Entities",
+				"x": 288,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 2943221,
+				"customFields" : {}
+			},
+			{
+				"id": "BustedParts",
+				"iid": "c3c22620-b0a0-11ee-bbef-837a570ef6ff",
+				"layer": "Entities",
+				"x": 304,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 2943221,
+				"customFields" : {}
+			},
+			{
+				"id": "BustedParts",
+				"iid": "c4113080-b0a0-11ee-bbef-0ba327a99083",
+				"layer": "Entities",
+				"x": 320,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 2943221,
+				"customFields" : {}
+			}
 		]
 	}
 }
