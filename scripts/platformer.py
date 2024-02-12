@@ -6,7 +6,6 @@ from itertools import cycle
 from math import sin
 
 import pygame
-import pygame._sdl2 as sdl2
 
 from scripts import game_state, sprite, util_draw
 
@@ -38,6 +37,9 @@ class PhysicsSprite(sprite.Sprite):
     def collision_rect(self):
         return self.rect.copy()
 
+    def on_xy_collision(self):
+        pass
+
     def update(self, dt):
         # physics
         old_rect = self.collision_rect.copy()
@@ -54,12 +56,14 @@ class PhysicsSprite(sprite.Sprite):
                 self.level.collision_rects, key=lambda rect: -rect.x
             ):
                 if self.collision_rect.colliderect(collided):
+                    self.on_xy_collision()
                     self.rect.x += collided.right - self.collision_rect.left
                     self.velocity.x = 0
                     break
         else:
             for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
                 if self.collision_rect.colliderect(collided):
+                    self.on_xy_collision()
                     self.rect.x += collided.left - self.collision_rect.right
                     self.velocity.x = 0
                     break
@@ -139,11 +143,46 @@ class BustedParts(sprite.Sprite):
         if self.collision_rect.colliderect(self.level.player.collision_rect):
             self.image = self.hit_image
             self.anim_time = 0
-            self.level.player.jump(True)
+            self.level.player.jump(True, .7)
         self.anim_time += dt
         if self.anim_time >= self.anim_speed:
             self.anim_time = 0
             self.image = next(self.anim)
+        return True
+
+
+class BoingerBeetle(PhysicsSprite):
+    def __init__(self, level, rect=(0, 0, 16, 16)):
+        super().__init__(level, rect=rect, weight=3)
+        self.anim_speed = 0.2
+        self.anim_time = 0
+        self.anim = cycle(
+            self.level.game.loader.get_spritesheet("platformer-sprites.png")[8:12]
+        )
+        self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[12]
+        self.facing_left = True
+        self.image = next(self.anim)
+
+    @property
+    def collision_rect(self):
+        return self.rect.inflate(-4, -10).move(0, 5)
+
+    def on_xy_collision(self):
+        self.facing_left = not self.facing_left
+
+    def update(self, dt):
+        self.velocity.x = WALK_SPEED * .3 * (-1 + self.facing_left * 2)
+        if not super().update(dt):
+            return False
+        self.anim_time += dt
+        if self.collision_rect.colliderect(self.level.player.collision_rect) and self.level.player.velocity.y > 0:
+            self.image = self.hit_image
+            self.anim_time = 0
+            self.level.player.jump(True, 1.5)
+        if self.anim_time >= self.anim_speed:
+            self.anim_time = 0
+            self.image = next(self.anim)
+        self.image.flip_x = self.facing_left
         return True
 
 
@@ -198,6 +237,8 @@ class Player(PhysicsSprite):
         if self.anim_time > self.anim_speed:
             self.image = next(self.anim_dict[self.state])
             self.anim_time = 0
+            if self.velocity.x:
+                self.image.flip_x = self.velocity.x < 0
         return super().update(dt)
 
     def walk_left(self):
@@ -209,9 +250,9 @@ class Player(PhysicsSprite):
     def unwalk(self):
         pass
 
-    def jump(self, pain=False):
+    def jump(self, pain=False, amp=1):
         if self.on_ground or pain:
-            self.velocity.y = -JUMP_SPEED
+            self.velocity.y = -JUMP_SPEED * amp
             self.on_ground = False
             self.on_downer = False
             self.jump_forced = pain
@@ -228,6 +269,7 @@ class Level(game_state.GameState):
     sprite_classes = {
         "Emerald": Emerald,
         "BustedParts": BustedParts,
+        "BoingerBeetle": BoingerBeetle,
     }
 
     def __init__(self, game, player_pos=(0, 0), map_size=(256, 256)):
