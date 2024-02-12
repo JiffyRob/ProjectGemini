@@ -109,12 +109,12 @@ class Level(game_state.GameState):
             self.player.walk_right()
         else:
             self.player.unwalk()
-        if not keys[pygame.K_UP]:
-            self.player.unjump()
         if keys[pygame.K_DOWN]:
             self.player.duck()
         if keys[pygame.K_UP]:
             self.player.jump()
+        if keys[pygame.K_SPACE]:
+            self.game.time_phase(-1)
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
         self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
