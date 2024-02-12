@@ -24,6 +24,9 @@ class Game:
         self.renderer = None
         self.loader = None
 
+    def time_phase(self, mult):
+        self.dt_mult = mult
+
     async def run(self):
         self.running = True
         self.window = sdl2.Window(
@@ -52,6 +55,7 @@ class Game:
             self.stack[0].draw()
             self.renderer.present()
             dt = self.clock.tick(self.fps) * self.dt_mult / 1000
+            self.dt_mult = 1
             await asyncio.sleep(0)
 
         self.window.destroy()
