@@ -12,7 +12,7 @@ pygame.init()
 
 
 class Game:
-    def __init__(self, title="Project Gemini", fps=0):
+    def __init__(self, title="Project Gemini", fps=120):
         self.title = title
         self.window = None
         self.clock = pygame.time.Clock()
@@ -21,8 +21,12 @@ class Game:
         self.stack = deque()
         self.dt_mult = 1
         self.running = False
-        self.renderer = None
         self.loader = None
+        self.display_surface = None
+
+    @property
+    def window_surface(self):
+        return self.display_surface
 
     def time_phase(self, mult):
         self.dt_mult = mult
@@ -36,27 +40,29 @@ class Game:
             resizable=True,
             maximized=True,
         )
-        self.renderer = sdl2.Renderer(self.window, -1, -1, True)
-        self.renderer.logical_size = util_draw.RESOLUTION
-        self.loader = loader.Loader(self.renderer)
-        # self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
+        self.window.get_surface()  # allows convert() calls to happen
+        self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
+        self.loader = loader.Loader()
+        self.stack.appendleft(space.Space(self))
+        # self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 
         while self.running and len(self.stack):
+            self.window_surface.fill(self.stack[0].bgcolor)
+            self.window.get_surface().fill("black")
             self.stack[0].update(dt * self.dt_mult)
-            # draw black borders on areas outside aspect ratio
-            self.renderer.draw_color = "black"
-            self.renderer.clear()
-            # but still color that actual screen area with the state's background
-            self.renderer.draw_color = self.stack[0].bg_color
-            self.renderer.fill_rect(self.screen_rect)
             self.stack[0].draw()
-            self.renderer.present()
             dt = self.clock.tick(self.fps) * self.dt_mult / 1000
             self.dt_mult = 1
-            await asyncio.sleep(0)
+            self.window.title = str(round(self.clock.get_fps())).zfill(5)
+            # window scaling
+            factor = min(self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
+                         self.window.get_surface().get_height() // util_draw.RESOLUTION[1])
+            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
+            rect.center = self.window.get_surface().get_rect().center
+            self.window.get_surface().blit(pygame.transform.scale_by(self.display_surface, (factor, factor)), rect.topleft)
+            self.window.flip()
 
         self.window.destroy()
         self.renderer = None

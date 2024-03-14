@@ -1,3 +1,17 @@
+import functools
+
+import pygame
+
+
+@functools.cache
+def flip_surface(surface, flip_x, flip_y):
+    if flip_x:
+        surface = pygame.transform.flip(surface, True, False)
+    if flip_y:
+        surface = pygame.transform.flip(surface, False, True)
+    return surface
+
+
 class Animation:
     def __init__(self, frames, speed=.2, flip_x=False, flip_y=False):
         self.frames = list(frames)
@@ -15,6 +29,4 @@ class Animation:
     @property
     def image(self):
         image = self.frames[round(self.time / self.speed) % len(self.frames)]
-        image.flip_x = self.flip_x
-        image.flip_y = self.flip_y
-        return image
+        return flip_surface(image, self.flip_x, self.flip_y)

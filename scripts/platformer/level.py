@@ -59,7 +59,7 @@ class Level(game_state.GameState):
         for image, multiplier in zip(images, multipliers):
             level.backgrounds.append(
                 Parallax(
-                    image,
+                    pygame.transform.scale(image, (256, 256)),
                     mult=multiplier,
                     loop_x=data["customFields"]["LoopX"],
                     loop_y=data["customFields"]["LoopY"],
@@ -71,7 +71,7 @@ class Level(game_state.GameState):
             level.add_sprite(
                 sprite.Sprite(
                     level,
-                    game.loader.get_texture(folder / layer),
+                    game.loader.get_surface(folder / layer),
                     pygame.FRect(map_rect),
                     z=layer_ind + entity_layer,
                 )
@@ -128,15 +128,14 @@ class Level(game_state.GameState):
             offset = (
                 -pygame.Vector2(self.viewport_rect.topleft)
             ).elementwise() * background.mult
-            offset.y += self.map_rect.height - background.rect.height
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
                 while offset.x < util_draw.RESOLUTION[0]:
-                    background.image.draw(None, background.rect.move(offset))
+                    self.game.window_surface.blit(background.image, background.rect.move(offset))
                     offset.x += background.rect.width
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             if sprite.image is not None:
-                sprite.image.draw(
-                    sprite.src_rect,
+                self.game.window_surface.blit(
+                    sprite.image,
                     sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)),
                 )

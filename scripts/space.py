@@ -5,7 +5,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import game_state, loader, util3d
+from scripts import game_state, util3d, util_draw, loader
 
 
 class StaticSpriteGroup:
@@ -117,13 +117,13 @@ class Space(game_state.GameState):
         self.camera = util3d.Camera(
             pygame.Vector3(),
             util3d.Quaternion(),
-            pygame.Vector2(self.game.renderer.logical_size) / 2,
+            pygame.Vector2(util_draw.RESOLUTION) / 2,
             pygame.Vector2(60, 60),  # TODO : FOV
             450,
             800,
         )
         self.sprites = []
-        self.ship_overlay = self.game.loader.get_texture("ship-inside.png")
+        self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
         self.static_sprites = StaticSpriteGroup(3000)
         self.static_sprites.add_texture(
             "star0", self.game.loader.get_image("stars", "blue4a"), (16, 16)
@@ -207,5 +207,5 @@ class Space(game_state.GameState):
                 sprite.rect.center = screen_pos.xy + self.camera.center
                 self.game.renderer.blit(sprite.image, sprite.rect)
         # ship image
-        self.ship_overlay.draw(None, None)
+        self.game.display_surface.blit(self.ship_overlay, (0, 0))
         # TODO: GUI over ship controls
