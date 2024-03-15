@@ -6,7 +6,7 @@ import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 from scripts import game_state, util3d, util_draw
-from scripts.animation import Animation, SingleAnimation
+from scripts.animation import AnimatedSurface
 
 # TODO: port this properly to software rendering + implement z buffer (or port this whole thing to GLSL code)
 
@@ -35,7 +35,7 @@ class StaticSpriteGroup:
             (self.sprite_count,), dtype=numpy.uint8
         )
         self.texture_sizes = numpy.zeros((256, lod, 2), dtype=numpy.int32)
-        self.textures = numpy.zeros((256, lod), dtype=Animation)
+        self.textures = numpy.zeros((256, lod), dtype=object)
         self.texture_names = {}
         self.next_texture_id = 0
 
@@ -55,15 +55,13 @@ class StaticSpriteGroup:
     def update(self, dt):
         for texture_list in self.textures[: self.next_texture_id]:
             for texture in texture_list:
-                if texture:
+                if isinstance(texture, AnimatedSurface):
                     texture.update(dt)
 
     def add_textures(self, name, data):
         texture_id = self.next_texture_id
         self.texture_names[name] = texture_id
         for i, value in enumerate(data.values()):
-            if isinstance(value, pygame.Surface):
-                value = SingleAnimation(value)
             self.textures[texture_id][i] = value
         keys = tuple(data.keys())
         self.texture_sizes[texture_id][: len(keys)] = keys
@@ -131,15 +129,14 @@ class StaticSpriteGroup:
 
     def draw(self):
         self.level.game.window_surface.fblits(
-            [
-                (
-                    self.textures[self.sprite_texture_ids[i]][
-                        self.sprite_texture_sub_ids[i]
-                    ].image,
-                    self.screen_positions[i][:2],
+            (
+                zip(
+                    self.textures[self.sprite_texture_ids, self.sprite_texture_sub_ids][
+                        self.draw_indices
+                    ],
+                    self.screen_positions[:, :2][self.draw_indices],
                 )
-                for i in self.ids[self.draw_indices]
-            ]
+            )
         )
 
     def dirty_draw(self, camera):
@@ -206,7 +203,7 @@ class Space(game_state.GameState):
         self.static_sprites.add_textures(
             "Terra",
             {
-                (size, size): Animation(
+                (size, size): AnimatedSurface(
                     self.game.loader.get_spritesheet(
                         f"planets/Terra{size}", (size, size)
                     )

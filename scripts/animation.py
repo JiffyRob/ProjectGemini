@@ -44,3 +44,27 @@ class SingleAnimation:
     @property
     def image(self):
         return flip_surface(self.surface, self.flip_x, self.flip_y)
+
+
+class AnimatedSurface(pygame.Surface):
+    def __init__(self, frames, speed=0.2, flip_x=False, flip_y=False):
+        self.frames = list(frames)
+        self.time = 0
+        self.speed = speed
+        self.flip_x = flip_x
+        self.flip_y = flip_y
+        self.index = 0
+        super().__init__(self.frames[0].get_size(), pygame.SRCALPHA)
+
+    def restart(self):
+        self.time = 0
+
+    def update(self, dt):
+        self.time += dt
+        new_index = round(self.time / self.speed) % len(self.frames)
+        if new_index != self.index:
+            self.index = new_index
+            self.fill((0, 0, 0, 0))
+            self.blit(
+                flip_surface(self.frames[self.index], self.flip_x, self.flip_y), (0, 0)
+            )
