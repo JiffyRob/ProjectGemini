@@ -21,6 +21,8 @@ class Level(game_state.GameState):
         "Emerald": immobile.Emerald,
         "BustedParts": immobile.BustedParts,
         "BoingerBeetle": mobile.BoingerBeetle,
+        "RedShroom": immobile.Prop,
+        "BrownShroom": immobile.BrownShroom,
     }
 
     def __init__(self, game, player_pos=(0, 0), map_size=(256, 256)):
@@ -73,7 +75,7 @@ class Level(game_state.GameState):
                     level,
                     game.loader.get_surface(folder / layer),
                     pygame.FRect(map_rect),
-                    z=layer_ind + entity_layer,
+                    z=layer_ind,
                 )
             )
         for key, value in data["entities"].items():
@@ -137,5 +139,5 @@ class Level(game_state.GameState):
             if sprite.image is not None:
                 self.game.window_surface.blit(
                     sprite.image,
-                    sprite.rect.move(-pygame.Vector2(self.viewport_rect.topleft)),
+                    sprite.rect.move((-int(self.viewport_rect.left), -int(self.viewport_rect.top))),
                 )

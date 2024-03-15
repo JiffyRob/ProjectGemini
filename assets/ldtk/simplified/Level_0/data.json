@@ -136,6 +136,87 @@
 				"color": 7552569,
 				"customFields" : {}
 			}
+		],
+		"RedShroom": [
+			{
+				"id": "RedShroom",
+				"iid": "03b99270-d7b0-11ee-b607-bbef1387f835",
+				"layer": "Entities",
+				"x": 80,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 14957380,
+				"customFields" : {}
+			},
+			{
+				"id": "RedShroom",
+				"iid": "0d685cc0-d7b0-11ee-b607-01934be1ddd8",
+				"layer": "Entities",
+				"x": 256,
+				"y": 176,
+				"width": 16,
+				"height": 16,
+				"color": 14957380,
+				"customFields" : {}
+			},
+			{
+				"id": "RedShroom",
+				"iid": "168a0240-d7b0-11ee-b607-c170db1d9ce1",
+				"layer": "Entities",
+				"x": 480,
+				"y": 208,
+				"width": 16,
+				"height": 16,
+				"color": 14957380,
+				"customFields" : {}
+			}
+		],
+		"BrownShroom": [
+			{
+				"id": "BrownShroom",
+				"iid": "c796de50-d7b0-11ee-b607-79ee038f4682",
+				"layer": "Entities",
+				"x": 208,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "c9d890f0-d7b0-11ee-b607-f31d9d868b3f",
+				"layer": "Entities",
+				"x": 352,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "cdcd98e0-d7b0-11ee-b607-4d6ce6b1e0f8",
+				"layer": "Entities",
+				"x": 0,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "b9267560-d7b0-11ee-9eb6-e3662260d885",
+				"layer": "Entities",
+				"x": 304,
+				"y": 160,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			}
 		]
 	}
 }

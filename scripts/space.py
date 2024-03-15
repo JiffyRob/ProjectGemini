@@ -7,6 +7,8 @@ import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 from scripts import game_state, util3d, util_draw, loader
 
+# TODO: port this properly to software rendering + implement z buffer (or port this whole thing to GLSL code)
+
 
 class StaticSpriteGroup:
     def __init__(self, sprites=1000):

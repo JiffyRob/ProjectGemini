@@ -137,6 +137,7 @@ class Player(PhysicsSprite):
         self.state = "jump"
         self.jump_forced = False
         self.image = self.anim_dict[self.state].image
+        self.facing_left = False
 
     def swap_state(self, new):
         if self.state != new:
@@ -150,8 +151,10 @@ class Player(PhysicsSprite):
             self.swap_state("walk")
         else:
             self.swap_state("idle")
+        if self.velocity.x:
+            self.facing_left = self.velocity.x < 0
         self.anim_dict[self.state].update(dt)
-        self.anim_dict[self.state].flip_x = self.velocity.x < 0
+        self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
         return super().update(dt)
 
