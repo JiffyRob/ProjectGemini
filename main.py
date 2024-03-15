@@ -35,9 +35,7 @@ class Game:
                 self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
                 self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
             )
-            rect = pygame.Rect(
-                0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor
-            )
+            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
             rect.center = self.window.get_surface().get_rect().center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
         if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
@@ -61,8 +59,8 @@ class Game:
         self.window.get_surface()  # allows convert() calls to happen
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
-        self.stack.appendleft(space.Space(self))
-        # self.stack.appendleft(platformer.Level.load(self, "Level_0"))
+        # self.stack.appendleft(space.Space(self))
+        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 
@@ -72,9 +70,7 @@ class Game:
             self.stack[0].update(dt * self.dt_mult)
             self.stack[0].draw()
             # if fps drops below 10 the game will start to lag
-            dt = pygame.math.clamp(
-                self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
-            )
+            dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1)
             self.dt_mult = 1
             # self.window.title = str(round(self.clock.get_fps())).zfill(5)
             # window scaling
@@ -100,6 +96,7 @@ class Game:
                     (0, 0),
                 )
             self.window.flip()
+            await asyncio.sleep(0)
 
         self.window.destroy()
         self.renderer = None
