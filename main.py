@@ -12,7 +12,7 @@ pygame.init()
 
 
 class Game:
-    def __init__(self, title="Project Gemini", fps=60):
+    def __init__(self, title="Project Gemini", fps=0):
         self.title = title
         self.window = None
         self.clock = pygame.time.Clock()
@@ -43,8 +43,8 @@ class Game:
         self.window.get_surface()  # allows convert() calls to happen
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
-        # self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
+        self.stack.appendleft(space.Space(self))
+        # self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 
@@ -58,11 +58,14 @@ class Game:
             self.dt_mult = 1
             # self.window.title = str(round(self.clock.get_fps())).zfill(5)
             # window scaling
-            factor = min(self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
-                         self.window.get_surface().get_height() // util_draw.RESOLUTION[1])
-            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
-            rect.center = self.window.get_surface().get_rect().center
-            self.window.get_surface().blit(pygame.transform.scale_by(self.display_surface, (factor, factor)), rect.topleft)
+            if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
+                factor = min(self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
+                             self.window.get_surface().get_height() // util_draw.RESOLUTION[1])
+                rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
+                rect.center = self.window.get_surface().get_rect().center
+                self.window.get_surface().blit(pygame.transform.scale_by(self.display_surface, (factor, factor)), rect.topleft)
+            if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
+                self.window.get_surface().blit(pygame.transform.scale(self.display_surface, self.window.size), (0, 0))
             self.window.flip()
 
         self.window.destroy()
