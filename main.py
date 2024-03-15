@@ -53,7 +53,8 @@ class Game:
             self.window.get_surface().fill("black")
             self.stack[0].update(dt * self.dt_mult)
             self.stack[0].draw()
-            dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -.6, .6)
+            # if fps drops below 10 the game will start to lag
+            dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -.1, .1)
             self.dt_mult = 1
             # self.window.title = str(round(self.clock.get_fps())).zfill(5)
             # window scaling
