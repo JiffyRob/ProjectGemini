@@ -6,7 +6,6 @@ import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 from scripts import game_state, util3d, util_draw
-
 from scripts.animation import Animation, SingleAnimation
 
 # TODO: port this properly to software rendering + implement z buffer (or port this whole thing to GLSL code)
@@ -32,7 +31,9 @@ class StaticSpriteGroup:
         )  # width, height
 
         self.sprite_texture_ids = numpy.zeros((self.sprite_count,), dtype=numpy.uint8)
-        self.sprite_texture_sub_ids = numpy.zeros((self.sprite_count, ), dtype=numpy.uint8)
+        self.sprite_texture_sub_ids = numpy.zeros(
+            (self.sprite_count,), dtype=numpy.uint8
+        )
         self.texture_sizes = numpy.zeros((256, lod, 2), dtype=numpy.int32)
         self.textures = numpy.zeros((256, lod), dtype=Animation)
         self.texture_names = {}
@@ -42,7 +43,9 @@ class StaticSpriteGroup:
 
         # preallocate memory for transform data
         self.cross_buffer = numpy.zeros((self.sprite_count,), dtype=numpy.float64)
-        self.texture_difference_buffer = numpy.zeros((self.sprite_count, lod, 2), dtype=numpy.float64)
+        self.texture_difference_buffer = numpy.zeros(
+            (self.sprite_count, lod, 2), dtype=numpy.float64
+        )
         self.mod_array = numpy.zeros((6,), dtype=numpy.float64)
         self.ids = numpy.arange(self.sprite_count)
 
@@ -50,7 +53,7 @@ class StaticSpriteGroup:
         self.next_texture_id = 0
 
     def update(self, dt):
-        for texture_list in self.textures[:self.next_texture_id]:
+        for texture_list in self.textures[: self.next_texture_id]:
             for texture in texture_list:
                 if texture:
                     texture.update(dt)
@@ -63,7 +66,7 @@ class StaticSpriteGroup:
                 value = SingleAnimation(value)
             self.textures[texture_id][i] = value
         keys = tuple(data.keys())
-        self.texture_sizes[texture_id][:len(keys)] = keys
+        self.texture_sizes[texture_id][: len(keys)] = keys
         self.next_texture_id += 1
 
     def add_sprite(self, position, texture, size=(16, 16)):
@@ -77,27 +80,39 @@ class StaticSpriteGroup:
 
     def finalize(self, camera):
         # move to camera center
-        numpy.add(self.screen_positions[:self.next_id], (*camera.center, 0), self.screen_positions[:self.next_id])
+        numpy.add(
+            self.screen_positions[: self.next_id],
+            (*camera.center, 0),
+            self.screen_positions[: self.next_id],
+        )
         # texture matching (get best size texture for computed object size)
         numpy.subtract(
-            self.screen_sizes.reshape(self.sprite_count, 1, 2)[:self.next_id], self.texture_sizes[self.sprite_texture_ids][:self.next_id], self.texture_difference_buffer
+            self.screen_sizes.reshape(self.sprite_count, 1, 2)[: self.next_id],
+            self.texture_sizes[self.sprite_texture_ids][: self.next_id],
+            self.texture_difference_buffer,
         )
-        numpy.argmin(numpy.linalg.norm(self.texture_difference_buffer[:self.next_id], axis=2), axis=1, out=self.sprite_texture_sub_ids[:self.next_id])
-        self.screen_sizes[:self.next_id] = self.texture_sizes[self.sprite_texture_ids, self.sprite_texture_sub_ids][:self.next_id]
+        numpy.argmin(
+            numpy.linalg.norm(self.texture_difference_buffer[: self.next_id], axis=2),
+            axis=1,
+            out=self.sprite_texture_sub_ids[: self.next_id],
+        )
+        self.screen_sizes[: self.next_id] = self.texture_sizes[
+            self.sprite_texture_ids, self.sprite_texture_sub_ids
+        ][: self.next_id]
         # top left positioning
         numpy.subtract(
-            self.screen_positions[:self.next_id][:, :2],
-            self.screen_sizes[:self.next_id] / 2,
-            self.screen_positions[:self.next_id][:, :2],
+            self.screen_positions[: self.next_id][:, :2],
+            self.screen_sizes[: self.next_id] / 2,
+            self.screen_positions[: self.next_id][:, :2],
         )
         # don't draw things outside view area
-        zs = self.screen_positions[:self.next_id][:, 2]
+        zs = self.screen_positions[: self.next_id][:, 2]
         indices = numpy.argsort(-zs)
         zs = zs[indices]
-        xs = self.screen_sizes[:self.next_id][:, 0][indices]
-        ys = self.screen_sizes[:self.next_id][:, 1][indices]
+        xs = self.screen_sizes[: self.next_id][:, 0][indices]
+        ys = self.screen_sizes[: self.next_id][:, 1][indices]
 
-        self.draw_indices = self.ids[:self.next_id][indices][
+        self.draw_indices = self.ids[: self.next_id][indices][
             (zs >= 0)
             & (zs <= camera.far_z)
             & (xs >= 0)
@@ -107,23 +122,38 @@ class StaticSpriteGroup:
         ]
 
     def get_rect(self, id):
-        return pygame.FRect(tuple(self.screen_positions[id][:2]), tuple(self.screen_sizes[id]))
+        return pygame.FRect(
+            tuple(self.screen_positions[id][:2]), tuple(self.screen_sizes[id])
+        )
 
     def distance(self, id):
         return pygame.Vector3(tuple(self.screen_positions[id])).length()
 
     def draw(self):
         self.level.game.window_surface.fblits(
-            [(self.textures[self.sprite_texture_ids[i]][self.sprite_texture_sub_ids[i]].image, self.screen_positions[i][:2])
-             for i in self.ids[self.draw_indices]]
+            [
+                (
+                    self.textures[self.sprite_texture_ids[i]][
+                        self.sprite_texture_sub_ids[i]
+                    ].image,
+                    self.screen_positions[i][:2],
+                )
+                for i in self.ids[self.draw_indices]
+            ]
         )
 
     def dirty_draw(self, camera):
         # copy
-        numpy.copyto(self.screen_positions[:self.next_id], self.global_positions[:self.next_id])
-        numpy.copyto(self.screen_sizes[:self.next_id], self.global_sizes[:self.next_id])
+        numpy.copyto(
+            self.screen_positions[: self.next_id], self.global_positions[: self.next_id]
+        )
+        numpy.copyto(
+            self.screen_sizes[: self.next_id], self.global_sizes[: self.next_id]
+        )
         util3d.inverse_camera_transform_points_sizes(
-            self.screen_positions[:self.next_id], self.screen_sizes[:self.next_id], camera
+            self.screen_positions[: self.next_id],
+            self.screen_sizes[: self.next_id],
+            camera,
         )
         # center on screen + culling
         self.finalize(camera)
@@ -154,30 +184,40 @@ class Space(game_state.GameState):
             1000,
         )
         self.sprites = []
-        self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
+        self.ship_overlay = self.game.loader.get_surface_scaled_to(
+            "ship-inside.png", util_draw.RESOLUTION
+        )
         self.static_sprites = StaticSpriteGroup(self, 10000, 6)
         sizes = ((16, 16), (9, 9), (5, 5), (1, 1))
         self.static_sprites.add_textures(
-            "blue", {
-                size: self.game.loader.get_image("stars", f"blue{i + 1}") for i, size in enumerate(sizes)
-            }
+            "blue",
+            {
+                size: self.game.loader.get_image("stars", f"blue{i + 1}")
+                for i, size in enumerate(sizes)
+            },
         )
         self.static_sprites.add_textures(
-            "yellow", {
-                size: self.game.loader.get_image("stars", f"yellow{i + 1}") for i, size in enumerate(sizes)
-            }
+            "yellow",
+            {
+                size: self.game.loader.get_image("stars", f"yellow{i + 1}")
+                for i, size in enumerate(sizes)
+            },
         )
         self.static_sprites.add_textures(
-            "Terra", {
-                (size, size): Animation(self.game.loader.get_spritesheet(f"planets/Terra{size}", (size, size))) for size in (6, 16, 32, 48, 64, 128)
-            }
+            "Terra",
+            {
+                (size, size): Animation(
+                    self.game.loader.get_spritesheet(
+                        f"planets/Terra{size}", (size, size)
+                    )
+                )
+                for size in (6, 16, 32, 48, 64, 128)
+            },
         )
         self.terra_id = self.static_sprites.add_sprite((0, 0, 0), "Terra", (64, 64))
 
         for pos in numpy.random.uniform(low=-1000, high=1000, size=(9999, 3)):
-            self.static_sprites.add_sprite(
-                tuple(pos), "yellow"
-            )
+            self.static_sprites.add_sprite(tuple(pos), "yellow")
 
     def update(self, dt):
         buttons = pygame.mouse.get_pressed()
@@ -195,8 +235,14 @@ class Space(game_state.GameState):
                     self.camera.rotation *= rotation
                     pass
                 case pygame.Event(type=pygame.MOUSEBUTTONDOWN, button=button):
-                    if button==1:
-                        if self.static_sprites.get_rect(self.terra_id).collidepoint(self.game.mouse_pos) and self.static_sprites.distance(self.terra_id) < self.camera.near_z:
+                    if button == 1:
+                        if (
+                            self.static_sprites.get_rect(self.terra_id).collidepoint(
+                                self.game.mouse_pos
+                            )
+                            and self.static_sprites.distance(self.terra_id)
+                            < self.camera.near_z
+                        ):
                             print("entering Terra!")
                             raise SystemExit
         motion = pygame.Vector3()

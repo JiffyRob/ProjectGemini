@@ -31,13 +31,20 @@ class Game:
     @property
     def mouse_pos(self):
         if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
-            factor = min(self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
-                         self.window.get_surface().get_height() // util_draw.RESOLUTION[1])
-            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
+            factor = min(
+                self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
+                self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
+            )
+            rect = pygame.Rect(
+                0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor
+            )
             rect.center = self.window.get_surface().get_rect().center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
         if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
-            return pygame.Vector2(pygame.mouse.get_pos()).elementwise() * (util_draw.RESOLUTION[0] / self.window.size[0], util_draw.RESOLUTION[1] / self.window.size[1])
+            return pygame.Vector2(pygame.mouse.get_pos()).elementwise() * (
+                util_draw.RESOLUTION[0] / self.window.size[0],
+                util_draw.RESOLUTION[1] / self.window.size[1],
+            )
 
     def time_phase(self, mult):
         self.dt_mult = mult
@@ -65,18 +72,33 @@ class Game:
             self.stack[0].update(dt * self.dt_mult)
             self.stack[0].draw()
             # if fps drops below 10 the game will start to lag
-            dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -.1, .1)
+            dt = pygame.math.clamp(
+                self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
+            )
             self.dt_mult = 1
             # self.window.title = str(round(self.clock.get_fps())).zfill(5)
             # window scaling
             if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
-                factor = min(self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
-                             self.window.get_surface().get_height() // util_draw.RESOLUTION[1])
-                rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
+                factor = min(
+                    self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
+                    self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
+                )
+                rect = pygame.Rect(
+                    0,
+                    0,
+                    util_draw.RESOLUTION[0] * factor,
+                    util_draw.RESOLUTION[1] * factor,
+                )
                 rect.center = self.window.get_surface().get_rect().center
-                self.window.get_surface().blit(pygame.transform.scale_by(self.display_surface, (factor, factor)), rect.topleft)
+                self.window.get_surface().blit(
+                    pygame.transform.scale_by(self.display_surface, (factor, factor)),
+                    rect.topleft,
+                )
             if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
-                self.window.get_surface().blit(pygame.transform.scale(self.display_surface, self.window.size), (0, 0))
+                self.window.get_surface().blit(
+                    pygame.transform.scale(self.display_surface, self.window.size),
+                    (0, 0),
+                )
             self.window.flip()
 
         self.window.destroy()

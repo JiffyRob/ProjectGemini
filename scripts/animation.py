@@ -13,7 +13,7 @@ def flip_surface(surface, flip_x, flip_y):
 
 
 class Animation:
-    def __init__(self, frames, speed=.2, flip_x=False, flip_y=False):
+    def __init__(self, frames, speed=0.2, flip_x=False, flip_y=False):
         self.frames = list(frames)
         self.time = 0
         self.speed = speed

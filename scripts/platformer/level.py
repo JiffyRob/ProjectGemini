@@ -133,11 +133,15 @@ class Level(game_state.GameState):
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
                 while offset.x < util_draw.RESOLUTION[0]:
-                    self.game.window_surface.blit(background.image, background.rect.move(offset))
+                    self.game.window_surface.blit(
+                        background.image, background.rect.move(offset)
+                    )
                     offset.x += background.rect.width
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             if sprite.image is not None:
                 self.game.window_surface.blit(
                     sprite.image,
-                    sprite.rect.move((-int(self.viewport_rect.left), -int(self.viewport_rect.top))),
+                    sprite.rect.move(
+                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
+                    ),
                 )

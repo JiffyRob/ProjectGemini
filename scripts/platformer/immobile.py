@@ -1,7 +1,9 @@
 import random
 from itertools import cycle
 from math import sin
+
 import pygame
+
 from scripts import sprite, util_draw
 from scripts.animation import Animation
 
@@ -35,7 +37,12 @@ class Prop(sprite.Sprite):
 
     def __init__(self, level, rect=(0, 0, 16, 16)):
         super().__init__(level, image=None, rect=rect)
-        self.anim = Animation(level.game.loader.get_spritesheet("platformer-sprites.png")[self.FIRST:self.LAST], self.SPEED)
+        self.anim = Animation(
+            level.game.loader.get_spritesheet("platformer-sprites.png")[
+                self.FIRST : self.LAST
+            ],
+            self.SPEED,
+        )
         # util_draw.debug_show(self.anim.image)
 
     def update(self, dt):
@@ -56,7 +63,9 @@ class BustedParts(sprite.Sprite):
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[16:20]
         )
-        self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[20]
+        self.hit_image = self.level.game.loader.get_spritesheet(
+            "platformer-sprites.png"
+        )[20]
         self.hit_time = 0
         self.hit_wait = 0.2
         self.collision_rect = self.rect.inflate(-2, -12)
@@ -69,7 +78,7 @@ class BustedParts(sprite.Sprite):
         if self.collision_rect.colliderect(self.level.player.collision_rect):
             self.image = self.hit_image
             self.hit_time = 0.2
-            self.level.player.jump(True, .7)
+            self.level.player.jump(True, 0.7)
         if self.hit_time > 0:
             self.hit_time -= dt
         else:
@@ -91,4 +100,3 @@ class CollisionSprite(sprite.Sprite):
     @property
     def collision_rect(self):
         return self.rect.copy()
-

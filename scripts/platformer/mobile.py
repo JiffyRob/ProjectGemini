@@ -32,7 +32,7 @@ class PhysicsSprite(sprite.Sprite):
     def update(self, dt):
         # physics
         old_rect = self.collision_rect.copy()
-        vel = self.velocity * dt + .5 * GRAVITY * self.weight * dt ** 2
+        vel = self.velocity * dt + 0.5 * GRAVITY * self.weight * dt**2
         self.velocity += GRAVITY * self.weight * dt
         self.rect.x += vel.x
         self.on_ground = False
@@ -93,10 +93,12 @@ class BoingerBeetle(PhysicsSprite):
         super().__init__(level, rect=rect, weight=3)
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[8:12],
-            .15,
+            0.15,
         )
-        self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[12]
-        self.hit_wait = .2
+        self.hit_image = self.level.game.loader.get_spritesheet(
+            "platformer-sprites.png"
+        )[12]
+        self.hit_wait = 0.2
         self.hit_timer = 0
         self.facing_left = True
         self.image = self.anim.image
@@ -109,12 +111,15 @@ class BoingerBeetle(PhysicsSprite):
         self.facing_left = not self.facing_left
 
     def update(self, dt):
-        self.velocity.x = WALK_SPEED * .3 * (-1 + self.facing_left * 2)
+        self.velocity.x = WALK_SPEED * 0.3 * (-1 + self.facing_left * 2)
         self.anim.flip_x = self.facing_left
         if not super().update(dt):
             return False
         self.anim.update(dt)
-        if self.collision_rect.colliderect(self.level.player.collision_rect) and self.level.player.velocity.y > 0:
+        if (
+            self.collision_rect.colliderect(self.level.player.collision_rect)
+            and self.level.player.velocity.y > 0
+        ):
             self.image = flip_surface(self.hit_image, self.anim.flip_x, False)
             self.hit_timer = self.hit_wait
             self.level.player.jump(True, 1.5)
