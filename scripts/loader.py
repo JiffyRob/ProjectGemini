@@ -56,17 +56,17 @@ class Loader:
 
     @functools.cache
     def get_surface(self, path):
-        return self.convert(pygame.image.load(pathlib.Path(self.base_path, path)))
+        return self.convert(pygame.image.load(pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))))
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):
         path = pathlib.Path(path)
-        return self.convert(pygame.transform.scale_by(self.get_surface(path.with_suffix(".png")), factor))
+        return self.convert(pygame.transform.scale_by(self.get_surface(path), factor))
 
     @functools.cache
     def get_surface_scaled_to(self, path, size=(16, 16)):
         path = pathlib.Path(path)
-        return self.convert(pygame.transform.scale(self.get_surface(path.with_suffix(".png")), size))
+        return self.convert(pygame.transform.scale(self.get_surface(path), size))
 
     @functools.cache
     def get_spritesheet(self, path, size=(16, 16)):
@@ -87,7 +87,7 @@ class Loader:
     @functools.cache
     def get_image(self, path, area=None):
         path = pathlib.Path(path)
-        surface = self.get_surface(path.with_suffix(".png"))
+        surface = self.get_surface(path)
         if isinstance(area, str):
             area = self.get_json(path.with_suffix(".json"))[area]
         return self.convert(surface.subsurface(area))

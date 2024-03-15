@@ -28,6 +28,17 @@ class Game:
     def window_surface(self):
         return self.display_surface
 
+    @property
+    def mouse_pos(self):
+        if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
+            factor = min(self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
+                         self.window.get_surface().get_height() // util_draw.RESOLUTION[1])
+            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
+            rect.center = self.window.get_surface().get_rect().center
+            return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
+        if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
+            return pygame.Vector2(pygame.mouse.get_pos()).elementwise() * (util_draw.RESOLUTION[0] / self.window.size[0], util_draw.RESOLUTION[1] / self.window.size[1])
+
     def time_phase(self, mult):
         self.dt_mult = mult
 

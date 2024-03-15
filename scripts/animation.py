@@ -30,3 +30,17 @@ class Animation:
     def image(self):
         image = self.frames[round(self.time / self.speed) % len(self.frames)]
         return flip_surface(image, self.flip_x, self.flip_y)
+
+
+class SingleAnimation:
+    def __init__(self, surface, flip_x=False, flip_y=False):
+        self.surface = surface
+        self.flip_x = flip_x
+        self.flip_y = flip_y
+
+    def update(self, dt):
+        pass
+
+    @property
+    def image(self):
+        return flip_surface(self.surface, self.flip_x, self.flip_y)

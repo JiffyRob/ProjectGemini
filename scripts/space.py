@@ -5,13 +5,15 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import game_state, util3d, util_draw, loader
+from scripts import game_state, util3d, util_draw
+
+from scripts.animation import Animation, SingleAnimation
 
 # TODO: port this properly to software rendering + implement z buffer (or port this whole thing to GLSL code)
 
 
 class StaticSpriteGroup:
-    def __init__(self, level, sprites=1000):
+    def __init__(self, level, sprites=1000, lod=4):
         self.level = level
         self.sprite_count = sprites
 
@@ -31,8 +33,8 @@ class StaticSpriteGroup:
 
         self.sprite_texture_ids = numpy.zeros((self.sprite_count,), dtype=numpy.uint8)
         self.sprite_texture_sub_ids = numpy.zeros((self.sprite_count, ), dtype=numpy.uint8)
-        self.texture_sizes = numpy.zeros((256, 4, 2), dtype=numpy.int32)
-        self.textures = numpy.zeros((256, 4), dtype=pygame.Surface)
+        self.texture_sizes = numpy.zeros((256, lod, 2), dtype=numpy.int32)
+        self.textures = numpy.zeros((256, lod), dtype=Animation)
         self.texture_names = {}
         self.next_texture_id = 0
 
@@ -40,20 +42,29 @@ class StaticSpriteGroup:
 
         # preallocate memory for transform data
         self.cross_buffer = numpy.zeros((self.sprite_count,), dtype=numpy.float64)
-        self.texture_difference_buffer = numpy.zeros((self.sprite_count, 4, 2), dtype=numpy.float64)
+        self.texture_difference_buffer = numpy.zeros((self.sprite_count, lod, 2), dtype=numpy.float64)
         self.mod_array = numpy.zeros((6,), dtype=numpy.float64)
         self.ids = numpy.arange(self.sprite_count)
 
         self.next_id = 0
         self.next_texture_id = 0
 
+    def update(self, dt):
+        for texture_list in self.textures[:self.next_texture_id]:
+            for texture in texture_list:
+                if texture:
+                    texture.update(dt)
+
     def add_textures(self, name, data):
         texture_id = self.next_texture_id
         self.texture_names[name] = texture_id
-        self.textures[texture_id] = tuple(data.values())
-        self.texture_sizes[texture_id] = tuple(data.keys())
+        for i, value in enumerate(data.values()):
+            if isinstance(value, pygame.Surface):
+                value = SingleAnimation(value)
+            self.textures[texture_id][i] = value
+        keys = tuple(data.keys())
+        self.texture_sizes[texture_id][:len(keys)] = keys
         self.next_texture_id += 1
-
 
     def add_sprite(self, position, texture, size=(16, 16)):
         texture_id = self.texture_names[texture]
@@ -72,7 +83,7 @@ class StaticSpriteGroup:
             self.screen_sizes.reshape(self.sprite_count, 1, 2)[:self.next_id], self.texture_sizes[self.sprite_texture_ids][:self.next_id], self.texture_difference_buffer
         )
         numpy.argmin(numpy.linalg.norm(self.texture_difference_buffer[:self.next_id], axis=2), axis=1, out=self.sprite_texture_sub_ids[:self.next_id])
-
+        self.screen_sizes[:self.next_id] = self.texture_sizes[self.sprite_texture_ids, self.sprite_texture_sub_ids][:self.next_id]
         # top left positioning
         numpy.subtract(
             self.screen_positions[:self.next_id][:, :2],
@@ -81,13 +92,13 @@ class StaticSpriteGroup:
         )
         # don't draw things outside view area
         zs = self.screen_positions[:self.next_id][:, 2]
-        indices = numpy.argsort(zs)
+        indices = numpy.argsort(-zs)
         zs = zs[indices]
         xs = self.screen_sizes[:self.next_id][:, 0][indices]
         ys = self.screen_sizes[:self.next_id][:, 1][indices]
 
         self.draw_indices = self.ids[:self.next_id][indices][
-            (zs >= camera.near_z)
+            (zs >= 0)
             & (zs <= camera.far_z)
             & (xs >= 0)
             & (ys >= 0)
@@ -95,9 +106,15 @@ class StaticSpriteGroup:
             & (ys <= camera.center.y * 2)
         ]
 
+    def get_rect(self, id):
+        return pygame.FRect(tuple(self.screen_positions[id][:2]), tuple(self.screen_sizes[id]))
+
+    def distance(self, id):
+        return pygame.Vector3(tuple(self.screen_positions[id])).length()
+
     def draw(self):
         self.level.game.window_surface.fblits(
-            [(self.textures[self.sprite_texture_ids[i]][self.sprite_texture_sub_ids[i]], self.screen_positions[i][:2])
+            [(self.textures[self.sprite_texture_ids[i]][self.sprite_texture_sub_ids[i]].image, self.screen_positions[i][:2])
              for i in self.ids[self.draw_indices]]
         )
 
@@ -133,12 +150,12 @@ class Space(game_state.GameState):
             util3d.Quaternion(),
             pygame.Vector2(util_draw.RESOLUTION) / 2,
             pygame.Vector2(60, 60),  # TODO : FOV
-            100,
             400,
+            1000,
         )
         self.sprites = []
         self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
-        self.static_sprites = StaticSpriteGroup(self, 10000)
+        self.static_sprites = StaticSpriteGroup(self, 10000, 6)
         sizes = ((16, 16), (9, 9), (5, 5), (1, 1))
         self.static_sprites.add_textures(
             "blue", {
@@ -150,7 +167,14 @@ class Space(game_state.GameState):
                 size: self.game.loader.get_image("stars", f"yellow{i + 1}") for i, size in enumerate(sizes)
             }
         )
-        for pos in numpy.random.uniform(low=-1000, high=1000, size=(10000, 3)):
+        self.static_sprites.add_textures(
+            "Terra", {
+                (size, size): Animation(self.game.loader.get_spritesheet(f"planets/Terra{size}", (size, size))) for size in (6, 16, 32, 48, 64, 128)
+            }
+        )
+        self.terra_id = self.static_sprites.add_sprite((0, 0, 0), "Terra", (64, 64))
+
+        for pos in numpy.random.uniform(low=-1000, high=1000, size=(9999, 3)):
             self.static_sprites.add_sprite(
                 tuple(pos), "yellow"
             )
@@ -170,6 +194,11 @@ class Space(game_state.GameState):
                     rotation = util3d.Quaternion(motion * dt, (0, 0, 1))
                     self.camera.rotation *= rotation
                     pass
+                case pygame.Event(type=pygame.MOUSEBUTTONDOWN, button=button):
+                    if button==1:
+                        if self.static_sprites.get_rect(self.terra_id).collidepoint(self.game.mouse_pos) and self.static_sprites.distance(self.terra_id) < self.camera.near_z:
+                            print("entering Terra!")
+                            raise SystemExit
         motion = pygame.Vector3()
         if keys[pygame.K_UP]:
             motion.z += 100 * dt
@@ -185,6 +214,7 @@ class Space(game_state.GameState):
             motion.y += 100 * dt
         if keys[pygame.K_LCTRL]:
             self.camera.rotation = util3d.Quaternion()
+        self.static_sprites.update(dt)
         self.camera.pos += self.camera.rotation * motion
         if keys[pygame.K_ESCAPE]:
             self.game.quit()
