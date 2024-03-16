@@ -172,7 +172,6 @@ class Space(game_state.GameState):
             self.static_sprites.add_sprite(tuple(pos), "yellow")
 
     def update(self, dt):
-        buttons = pygame.mouse.get_pressed()
         keys = pygame.key.get_pressed()
         for event in pygame.event.get():
             match event:
@@ -189,7 +188,7 @@ class Space(game_state.GameState):
                             and self.static_sprites.distance(self.terra_id) < self.camera.near_z
                         ):
                             print("entering Terra!")
-                            raise SystemExit
+                            self.game.load_map("Level_0")
         motion = pygame.Vector3()
         motion.z += 100 * dt
         rot_speed = 0.25
@@ -212,6 +211,7 @@ class Space(game_state.GameState):
         if keys[pygame.K_ESCAPE]:
             self.game.quit()
         # self.game.window.title = f"FPS: {round(self.game.clock.get_fps())} ROTATION: {self.camera.rotation}"
+        return True
 
     def draw(self):
         self.static_sprites.dirty_draw(self.camera)

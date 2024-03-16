@@ -12,7 +12,7 @@ pygame.init()
 
 
 class Game:
-    def __init__(self, title="Project Gemini", fps=0):
+    def __init__(self, title="Project Gemini", fps=60):
         self.title = title
         self.window = None
         self.clock = pygame.time.Clock()
@@ -44,6 +44,9 @@ class Game:
                 util_draw.RESOLUTION[1] / self.window.size[1],
             )
 
+    def load_map(self, map_name):
+        self.stack.appendleft(platformer.Level.load(self, map_name))
+
     def time_phase(self, mult):
         self.dt_mult = mult
 
@@ -65,9 +68,11 @@ class Game:
         pygame.key.set_repeat(0, 0)
 
         while self.running and len(self.stack):
+            kill_state = False
             self.window_surface.fill(self.stack[0].bgcolor)
             self.window.get_surface().fill("black")
-            self.stack[0].update(dt * self.dt_mult)
+            if not self.stack[0].update(dt * self.dt_mult):
+                kill_state = True
             self.stack[0].draw()
             # if fps drops below 10 the game will start to lag
             dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1)
@@ -96,6 +101,8 @@ class Game:
                 )
             self.window.flip()
             await asyncio.sleep(0)
+            if kill_state:
+                self.stack.popleft()
 
         self.window.destroy()
         self.renderer = None

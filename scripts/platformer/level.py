@@ -41,7 +41,6 @@ class Level(game_state.GameState):
         self.sprites.append(sprite)
 
     @classmethod
-    @functools.cache
     def load(cls, game, name):
         # basic metadata
         folder = pathlib.Path("ldtk/simplified", name)
@@ -121,6 +120,11 @@ class Level(game_state.GameState):
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
         self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
         self.viewport_rect.clamp_ip(self.map_rect)
+        # if player died, end game
+        if self.player not in self.sprites:
+            print("player dead.  Exiting.")
+            return False
+        return True
 
     def draw(self):
         super().draw()
