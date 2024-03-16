@@ -14,7 +14,9 @@ class Quaternion:
         self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
 
     def magnitude(self):
-        return math.sqrt(self.real**2 + self.vector.x**2 + self.vector.y**2 + self.vector.z**2)
+        return math.sqrt(
+            self.real**2 + self.vector.x**2 + self.vector.y**2 + self.vector.z**2
+        )
 
     @classmethod
     def from_standard(cls, r, i, j, k):
@@ -48,8 +50,16 @@ class Quaternion:
             )
         if isinstance(other, pygame.Vector3):
             cross_product = self.vector.cross(other)
-            return other + (cross_product * 2 * self.real) + 2 * self.vector.cross(cross_product)
-        raise TypeError(f"No multiplication between Quaternions and '{type(other)}' allowed")
+            return (
+                other
+                + (cross_product * 2 * self.real)
+                + 2 * self.vector.cross(cross_product)
+            )
+        if isinstance(other, float):
+            return Quaternion.from_standard(self.real * other, *self.vector)
+        raise TypeError(
+            f"No multiplication between Quaternions and '{type(other)}' allowed"
+        )
 
     def __repr__(self):
         return f"<{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}>"
@@ -180,17 +190,25 @@ class Model:
                     case ["newmtl", name]:
                         materials[name] = Material()
                     case ["Ka", r, g, b] if current_key is not None:
-                        materials[current_key].ambient_color = denormalize_color(r, g, b)
+                        materials[current_key].ambient_color = denormalize_color(
+                            r, g, b
+                        )
                     case ["Kd", r, g, b] if current_key is not None:
-                        materials[current_key].diffuse_color = denormalize_color(r, g, b)
+                        materials[current_key].diffuse_color = denormalize_color(
+                            r, g, b
+                        )
                     case ["Ks", r, g, b] if current_key is not None:
-                        materials[current_key].specular_color = denormalize_color(r, g, b)
+                        materials[current_key].specular_color = denormalize_color(
+                            r, g, b
+                        )
                     case ["d", n] if current_key is not None:
                         materials[current_key].transparency = 1 - n
                     case ["Tr", n] if current_key is not None:
                         materials[current_key].transparency = n
                     case _:
-                        print(f"File {path}: line {line} contains incorrect syntax or is not supported")
+                        print(
+                            f"File {path}: line {line} contains incorrect syntax or is not supported"
+                        )
 
     @classmethod
     def from_files(cls, path, texture_path=None, pos=None, rotation=None, cache=True):
@@ -227,8 +245,12 @@ class Model:
                         face_texcoords = []
                         face_normals = []
                         for vert in verts:
-                            vert += "/" * (3 - vert.count("/"))  # add implicit slashes for easier parsing
-                            vertex_index, texture_index, normal_index, *_ = vert.split("/")
+                            vert += "/" * (
+                                3 - vert.count("/")
+                            )  # add implicit slashes for easier parsing
+                            vertex_index, texture_index, normal_index, *_ = vert.split(
+                                "/"
+                            )
                             face.append(vertex_index)
                             if texture_index:
                                 face_texcoords.append(int(texture_index))
@@ -236,4 +258,6 @@ class Model:
                                 face_normals.append(int(normal_index))
                         faces.append([face, normals, texcoords, material])
                     case _:
-                        print(f"File {path}: line {line} contains incorrect syntax or is not supported")
+                        print(
+                            f"File {path}: line {line} contains incorrect syntax or is not supported"
+                        )

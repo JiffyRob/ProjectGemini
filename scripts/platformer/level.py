@@ -119,21 +119,29 @@ class Level(game_state.GameState):
             self.game.time_phase(-1)
         # removes dead sprites from the list
         self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
-        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
+        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
+            self.player.pos, LERP_SPEED
+        )
         self.viewport_rect.clamp_ip(self.map_rect)
 
     def draw(self):
         super().draw()
         for background in self.backgrounds:
-            offset = (-pygame.Vector2(self.viewport_rect.topleft)).elementwise() * background.mult
+            offset = (
+                -pygame.Vector2(self.viewport_rect.topleft)
+            ).elementwise() * background.mult
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
                 while offset.x < util_draw.RESOLUTION[0]:
-                    self.game.window_surface.blit(background.image, background.rect.move(offset))
+                    self.game.window_surface.blit(
+                        background.image, background.rect.move(offset)
+                    )
                     offset.x += background.rect.width
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             if sprite.image is not None:
                 self.game.window_surface.blit(
                     sprite.image,
-                    sprite.rect.move((-int(self.viewport_rect.left), -int(self.viewport_rect.top))),
+                    sprite.rect.move(
+                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
+                    ),
                 )
