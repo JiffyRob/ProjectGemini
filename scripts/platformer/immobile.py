@@ -11,9 +11,7 @@ from scripts.animation import Animation
 class Emerald(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
         super().__init__(level, image=None, rect=rect, src_rect=None, z=0)
-        self.anim = Animation(
-            self.level.game.loader.get_spritesheet("platformer-sprites.png")[0:5], 0.08
-        )
+        self.anim = Animation(self.level.game.loader.get_spritesheet("platformer-sprites.png")[0:5], 0.08)
         self.age = random.randint(0, 10)
         self.y = self.rect.top
         self.collision_rect = self.rect.inflate(-8, -4)
@@ -38,9 +36,7 @@ class Prop(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
         super().__init__(level, image=None, rect=rect)
         self.anim = Animation(
-            level.game.loader.get_spritesheet("platformer-sprites.png")[
-                self.FIRST : self.LAST
-            ],
+            level.game.loader.get_spritesheet("platformer-sprites.png")[self.FIRST : self.LAST],
             self.SPEED,
         )
         # util_draw.debug_show(self.anim.image)
@@ -60,12 +56,8 @@ class BrownShroom(Prop):
 class BustedParts(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
         super().__init__(level, image=None, rect=rect, src_rect=None, z=0)
-        self.anim = Animation(
-            self.level.game.loader.get_spritesheet("platformer-sprites.png")[16:20]
-        )
-        self.hit_image = self.level.game.loader.get_spritesheet(
-            "platformer-sprites.png"
-        )[20]
+        self.anim = Animation(self.level.game.loader.get_spritesheet("platformer-sprites.png")[16:20])
+        self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[20]
         self.hit_time = 0
         self.hit_wait = 0.2
         self.collision_rect = self.rect.inflate(-2, -12)

@@ -16,24 +16,14 @@ class StaticSpriteGroup:
         self.level = level
         self.sprite_count = sprites
 
-        self.global_positions = numpy.zeros(
-            (self.sprite_count, 3), dtype=numpy.float64
-        )  # x, y, z
-        self.global_sizes = numpy.zeros(
-            (self.sprite_count, 2), dtype=numpy.float64
-        )  # width, height
+        self.global_positions = numpy.zeros((self.sprite_count, 3), dtype=numpy.float64)  # x, y, z
+        self.global_sizes = numpy.zeros((self.sprite_count, 2), dtype=numpy.float64)  # width, height
 
-        self.screen_positions = numpy.zeros(
-            (self.sprite_count, 3), dtype=numpy.float64
-        )  # x, y, z
-        self.screen_sizes = numpy.zeros(
-            (self.sprite_count, 2), dtype=numpy.float64
-        )  # width, height
+        self.screen_positions = numpy.zeros((self.sprite_count, 3), dtype=numpy.float64)  # x, y, z
+        self.screen_sizes = numpy.zeros((self.sprite_count, 2), dtype=numpy.float64)  # width, height
 
         self.sprite_texture_ids = numpy.zeros((self.sprite_count,), dtype=numpy.uint8)
-        self.sprite_texture_sub_ids = numpy.zeros(
-            (self.sprite_count,), dtype=numpy.uint8
-        )
+        self.sprite_texture_sub_ids = numpy.zeros((self.sprite_count,), dtype=numpy.uint8)
         self.texture_sizes = numpy.zeros((256, lod, 2), dtype=numpy.int32)
         self.textures = numpy.zeros((256, lod), dtype=object)
         self.texture_names = {}
@@ -43,9 +33,7 @@ class StaticSpriteGroup:
 
         # preallocate memory for transform data
         self.cross_buffer = numpy.zeros((self.sprite_count,), dtype=numpy.float64)
-        self.texture_difference_buffer = numpy.zeros(
-            (self.sprite_count, lod, 2), dtype=numpy.float64
-        )
+        self.texture_difference_buffer = numpy.zeros((self.sprite_count, lod, 2), dtype=numpy.float64)
         self.mod_array = numpy.zeros((6,), dtype=numpy.float64)
         self.ids = numpy.arange(self.sprite_count)
 
@@ -94,9 +82,7 @@ class StaticSpriteGroup:
             axis=1,
             out=self.sprite_texture_sub_ids[: self.next_id],
         )
-        self.screen_sizes[: self.next_id] = self.texture_sizes[
-            self.sprite_texture_ids, self.sprite_texture_sub_ids
-        ][: self.next_id]
+        self.screen_sizes[: self.next_id] = self.texture_sizes[self.sprite_texture_ids, self.sprite_texture_sub_ids][: self.next_id]
         # top left positioning
         numpy.subtract(
             self.screen_positions[: self.next_id][:, :2],
@@ -111,19 +97,12 @@ class StaticSpriteGroup:
         ys = self.screen_sizes[: self.next_id][:, 1][indices]
 
         self.draw_indices = self.ids[: self.next_id][indices][
-            (zs >= 0)
-            & (zs <= camera.far_z)
-            & (xs >= 0)
-            & (ys >= 0)
-            & (xs <= camera.center.x * 2)
-            & (ys <= camera.center.y * 2)
+            (zs >= 0) & (zs <= camera.far_z) & (xs >= 0) & (ys >= 0) & (xs <= camera.center.x * 2) & (ys <= camera.center.y * 2)
         ]
 
     def get_rect(self, id):
         if id in self.draw_indices:
-            return pygame.FRect(
-                tuple(self.screen_positions[id][:2]), tuple(self.screen_sizes[id])
-            )
+            return pygame.FRect(tuple(self.screen_positions[id][:2]), tuple(self.screen_sizes[id]))
         return pygame.FRect(0, 0, 0, 0)
 
     def distance(self, id):
@@ -133,9 +112,7 @@ class StaticSpriteGroup:
         self.level.game.window_surface.fblits(
             (
                 zip(
-                    self.textures[self.sprite_texture_ids, self.sprite_texture_sub_ids][
-                        self.draw_indices
-                    ],
+                    self.textures[self.sprite_texture_ids, self.sprite_texture_sub_ids][self.draw_indices],
                     self.screen_positions[:, :2][self.draw_indices],
                 )
             )
@@ -143,12 +120,8 @@ class StaticSpriteGroup:
 
     def dirty_draw(self, camera):
         # copy
-        numpy.copyto(
-            self.screen_positions[: self.next_id], self.global_positions[: self.next_id]
-        )
-        numpy.copyto(
-            self.screen_sizes[: self.next_id], self.global_sizes[: self.next_id]
-        )
+        numpy.copyto(self.screen_positions[: self.next_id], self.global_positions[: self.next_id])
+        numpy.copyto(self.screen_sizes[: self.next_id], self.global_sizes[: self.next_id])
         util3d.inverse_camera_transform_points_sizes(
             self.screen_positions[: self.next_id],
             self.screen_sizes[: self.next_id],
@@ -175,33 +148,21 @@ class Space(game_state.GameState):
             1000,
         )
         self.sprites = []
-        self.ship_overlay = self.game.loader.get_surface_scaled_to(
-            "ship-inside.png", util_draw.RESOLUTION
-        )
+        self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
         self.static_sprites = StaticSpriteGroup(self, 10000, 6)
         sizes = ((16, 16), (9, 9), (5, 5), (1, 1))
         self.static_sprites.add_textures(
             "blue",
-            {
-                size: self.game.loader.get_image("stars", f"blue{i + 1}")
-                for i, size in enumerate(sizes)
-            },
+            {size: self.game.loader.get_image("stars", f"blue{i + 1}") for i, size in enumerate(sizes)},
         )
         self.static_sprites.add_textures(
             "yellow",
-            {
-                size: self.game.loader.get_image("stars", f"yellow{i + 1}")
-                for i, size in enumerate(sizes)
-            },
+            {size: self.game.loader.get_image("stars", f"yellow{i + 1}") for i, size in enumerate(sizes)},
         )
         self.static_sprites.add_textures(
             "Terra",
             {
-                (size, size): AnimatedSurface(
-                    self.game.loader.get_spritesheet(
-                        f"planets/Terra{size}", (size, size)
-                    )
-                )
+                (size, size): AnimatedSurface(self.game.loader.get_spritesheet(f"planets/Terra{size}", (size, size)))
                 for size in (6, 16, 32, 48, 64, 128)
             },
         )
@@ -224,11 +185,8 @@ class Space(game_state.GameState):
                 case pygame.Event(type=pygame.MOUSEBUTTONDOWN, button=button):
                     if button == 1:
                         if (
-                            self.static_sprites.get_rect(self.terra_id).collidepoint(
-                                self.game.mouse_pos
-                            )
-                            and self.static_sprites.distance(self.terra_id)
-                            < self.camera.near_z
+                            self.static_sprites.get_rect(self.terra_id).collidepoint(self.game.mouse_pos)
+                            and self.static_sprites.distance(self.terra_id) < self.camera.near_z
                         ):
                             print("entering Terra!")
                             raise SystemExit
@@ -281,13 +239,8 @@ class Space(game_state.GameState):
             sprite.rect.width = sprite.width * scale_factor
             sprite.rect.height = sprite.height * scale_factor
             # project
-            screen_pos = projection_matrix @ numpy.array(
-                (relative_pos.x, relative_pos.y, relative_pos.z, 1)
-            )
-            screen_pos = (
-                pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2])
-                / screen_pos[3]
-            )
+            screen_pos = projection_matrix @ numpy.array((relative_pos.x, relative_pos.y, relative_pos.z, 1))
+            screen_pos = pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2]) / screen_pos[3]
             # draw
             if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
                 sprite.rect.center = screen_pos.xy + self.camera.center

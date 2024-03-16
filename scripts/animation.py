@@ -65,6 +65,4 @@ class AnimatedSurface(pygame.Surface):
         if new_index != self.index:
             self.index = new_index
             self.fill((0, 0, 0, 0))
-            self.blit(
-                flip_surface(self.frames[self.index], self.flip_x, self.flip_y), (0, 0)
-            )
+            self.blit(flip_surface(self.frames[self.index], self.flip_x, self.flip_y), (0, 0))
