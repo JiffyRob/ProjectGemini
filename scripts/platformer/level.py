@@ -35,7 +35,8 @@ class Level(game_state.GameState):
         self.collision_rects = []
         self.down_rects = []
         self.gui = [
-            gui2d.HeartMeter(self, (2, 2, 16 * 9, 3 * 9))
+            gui2d.HeartMeter(self, (2, 2, 16 * 9, 9)),
+            gui2d.EmeraldMeter(self, (2, 11, 0, 0))
         ]
         self.map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(self.game.screen_rect)

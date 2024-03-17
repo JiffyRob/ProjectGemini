@@ -131,6 +131,7 @@ class Player(PhysicsSprite):
         self.facing_left = False
         self.health = 16
         self.health_capacity = 16
+        self.emeralds = 10
 
     def swap_state(self, new):
         if self.state != new:
@@ -153,6 +154,15 @@ class Player(PhysicsSprite):
 
     def hurt(self, amount):
         self.health = max(0, self.health - amount)
+
+    def heal(self, amount):
+        self.health = min(self.health_capacity, self.health + amount)
+
+    def pay(self, emeralds):
+        self.emeralds = min(999, self.emeralds + emeralds)
+
+    def charge(self, emeralds):
+        self.emeralds = max(0, self.emeralds - emeralds)
 
     def walk_left(self):
         self.velocity.x -= WALK_SPEED

@@ -20,6 +20,7 @@ class Emerald(sprite.Sprite):
         if not super().update(dt):
             return False
         if self.collision_rect.colliderect(self.level.player.collision_rect):
+            self.level.player.pay(5)
             return False
         self.anim.update(dt)
         self.image = self.anim.image
