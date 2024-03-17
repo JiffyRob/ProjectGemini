@@ -64,14 +64,11 @@ class Space(game_state.GameState):
                     rotation = math3d.Quaternion(motion * dt, (0, 0, 1))
                     self.camera.rotation *= rotation
                     pass
-                case pygame.Event(type=pygame.MOUSEBUTTONDOWN, button=button):
-                    if button == 1:
-                        if (
-                            self.static_sprites.get_rect(self.terra_id).collidepoint(self.game.mouse_pos)
-                            and self.static_sprites.distance(self.terra_id) < self.camera.near_z
-                        ):
-                            print("entering Terra!")
-                            self.game.load_map("Level_0")
+                case pygame.Event(type=pygame.KEYDOWN, key=pygame.K_RETURN):
+                    rect = self.static_sprites.get_rect(self.terra_id)
+                    if rect.width > 100:
+                        print("entering Terra!")
+                        self.game.load_map("Level_0")
         motion = pygame.Vector3()
         motion.z += 100 * dt
         rot_speed = 0.25
