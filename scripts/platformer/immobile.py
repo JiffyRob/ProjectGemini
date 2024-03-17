@@ -10,7 +10,7 @@ from scripts.animation import Animation
 
 class Emerald(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(level, image=None, rect=rect, src_rect=None, z=0)
+        super().__init__(level, image=None, rect=rect, z=0)
         self.anim = Animation(self.level.game.loader.get_spritesheet("platformer-sprites.png")[0:5], 0.08)
         self.age = random.randint(0, 10)
         self.y = self.rect.top
@@ -55,7 +55,7 @@ class BrownShroom(Prop):
 
 class BustedParts(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(level, image=None, rect=rect, src_rect=None, z=0)
+        super().__init__(level, image=None, rect=rect, z=0)
         self.anim = Animation(self.level.game.loader.get_spritesheet("platformer-sprites.png")[16:20])
         self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[20]
         self.hit_time = 0
@@ -79,10 +79,10 @@ class BustedParts(sprite.Sprite):
 
 
 class CollisionSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0):
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0):
         if image is None:
             image = pygame.Surface(rect[2:]).convert_alpha()
-        super().__init__(level, image=image, rect=rect, src_rect=src_rect, z=z)
+        super().__init__(level, image=image, rect=rect, z=z)
         # self.level.groups["collision"].add(self)
         self.level.collision_rects.add(self.collision_rect)
 

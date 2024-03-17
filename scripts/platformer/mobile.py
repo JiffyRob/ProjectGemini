@@ -11,8 +11,8 @@ JUMP_SPEED = 240
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), src_rect=None, z=0, weight=10):
-        super().__init__(level, image=image, rect=rect, src_rect=src_rect, z=z)
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10):
+        super().__init__(level, image=image, rect=rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
         self.desired_velocity = pygame.Vector2()

@@ -6,7 +6,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import loader, platformer, space, util_draw
+from scripts import loader, platformer, util_draw, space
 
 pygame.init()
 

@@ -1,3 +1,1 @@
-from .immobile import *
-from .level import *
-from .mobile import *
+from .level import Level
