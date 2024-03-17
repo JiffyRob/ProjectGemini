@@ -18,7 +18,7 @@ class Space(game_state.GameState):
             pygame.Vector2(util_draw.RESOLUTION) / 2,
             pygame.Vector2(60, 60),  # TODO : FOV
             400,
-            1000,
+            2000,
         )
         ship_rect = pygame.Rect(0, 0, 48, 32)
         ship_rect.center = self.game.screen_rect.center
@@ -29,14 +29,18 @@ class Space(game_state.GameState):
         self.sprites = []
         self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
         self.static_sprites = sprite3d.StaticSpriteGroup(self, 10000, 6)
-        sizes = ((16, 16), (9, 9), (5, 5), (1, 1))
+        sizes = ((16, 16), (9, 9), (5, 5), (2, 2))
+        blue_textures = {size: self.game.loader.get_image("stars", f"blue{i + 1}") for i, size in enumerate(sizes)}
+        blue_textures[(0, 0)] = pygame.Surface((0, 0)).convert()
         self.static_sprites.add_textures(
             "blue",
-            {size: self.game.loader.get_image("stars", f"blue{i + 1}") for i, size in enumerate(sizes)},
+            blue_textures,
         )
+        yellow_textures = {size: self.game.loader.get_image("stars", f"yellow{i + 1}") for i, size in enumerate(sizes)}
+        yellow_textures[(0, 0)] = pygame.Surface((0, 0)).convert()
         self.static_sprites.add_textures(
             "yellow",
-            {size: self.game.loader.get_image("stars", f"yellow{i + 1}") for i, size in enumerate(sizes)},
+            yellow_textures,
         )
         self.static_sprites.add_textures(
             "Terra",
