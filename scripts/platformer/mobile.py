@@ -129,6 +129,8 @@ class Player(PhysicsSprite):
         self.jump_forced = False
         self.image = self.anim_dict[self.state].image
         self.facing_left = False
+        self.health = 16
+        self.health_capacity = 16
 
     def swap_state(self, new):
         if self.state != new:
@@ -147,7 +149,10 @@ class Player(PhysicsSprite):
         self.anim_dict[self.state].update(dt)
         self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
-        return super().update(dt)
+        return super().update(dt) and self.health > 0
+
+    def hurt(self, amount):
+        self.health = max(0, self.health - amount)
 
     def walk_left(self):
         self.velocity.x -= WALK_SPEED

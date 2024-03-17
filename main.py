@@ -63,7 +63,7 @@ class Game:
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
         self.stack.appendleft(space.Space(self))
-        # self.stack.appendleft(platformer.Level.load(self, "Level_0"))
+        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 

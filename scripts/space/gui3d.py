@@ -1,15 +1,10 @@
 import pygame
 
 from scripts import sprite
-from scripts.animation import Animation, flip_surface
+from scripts.animation import Animation
 
 
-class GUISprite(sprite.Sprite):
-    def draw(self, surface):
-        surface.blit(self.image, self.rect)
-
-
-class Ship(GUISprite):
+class Ship(sprite.GUISprite):
     UP = 1
     DOWN = 2
     LEFT = 4

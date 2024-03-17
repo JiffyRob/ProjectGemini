@@ -4,7 +4,7 @@ from collections import defaultdict, namedtuple
 
 import pygame
 
-from scripts import game_state, sprite, util_draw
+from scripts import game_state, sprite, util_draw, gui2d
 from scripts.platformer import immobile, mobile
 
 Parallax = namedtuple(
@@ -34,6 +34,9 @@ class Level(game_state.GameState):
         self.sprites = [self.player]
         self.collision_rects = []
         self.down_rects = []
+        self.gui = [
+            gui2d.HeartMeter(self, (2, 2, 16 * 9, 3 * 9))
+        ]
         self.map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(self.game.screen_rect)
 
@@ -124,6 +127,9 @@ class Level(game_state.GameState):
         if self.player not in self.sprites:
             print("player dead.  Exiting.")
             return False
+        # update gui
+        for sprite in self.gui:
+            sprite.update(dt)
         return True
 
     def draw(self):
@@ -141,3 +147,5 @@ class Level(game_state.GameState):
                     sprite.image,
                     sprite.rect.move((-int(self.viewport_rect.left), -int(self.viewport_rect.top))),
                 )
+        for sprite in self.gui:
+            sprite.draw(self.game.window_surface)

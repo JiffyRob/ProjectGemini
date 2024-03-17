@@ -16,3 +16,8 @@ class Sprite:
 
     def update(self, dt):
         return True
+
+
+class GUISprite(Sprite):
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
