@@ -23,35 +23,53 @@ class Space(game_state.GameState):
         ship_rect = pygame.Rect(0, 0, 48, 32)
         ship_rect.center = self.game.screen_rect.center
         self.ship = gui3d.Ship(self, ship_rect)
-        self.gui = [
-            self.ship
-        ]
+        self.gui = [self.ship]
         self.sprites = []
-        self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
+        self.ship_overlay = self.game.loader.get_surface_scaled_to(
+            "ship-inside.png", util_draw.RESOLUTION
+        )
         self.static_sprites = sprite3d.StaticSpriteGroup(self, 10000, 6)
         sizes = ((16, 16), (9, 9), (5, 5), (2, 2))
-        blue_textures = {size: self.game.loader.get_image("stars", f"blue{i + 1}") for i, size in enumerate(sizes)}
+        blue_textures = {
+            size: self.game.loader.get_image("stars", f"blue{i + 1}")
+            for i, size in enumerate(sizes)
+        }
         blue_textures[(0, 0)] = pygame.Surface((0, 0)).convert()
         self.static_sprites.add_textures(
             "blue",
             blue_textures,
         )
-        yellow_textures = {size: self.game.loader.get_image("stars", f"yellow{i + 1}") for i, size in enumerate(sizes)}
+        yellow_textures = {
+            size: self.game.loader.get_image("stars", f"yellow{i + 1}")
+            for i, size in enumerate(sizes)
+        }
         yellow_textures[(0, 0)] = pygame.Surface((0, 0)).convert()
         self.static_sprites.add_textures(
             "yellow",
             yellow_textures,
         )
-        self.static_sprites.add_textures(
-            "Terra",
-            {
-                (size, size): AnimatedSurface(self.game.loader.get_spritesheet(f"planets/Terra{size}", (size, size)))
-                for size in (6, 16, 32, 48, 64, 128)
-            },
-        )
-        self.terra_id = self.static_sprites.add_sprite((0, 0, 0), "Terra", (128, 128))
+        self.planet_ids = {}
+        planets = (("Terra", (0, 0, 1000)), ("Keergan", (0, 0, -1000)))
+        for name, position in planets:
+            planet_textures = {
+                (size, size): AnimatedSurface(
+                    self.game.loader.get_spritesheet(
+                        f"planets/{name}{size}", (size, size)
+                    )
+                )
+                for size in (6, 16, 32, 64, 128, 192)
+            }
+            self.static_sprites.add_textures(
+                name,
+                planet_textures,
+            )
+            self.planet_ids[name] = self.static_sprites.add_sprite(
+                position, name, (128, 128)
+            )
 
-        for pos in numpy.random.uniform(low=-2000, high=2000, size=(9999, 3)):
+        for pos in numpy.random.uniform(
+            low=-2000, high=2000, size=(10000 - len(planets), 3)
+        ):
             self.static_sprites.add_sprite(tuple(pos), "yellow")
 
     def update(self, dt):
@@ -65,10 +83,11 @@ class Space(game_state.GameState):
                     self.camera.rotation *= rotation
                     pass
                 case pygame.Event(type=pygame.KEYDOWN, key=pygame.K_RETURN):
-                    rect = self.static_sprites.get_rect(self.terra_id)
-                    if rect.width > 100:
-                        print("entering Terra!")
-                        self.game.load_map("Level_0")
+                    for name, id in self.planet_ids.items():
+                        rect = self.static_sprites.get_rect(id)
+                        if rect.width > 100:
+                            print(f"entering {name}!")
+                            self.game.load_map(name)
         motion = pygame.Vector3()
         motion.z += 100 * dt
         rot_speed = 0.25
@@ -125,8 +144,13 @@ class Space(game_state.GameState):
             sprite.rect.width = sprite.width * scale_factor
             sprite.rect.height = sprite.height * scale_factor
             # project
-            screen_pos = projection_matrix @ numpy.array((relative_pos.x, relative_pos.y, relative_pos.z, 1))
-            screen_pos = pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2]) / screen_pos[3]
+            screen_pos = projection_matrix @ numpy.array(
+                (relative_pos.x, relative_pos.y, relative_pos.z, 1)
+            )
+            screen_pos = (
+                pygame.Vector3(screen_pos[0], screen_pos[1], screen_pos[2])
+                / screen_pos[3]
+            )
             # draw
             if self.camera.near_z <= screen_pos[2] <= self.camera.far_z:
                 sprite.rect.center = screen_pos.xy + self.camera.center

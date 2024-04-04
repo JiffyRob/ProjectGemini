@@ -13,9 +13,7 @@ class Ship(sprite.GUISprite):
     ROTATYNESS = 45
 
     def __init__(self, level, rect):
-        super().__init__(
-            level, None, rect
-        )
+        super().__init__(level, None, rect)
         frames = self.level.game.loader.get_spritesheet("ship.png", (24, 32))
         self.anim_dict = {
             "normal": Animation(frames[0:3]),

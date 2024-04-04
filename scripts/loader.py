@@ -44,9 +44,11 @@ class Loader:
     @staticmethod
     def convert(surface):
         # for palette swapping
-        # new_surface = surface.convert(8)
-        # new_surface.set_colorkey(COLORKEY)
-        return surface.convert_alpha()
+        new_surface = pygame.Surface(surface.get_size()).convert()
+        new_surface.fill(COLORKEY)
+        new_surface.blit(surface, (0, 0))
+        new_surface.set_colorkey(COLORKEY)
+        return new_surface
 
     @classmethod
     def palette_swap(cls, surface, palette_index):
@@ -56,7 +58,11 @@ class Loader:
 
     @functools.cache
     def get_surface(self, path):
-        return self.convert(pygame.image.load(pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))))
+        return self.convert(
+            pygame.image.load(
+                pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
+            )
+        )
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):

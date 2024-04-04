@@ -14,7 +14,9 @@ class HeartMeter(sprite.GUISprite):
         pass
 
     def draw(self, surface):
-        heart_count = math.ceil(self.level.player.health_capacity / (len(self.heart_frames) - 1))
+        heart_count = math.ceil(
+            self.level.player.health_capacity / (len(self.heart_frames) - 1)
+        )
         columns = self.rect.width // 9
         position = pygame.Vector2()
         health_left = self.level.player.health
@@ -40,10 +42,14 @@ class EmeraldMeter(sprite.GUISprite):
         rect.size = (22, 7)
         super().__init__(level, None, rect)
         self.surface = pygame.Surface(rect.size).convert()
-        self.font_frames = self.level.game.loader.get_spritesheet("digifont.png", (3, 5))
+        self.font_frames = self.level.game.loader.get_spritesheet(
+            "digifont.png", (3, 5)
+        )
 
     def draw(self, surface):
-        numbers = [self.EMERALD, self.X] + [int(i) for i in str(self.level.player.emeralds).zfill(3)]
+        numbers = [self.EMERALD, self.X] + [
+            int(i) for i in str(self.level.player.emeralds).zfill(3)
+        ]
         position = pygame.Vector2(1, 1)
         self.surface.fill("black")
         for i, number in enumerate(numbers):

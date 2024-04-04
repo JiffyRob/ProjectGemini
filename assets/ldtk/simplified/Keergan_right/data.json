@@ -1,7 +1,7 @@
 {
-	"identifier": "Level_0",
+	"identifier": "Keergan_right",
 	"uniqueIdentifer": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
-	"x": 0,
+	"x": 304,
 	"y": 0,
 	"width": 592,
 	"height": 256,
@@ -9,12 +9,11 @@
 	"neighbourLevels": [],
 	"customFields": {
 		"start": [
-			128,
-			128
+			14,
+			227
 		],
 		"entity_layer": 0,
 		"Background": "bg-mushroom.png",
-		"Maptype": "Platformer_M",
 		"BackgroundXMult": [
 			0.3,
 			0.6
@@ -24,12 +23,15 @@
 		"BackgroundYMult": [
 			0.5,
 			0.5
-		]
+		],
+		"platformer": true,
+		"Biome": "Mushroom_Plat"
 	},
 	"layers": [
 		"Collision.png",
 		"AutoLayer.png",
-		"Tiles.png"
+		"Below.png",
+		"Above.png"
 	],
 	"entities": {
 		"Emerald": [

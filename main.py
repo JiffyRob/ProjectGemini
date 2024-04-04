@@ -6,7 +6,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import loader, platformer, util_draw, space
+from scripts import loader, level, util_draw, space
 
 pygame.init()
 
@@ -35,7 +35,9 @@ class Game:
                 self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
                 self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
             )
-            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
+            rect = pygame.Rect(
+                0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor
+            )
             rect.center = self.window.get_surface().get_rect().center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
         if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
@@ -45,7 +47,7 @@ class Game:
             )
 
     def load_map(self, map_name):
-        self.stack.appendleft(platformer.Level.load(self, map_name))
+        self.stack.appendleft(level.Level.load(self, map_name))
 
     def time_phase(self, mult):
         self.dt_mult = mult
@@ -63,7 +65,7 @@ class Game:
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(platformer.Level.load(self, "Level_0"))
+        self.stack.appendleft(level.Level.load(self, "Keergan"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 
@@ -75,7 +77,9 @@ class Game:
                 kill_state = True
             self.stack[0].draw()
             # if fps drops below 10 the game will start to lag
-            dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1)
+            dt = pygame.math.clamp(
+                self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
+            )
             self.dt_mult = 1
             # window scaling
             if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
@@ -100,6 +104,7 @@ class Game:
                     (0, 0),
                 )
             self.window.flip()
+            self.window.title = str(int(self.clock.get_fps())).zfill(3)
             await asyncio.sleep(0)
             if kill_state:
                 self.stack.popleft()

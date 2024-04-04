@@ -39,7 +39,9 @@ class PhysicsSprite(sprite.Sprite):
             self.dead = True
             return False
         if vel.x < 0:
-            for collided in sorted(self.level.collision_rects, key=lambda rect: -rect.x):
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: -rect.x
+            ):
                 if self.collision_rect.colliderect(collided):
                     self.on_xy_collision()
                     self.rect.x += collided.right - self.collision_rect.left
@@ -54,7 +56,9 @@ class PhysicsSprite(sprite.Sprite):
                     break
         self.rect.y += vel.y
         if vel.y < 0:
-            for collided in sorted(self.level.collision_rects, key=lambda rect: -rect.y):
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: -rect.y
+            ):
                 if self.collision_rect.colliderect(collided):
                     self.rect.y += collided.bottom - self.collision_rect.top
                     self.velocity.y = 0
@@ -68,7 +72,10 @@ class PhysicsSprite(sprite.Sprite):
                     break
             if not self.ducking:
                 for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):
-                    if old_rect.bottom <= collided.top and self.collision_rect.colliderect(collided):
+                    if (
+                        old_rect.bottom <= collided.top
+                        and self.collision_rect.colliderect(collided)
+                    ):
                         self.rect.y += collided.top - self.collision_rect.bottom
                         self.velocity.y = 0
                         self.on_ground = True
@@ -80,13 +87,15 @@ class PhysicsSprite(sprite.Sprite):
 
 
 class BoingerBeetle(PhysicsSprite):
-    def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(level, rect=rect, weight=3)
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+        super().__init__(level, rect=rect, weight=3, z=z)
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[8:12],
             0.15,
         )
-        self.hit_image = self.level.game.loader.get_spritesheet("platformer-sprites.png")[12]
+        self.hit_image = self.level.game.loader.get_spritesheet(
+            "platformer-sprites.png"
+        )[12]
         self.hit_wait = 0.2
         self.hit_timer = 0
         self.facing_left = True
@@ -105,7 +114,10 @@ class BoingerBeetle(PhysicsSprite):
         if not super().update(dt):
             return False
         self.anim.update(dt)
-        if self.collision_rect.colliderect(self.level.player.collision_rect) and self.level.player.velocity.y > 0:
+        if (
+            self.collision_rect.colliderect(self.level.player.collision_rect)
+            and self.level.player.velocity.y > 0
+        ):
             self.image = flip_surface(self.hit_image, self.anim.flip_x, False)
             self.hit_timer = self.hit_wait
             self.level.player.jump(True, 1.5)
@@ -117,8 +129,8 @@ class BoingerBeetle(PhysicsSprite):
 
 
 class Player(PhysicsSprite):
-    def __init__(self, level, rect=(0, 0, 16, 16)):
-        super().__init__(level, rect=rect, image=None)
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+        super().__init__(level, rect=rect, image=None, z=z)
         images = level.game.loader.get_spritesheet("me-Sheet.png")
         self.anim_dict = {
             "walk": Animation(images[8:12]),
@@ -139,6 +151,19 @@ class Player(PhysicsSprite):
             self.image = self.anim_dict[self.state].image
 
     def update(self, dt):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT]:
+            self.walk_left()
+        elif keys[pygame.K_RIGHT]:
+            self.walk_right()
+        else:
+            self.unwalk()
+        if keys[pygame.K_DOWN]:
+            self.duck()
+        if keys[pygame.K_UP]:
+            self.jump()
+        if keys[pygame.K_SPACE]:
+            self.level.game.time_phase(-1)
         if not self.on_ground:
             self.swap_state("jump")
         elif self.velocity.x:

@@ -1,0 +1,31 @@
+{
+	"identifier": "Keergan",
+	"uniqueIdentifer": "48f04ad0-d7b0-11ee-a609-c9ca9524fc9e",
+	"x": 0,
+	"y": 0,
+	"width": 256,
+	"height": 256,
+	"bgColor": "#000000",
+	"neighbourLevels": [],
+	"customFields": {
+		"start": [
+			152,
+			119
+		],
+		"entity_layer": 8,
+		"Background": null,
+		"BackgroundXMult": [],
+		"LoopX": false,
+		"LoopY": false,
+		"BackgroundYMult": [],
+		"platformer": false,
+		"Biome": "Mushroom_Topdown"
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities" : {}
+}
