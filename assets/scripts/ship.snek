@@ -1,7 +1,10 @@
+lock_player();
 leave = ask(
-    format("Do you wish to leave planet {current_planet()}?", "yes", "no")
+    format("Do you wish to leave planet {PLANET}?"),
+    "yes",
+    "no"
 );
-
+unlock_player();
 if leave == "yes" {
     pop_state();
 }

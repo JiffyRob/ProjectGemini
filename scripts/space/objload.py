@@ -1,9 +1,9 @@
-import numpy
 import pathlib
 
-from scripts.space import math3d
-
+import numpy
 import pygame._sdl2 as sdl2
+
+from scripts.space import math3d
 
 
 class Model:

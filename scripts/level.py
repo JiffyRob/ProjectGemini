@@ -3,8 +3,7 @@ from collections import defaultdict, namedtuple
 
 import pygame
 
-from scripts import game_state, sprite, util_draw, gui2d
-from scripts import platformer, topdown
+from scripts import game_state, gui2d, platformer, sprite, topdown, util_draw
 
 Parallax = namedtuple(
     "Parallax",
@@ -34,7 +33,14 @@ class Level(game_state.GameState):
         },
     )
 
-    def __init__(self, game, name=None, player_pos=(0, 0), map_size=(256, 256), is_platformer=False):
+    def __init__(
+        self,
+        game,
+        name=None,
+        player_pos=(0, 0),
+        map_size=(256, 256),
+        is_platformer=False,
+    ):
         super().__init__(game)
         self.name = name
         self.backgrounds = []
@@ -65,7 +71,9 @@ class Level(game_state.GameState):
             self.groups[group].add(sprite)
 
     def start_dialog(self, text, *answers, face=None, on_finish=lambda answer: None):
-        self.dialog = gui2d.Dialog(self, gui2d.dialog_rect(face is not None), text, answers, self.finish_dialog)
+        self.dialog = gui2d.Dialog(
+            self, gui2d.dialog_rect(face is not None), text, answers, self.finish_dialog
+        )
         self.gui.append(self.dialog)
         self.on_dialog_finish = on_finish
 
@@ -84,7 +92,13 @@ class Level(game_state.GameState):
         is_platformer = data["customFields"]["platformer"]
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
-        level = cls(game, name=name, player_pos=data["customFields"]["start"], map_size=size, is_platformer=is_platformer)
+        level = cls(
+            game,
+            name=name,
+            player_pos=data["customFields"]["start"],
+            map_size=size,
+            is_platformer=is_platformer,
+        )
         # background creation
         level.bgcolor = data["bgColor"]
         background_source = data["customFields"]["Background"]
@@ -123,7 +137,7 @@ class Level(game_state.GameState):
                     sprite_cls(
                         level,
                         (entity["x"], entity["y"], entity["width"], entity["height"]),
-                        z=entity_layer
+                        z=entity_layer,
                     )
                 )
         level.player.z = entity_layer
@@ -144,7 +158,6 @@ class Level(game_state.GameState):
         return level
 
     def update(self, dt):
-        super().update(dt)
         # removes dead sprites from the list
         self.sprites = {sprite for sprite in self.sprites if sprite.update(dt)}
         for group in self.groups.values():
@@ -160,7 +173,7 @@ class Level(game_state.GameState):
         # update gui
         for sprite in self.gui:
             sprite.update(dt)
-        return True
+        return super().update(dt) and True
 
     def draw(self):
         super().draw()

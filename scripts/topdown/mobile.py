@@ -1,4 +1,5 @@
 import pygame
+
 from scripts import sprite, util_draw
 from scripts.animation import Animation
 
@@ -11,6 +12,13 @@ class PhysicsSprite(sprite.Sprite):
         self.weight = weight
         self.velocity = pygame.Vector2()
         self.desired_velocity = pygame.Vector2()
+        self.input_locked = False
+
+    def lock_input(self):
+        self.input_locked = True
+
+    def unlock_input(self):
+        self.input_locked = False
 
     @property
     def collision_rect(self):
@@ -130,23 +138,24 @@ class Player(PhysicsSprite):
             self.image = self.anim_dict[f"{self.state}-{self.facing}"].image
 
     def update(self, dt):
-        keys = pygame.key.get_pressed()
         self.desired_velocity *= 0
-        if keys[pygame.K_UP]:
-            self.walk_up()
-        if keys[pygame.K_DOWN]:
-            self.walk_down()
-        if keys[pygame.K_LEFT]:
-            self.walk_left()
-        if keys[pygame.K_RIGHT]:
-            self.walk_right()
-        keys = pygame.key.get_just_pressed()
-        if keys[pygame.K_SPACE]:
-            for sprite in self.level.groups["interactable"]:
-                print(sprite.rect, self.interaction_rect)
-                if sprite.rect.colliderect(self.interaction_rect):
-                    print("interact w/", sprite)
-                    sprite.interact()
+        if not self.input_locked:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_UP]:
+                self.walk_up()
+            if keys[pygame.K_DOWN]:
+                self.walk_down()
+            if keys[pygame.K_LEFT]:
+                self.walk_left()
+            if keys[pygame.K_RIGHT]:
+                self.walk_right()
+            keys = pygame.key.get_just_pressed()
+            if keys[pygame.K_SPACE]:
+                for sprite in self.level.groups["interactable"]:
+                    print(sprite.rect, self.interaction_rect)
+                    if sprite.rect.colliderect(self.interaction_rect):
+                        print("interact w/", sprite)
+                        sprite.interact()
         self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)
         self.velocity = self.desired_velocity
         if self.velocity:

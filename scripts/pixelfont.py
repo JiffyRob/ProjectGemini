@@ -11,7 +11,9 @@ class PixelFont:
         for ind in text.encode(self.encoding):
             char = self.chars[ind]
             char_width = char.get_width()
-            if char_width + position.x > rect.right:
+            if char_width + position.x > rect.right or ind in "\n\r".encode(
+                self.encoding
+            ):
                 position.y += char.get_height()
                 position.x = rect.left
             surface.blit(char, position)

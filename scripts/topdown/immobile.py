@@ -1,5 +1,6 @@
 import pygame
-from scripts import sprite, snekgemini
+
+from scripts import snekgemini, sprite
 
 
 class Interactable(sprite.Sprite):
@@ -19,7 +20,6 @@ class Interactable(sprite.Sprite):
     def update(self, dt):
         if self.running_script:
             self.interpreter.cycle()
-            print("script cycle")
             if self.interpreter.done():
                 self.running_script = False
                 self.interpreter = None
@@ -27,15 +27,18 @@ class Interactable(sprite.Sprite):
         return True
 
 
-class Ship(sprite.Sprite):
+class Ship(Interactable):
     groups = {"interactable", "static-collision"}
 
     def __init__(self, level, rect=(0, 0, 48, 24), z=0):
+        rect = (rect[0], rect[1], 48, 32)  # ldtk always has single tile rects :/
+        self.collision_rect = pygame.FRect(rect[0] + 10, rect[1] + 10, 32, 12)
         super().__init__(
             level,
             level.game.loader.get_surface("tileset.png", rect=(208, 0, 48, 32)),
             rect=rect,
-            z=z
+            z=z,
+            script="ship",
         )
 
 
@@ -49,6 +52,6 @@ class BrokenShip(Interactable):
             level,
             level.game.loader.get_surface("tileset.png", rect=(160, 0, 48, 32)),
             rect=rect,
-            z=z
+            z=z,
+            script="broken_ship",
         )
-

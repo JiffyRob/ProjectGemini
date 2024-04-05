@@ -3,7 +3,7 @@ import pygame
 
 from scripts import game_state, util_draw
 from scripts.animation import AnimatedSurface
-from scripts.space import math3d, sprite3d, gui3d
+from scripts.space import gui3d, math3d, sprite3d
 
 
 class Space(game_state.GameState):

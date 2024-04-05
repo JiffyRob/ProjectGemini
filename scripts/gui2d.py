@@ -1,7 +1,8 @@
-import pygame
 import math
 
-from scripts import sprite, pixelfont, timer, util_draw
+import pygame
+
+from scripts import pixelfont, sprite, timer, util_draw
 
 
 class HeartMeter(sprite.GUISprite):
@@ -77,7 +78,9 @@ class Dialog(sprite.GUISprite):
         self.image.set_colorkey(util_draw.COLORKEY)
         self.state = self.STATE_WRITING_PROMPT
         self.pad = 3
-        self.font = pixelfont.PixelFont(self.level.game.loader.get_spritesheet("font.png", (7, 8)))
+        self.font = pixelfont.PixelFont(
+            self.level.game.loader.get_spritesheet("font.png", (7, 8))
+        )
         self.rebuild()
 
     def update_text(self):
@@ -114,7 +117,9 @@ class Dialog(sprite.GUISprite):
         self.image.fill(util_draw.COLORKEY)
         text = self.get_full_text()
         text_surface = self.font.render_to(
-            self.image, self.image.get_rect().inflate(-self.pad * 2, -self.pad * 2), text
+            self.image,
+            self.image.get_rect().inflate(-self.pad * 2, -self.pad * 2),
+            text,
         )
         pygame.draw.rect(self.image, "black", ((0, 0), self.rect.size), 1)
 
@@ -139,13 +144,15 @@ class Dialog(sprite.GUISprite):
                 self.answer_index = max(self.answer_index - 1, 0)
                 self.update_text()
             if keys[pygame.K_DOWN]:
-                self.answer_index = min(
-                    self.answer_index + 1, len(self.answers) - 1
-                )
+                self.answer_index = min(self.answer_index + 1, len(self.answers) - 1)
                 self.update_text()
-            if keys[pygame.K_RETURN] or keys[pygame.K_SPACE]:
+            if keys[pygame.K_RETURN]:
                 self.choose()
-        if self.state == self.STATE_COMPLETE and not self.answers and keys[pygame.K_RETURN] or keys[pygame.K_SPACE]:
+        if (
+            self.state == self.STATE_COMPLETE
+            and not self.answers
+            and keys[pygame.K_RETURN]
+        ):
             self.choose()
         return self.live
 

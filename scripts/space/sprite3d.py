@@ -1,5 +1,6 @@
 import numpy
 import pygame
+
 from scripts.animation import AnimatedSurface
 from scripts.space import math3d
 

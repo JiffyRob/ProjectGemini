@@ -55,7 +55,8 @@ class Loader:
             return self.convert(
                 pygame.image.load(
                     pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
-                ))
+                )
+            )
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):

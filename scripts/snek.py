@@ -5,9 +5,9 @@ SNEK Programming Language: Sorta like bad javascript.  Runs async with the rest 
 import functools
 import logging
 import operator
+import queue
 import random
 import time
-import queue
 
 import pyparsing as pp
 
