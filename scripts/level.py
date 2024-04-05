@@ -20,6 +20,8 @@ class Level(game_state.GameState):
         # topdown
         {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
+            "Ship": topdown.immobile.Ship,
+            "BrokenShip": topdown.immobile.BrokenShip,
         },
         # platformer
         {
@@ -42,18 +44,36 @@ class Level(game_state.GameState):
         else:
             self.player = topdown.mobile.Player(self)
         self.player.rect.center = player_pos
-        self.sprites = [self.player]
+        self.sprites = {self.player}
         self.collision_rects = []
         self.down_rects = []
         self.gui = [
             gui2d.HeartMeter(self, (2, 2, 16 * 9, 9)),
             gui2d.EmeraldMeter(self, (2, 11, 0, 0)),
         ]
+        self.dialog = None
+        self.on_dialog_finish = lambda answer: None
         self.map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(self.game.screen_rect)
 
     def add_sprite(self, sprite):
-        self.sprites.append(sprite)
+        self.sprites.add(sprite)
+        for group in sprite.groups:
+            if group == "static-collision":
+                self.collision_rects.append(sprite.collision_rect)
+                continue
+            self.groups[group].add(sprite)
+
+    def start_dialog(self, text, *answers, face=None, on_finish=lambda answer: None):
+        self.dialog = gui2d.Dialog(self, gui2d.dialog_rect(face is not None), text, answers, self.finish_dialog)
+        self.gui.append(self.dialog)
+        self.on_dialog_finish = on_finish
+
+    def finish_dialog(self, answer):
+        self.gui.remove(self.dialog)
+        self.dialog = None
+        self.on_dialog_finish(answer)
+        self.on_dialog_finish = lambda answer: None
 
     @classmethod
     def load(cls, game, name):
@@ -126,7 +146,9 @@ class Level(game_state.GameState):
     def update(self, dt):
         super().update(dt)
         # removes dead sprites from the list
-        self.sprites = [sprite for sprite in self.sprites if sprite.update(dt)]
+        self.sprites = {sprite for sprite in self.sprites if sprite.update(dt)}
+        for group in self.groups.values():
+            group &= self.sprites
         self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
             self.player.pos, LERP_SPEED
         )

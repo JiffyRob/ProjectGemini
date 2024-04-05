@@ -97,6 +97,17 @@ class Player(PhysicsSprite):
         self.health_capacity = 16
         self.emeralds = 10
 
+    @property
+    def interaction_rect(self):
+        return self.rect.move(
+            {
+                "up": (0, -8),
+                "down": (0, 8),
+                "left": (-8, 0),
+                "right": (8, 0),
+            }[self.facing]
+        )
+
     def on_map_departure(self, directions):
         self.level.game.load_map(f"{self.level.name}_{directions[0]}")
 
@@ -129,6 +140,13 @@ class Player(PhysicsSprite):
             self.walk_left()
         if keys[pygame.K_RIGHT]:
             self.walk_right()
+        keys = pygame.key.get_just_pressed()
+        if keys[pygame.K_SPACE]:
+            for sprite in self.level.groups["interactable"]:
+                print(sprite.rect, self.interaction_rect)
+                if sprite.rect.colliderect(self.interaction_rect):
+                    print("interact w/", sprite)
+                    sprite.interact()
         self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)
         self.velocity = self.desired_velocity
         if self.velocity:

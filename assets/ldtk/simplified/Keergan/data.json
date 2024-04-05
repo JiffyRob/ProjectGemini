@@ -27,5 +27,19 @@
 		"Below.png",
 		"Above.png"
 	],
-	"entities" : {}
+	"entities": {
+		"BrokenShip": [
+			{
+				"id": "BrokenShip",
+				"iid": "c26f6990-d7b0-11ee-a609-3544fd28f9e2",
+				"layer": "Entities",
+				"x": 128,
+				"y": 96,
+				"width": 16,
+				"height": 16,
+				"color": 4073265,
+				"customFields" : {}
+			}
+		]
+	}
 }

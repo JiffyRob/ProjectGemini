@@ -5,6 +5,8 @@ import pygame._sdl2.video as sdl2  # needed for WASM compat
 RESOLUTION = (256, 224)
 ASPECT_RATIO = RESOLUTION[0] / RESOLUTION[1]
 
+COLORKEY = (255, 0, 255)
+
 SCALEMODE_INTEGER = 0
 SCALEMODE_STRETCH = 1
 

@@ -1,0 +1,7 @@
+leave = ask(
+    format("Do you wish to leave planet {current_planet()}?", "yes", "no")
+);
+
+if leave == "yes" {
+    pop_state();
+}

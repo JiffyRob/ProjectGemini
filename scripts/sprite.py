@@ -2,6 +2,8 @@ import pygame
 
 
 class Sprite:
+    groups = set()
+
     def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0):
         self.level = level
         self.image = image

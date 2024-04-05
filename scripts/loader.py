@@ -1,21 +1,10 @@
-import csv
 import functools
 import json
 import pathlib
 
-import numpy
 import pygame
-import pygame._sdl2 as sdl2
-import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-COLORKEY = (255, 0, 255)
-# each surface gets 5 colors
-# No 2 palettes have the same colors.
-# PALETTE_SURFACE = pygame.image.load("assets/palettes.png").convert(8)
-# PALETTES = [
-#     numpy.array([PALETTE_SURFACE.get_at((i, j)) for i in range(PALETTE_SURFACE.get_width())], numpy.uint8)
-#     for j in range(PALETTE_SURFACE.get_height())
-# ]
+from scripts.util_draw import COLORKEY
 
 
 class Loader:
@@ -51,18 +40,22 @@ class Loader:
         return new_surface
 
     @classmethod
-    def palette_swap(cls, surface, palette_index):
-        surface = cls.convert(surface)  # just to be sure
-        surface.set_palette(PALETTES[palette_index % len(PALETTES)])
-        return surface
+    def create_surface(cls, size):
+        return cls.convert(pygame.Surface(size))
 
     @functools.cache
-    def get_surface(self, path):
-        return self.convert(
-            pygame.image.load(
-                pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
+    def get_surface(self, path, rect=None):
+        if rect:
+            return self.convert(
+                pygame.image.load(
+                    pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
+                ).subsurface(rect)
             )
-        )
+        else:
+            return self.convert(
+                pygame.image.load(
+                    pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
+                ))
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):
