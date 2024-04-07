@@ -11,6 +11,13 @@ class Sprite:
         self.z = z
         self.velocity = pygame.Vector2()
         self.dead = False
+        self.locked = False
+
+    def lock(self):
+        self.locked = True
+
+    def unlock(self):
+        self.locked = False
 
     @property
     def pos(self):

@@ -270,14 +270,18 @@ class SNEKProgram:
             # function call (always grouped by itself)
             case [func_name, "(", *args, ")"]:
                 callback = self.api[func_name](*args)
-                value = UNFINISHED
-                while value == UNFINISHED:
+                while True:
                     value = next(callback)
+                    print("got", value, "from callback", func_name)
                     if value == GET_VAR:
-                        # command has requested to read a variable
-                        value = next(callback)
-                        callback.get_var(value, self.namespace.get(value, NULL))
-                        value = next(callback)
+                        # command has requested to evaluate an expression for context
+                        # ugh too many nested loops
+                        expr = next(callback)
+                        eval_callback = self._evaluate_expression(Lexer.tokenize(expr + ";\n"))
+                        while (eval_value := next(eval_callback)) == UNFINISHED:
+                            yield eval_value
+                        callback.get_var(expr, eval_value)
+                        continue
                     if value == WARNING:
                         # command has issued a warning
                         value = next(callback)
@@ -286,8 +290,10 @@ class SNEKProgram:
                         print(func_name, args)
                         print(value)
                         print("...")
-                        value = next(callback)
+                        continue
                     yield value
+                    if value not in {UNFINISHED, GET_VAR, WARNING}:
+                        break
 
             # unary operator (also always grouped by itself)
             case [op, arg]:
@@ -442,7 +448,7 @@ class SNEKProgram:
             )
 
     def print(self, *args):
-        logger.info(f"SNEK says: {' '.join(repr(arg) for arg in args)}")
+        print(f"SNEK says: {' '.join(repr(arg) for arg in args)}")
         yield 1
 
     def format(self, string):

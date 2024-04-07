@@ -1,0 +1,3 @@
+lock();
+fade(FADEIN_CIRCLE);
+unlock();

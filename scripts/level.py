@@ -3,7 +3,7 @@ from collections import defaultdict, namedtuple
 
 import pygame
 
-from scripts import game_state, gui2d, platformer, sprite, topdown, util_draw
+from scripts import game_state, gui2d, platformer, sprite, topdown, util_draw, snekgemini
 
 Parallax = namedtuple(
     "Parallax",
@@ -61,6 +61,24 @@ class Level(game_state.GameState):
         self.on_dialog_finish = lambda answer: None
         self.map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(self.game.screen_rect)
+        self.effects = []
+        self.script = snekgemini.cutscene(self.game.loader.get_text("scripts/level_begin.snek"), level=self)
+        self.pop_after_script = False
+
+    def pop(self):
+        self.script = snekgemini.cutscene(self.game.loader.get_text("scripts/level_exit.snek"), level=self)
+        self.pop_after_script = True
+
+    def lock(self):
+        for sprite in self.sprites:
+            sprite.lock()
+
+    def unlock(self):
+        for sprite in self.sprites:
+            sprite.unlock()
+
+    def add_effect(self, effect):
+        self.effects.append(effect)
 
     def add_sprite(self, sprite):
         self.sprites.add(sprite)
@@ -173,10 +191,21 @@ class Level(game_state.GameState):
         # update gui
         for sprite in self.gui:
             sprite.update(dt)
+        # update visual effects
+        for effect in self.effects:
+            effect.update(dt)
+        # update script
+        if self.script is not None:
+            self.script.cycle()
+            if self.script.done():
+                self.script = None
+                if self.pop_after_script:
+                    super().pop()
         return super().update(dt) and True
 
     def draw(self):
         super().draw()
+        # draw backgrounds
         for background in self.backgrounds:
             offset = (
                 -pygame.Vector2(self.viewport_rect.topleft)
@@ -188,6 +217,7 @@ class Level(game_state.GameState):
                         background.image, background.rect.move(offset)
                     )
                     offset.x += background.rect.width
+        # draw map + sprites
         for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
             if sprite.image is not None:
                 self.game.window_surface.blit(
@@ -196,5 +226,9 @@ class Level(game_state.GameState):
                         (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
                     ),
                 )
+        # draw visual effects
+        for effect in self.effects:
+            effect.draw(self.game.window_surface)
+        # draw gui
         for sprite in self.gui:
             sprite.draw(self.game.window_surface)

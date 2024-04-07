@@ -1,10 +1,11 @@
-lock_player();
+lock();
 leave = ask(
     format("Do you wish to leave planet {PLANET}?"),
     "yes",
     "no"
 );
-unlock_player();
+print(leave);
+unlock();
 if leave == "yes" {
-    pop_state();
+    pop_state();  # always pop state LAST.  Once the level is exited this script will no longer be updated.
 }

@@ -29,6 +29,9 @@ class PhysicsSprite(sprite.Sprite):
 
     def update(self, dt):
         # physics
+        # locked sprites do not move
+        if self.locked:
+            self.velocity.x *= 0
         old_rect = self.collision_rect.copy()
         vel = self.velocity * dt + 0.5 * GRAVITY * self.weight * dt**2
         self.velocity += GRAVITY * self.weight * dt

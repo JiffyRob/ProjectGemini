@@ -12,13 +12,6 @@ class PhysicsSprite(sprite.Sprite):
         self.weight = weight
         self.velocity = pygame.Vector2()
         self.desired_velocity = pygame.Vector2()
-        self.input_locked = False
-
-    def lock_input(self):
-        self.input_locked = True
-
-    def unlock_input(self):
-        self.input_locked = False
 
     @property
     def collision_rect(self):
@@ -31,55 +24,58 @@ class PhysicsSprite(sprite.Sprite):
         pass
 
     def update(self, dt):
-        vel = self.velocity * dt
-        self.rect.clamp_ip(self.level.map_rect)
-        self.rect.x += vel.x
-        departure_directions = []
-        if vel.x < 0:
-            if self.rect.left < self.level.map_rect.left:
-                self.rect.left = self.level.map_rect.left
-                departure_directions.append("left")
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: -rect.x
-            ):
-                if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision()
-                    self.rect.x += collided.right - self.collision_rect.left
-                    vel.x = 0
-                    break
-        else:
-            if self.rect.right > self.level.map_rect.right:
-                self.rect.right = self.level.map_rect.right
-                departure_directions.append("right")
-            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
-                if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision()
-                    self.rect.x += collided.left - self.collision_rect.right
-                    vel.x = 0
-                    break
-        self.rect.y += vel.y
-        if vel.y < 0:
-            if self.rect.top < self.level.map_rect.top:
-                self.rect.top = self.level.map_rect.top
-                departure_directions.append("up")
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: -rect.y
-            ):
-                if self.collision_rect.colliderect(collided):
-                    self.rect.y += collided.bottom - self.collision_rect.top
-                    vel.y = 0
-                    break
-        else:
-            if self.rect.bottom > self.level.map_rect.bottom:
-                self.rect.bottom = self.level.map_rect.bottom
-                departure_directions.append("down")
-            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
-                if self.collision_rect.colliderect(collided):
-                    self.rect.y += collided.top - self.collision_rect.bottom
-                    vel.y = 0
-                    break
-        if departure_directions:
-            self.on_map_departure(departure_directions)
+        # physics
+        # locked sprites don't move
+        if not self.locked:
+            vel = self.velocity * dt
+            self.rect.clamp_ip(self.level.map_rect)
+            self.rect.x += vel.x
+            departure_directions = []
+            if vel.x < 0:
+                if self.rect.left < self.level.map_rect.left:
+                    self.rect.left = self.level.map_rect.left
+                    departure_directions.append("left")
+                for collided in sorted(
+                    self.level.collision_rects, key=lambda rect: -rect.x
+                ):
+                    if self.collision_rect.colliderect(collided):
+                        self.on_xy_collision()
+                        self.rect.x += collided.right - self.collision_rect.left
+                        vel.x = 0
+                        break
+            else:
+                if self.rect.right > self.level.map_rect.right:
+                    self.rect.right = self.level.map_rect.right
+                    departure_directions.append("right")
+                for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
+                    if self.collision_rect.colliderect(collided):
+                        self.on_xy_collision()
+                        self.rect.x += collided.left - self.collision_rect.right
+                        vel.x = 0
+                        break
+            self.rect.y += vel.y
+            if vel.y < 0:
+                if self.rect.top < self.level.map_rect.top:
+                    self.rect.top = self.level.map_rect.top
+                    departure_directions.append("up")
+                for collided in sorted(
+                    self.level.collision_rects, key=lambda rect: -rect.y
+                ):
+                    if self.collision_rect.colliderect(collided):
+                        self.rect.y += collided.bottom - self.collision_rect.top
+                        vel.y = 0
+                        break
+            else:
+                if self.rect.bottom > self.level.map_rect.bottom:
+                    self.rect.bottom = self.level.map_rect.bottom
+                    departure_directions.append("down")
+                for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
+                    if self.collision_rect.colliderect(collided):
+                        self.rect.y += collided.top - self.collision_rect.bottom
+                        vel.y = 0
+                        break
+            if departure_directions:
+                self.on_map_departure(departure_directions)
         return True
 
 
@@ -139,7 +135,7 @@ class Player(PhysicsSprite):
 
     def update(self, dt):
         self.desired_velocity *= 0
-        if not self.input_locked:
+        if not self.locked:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_UP]:
                 self.walk_up()
@@ -156,12 +152,12 @@ class Player(PhysicsSprite):
                     if sprite.rect.colliderect(self.interaction_rect):
                         print("interact w/", sprite)
                         sprite.interact()
-        self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)
-        self.velocity = self.desired_velocity
-        if self.velocity:
-            self.swap_state("walk")
-        else:
-            self.swap_state("idle")
+            self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)
+            self.velocity = self.desired_velocity
+            if self.velocity:
+                self.swap_state("walk")
+            else:
+                self.swap_state("idle")
         state = f"{self.state}-{self.facing}"
         self.anim_dict[state].update(dt)
         self.image = self.anim_dict[state].image

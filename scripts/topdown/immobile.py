@@ -15,7 +15,7 @@ class Interactable(sprite.Sprite):
     def interact(self):
         if not self.running_script:
             self.running_script = True
-            self.interpreter = snekgemini.interaction(self.script, self)
+            self.interpreter = snekgemini.cutscene(self.script, self)
 
     def update(self, dt):
         if self.running_script:

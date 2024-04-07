@@ -1,4 +1,4 @@
-from scripts import snek
+from scripts import snek, visual_fx, util_draw
 
 
 class Write(snek.SnekCommand):
@@ -58,22 +58,62 @@ class Ask(Write):
             return self.chosen
 
 
-def interaction(script, runner):
+class Fade(snek.SnekCommand):
+    IN_CIRCLE = 0
+    OUT_CIRCLE = 1
+    POS = "get_player_pos()"  # snek expression to get the player's position
+    FADES = (
+        visual_fx.GrowingCircle,
+        visual_fx.ShrinkingCircle,
+    )
+
+    def __init__(self, fade_type, x=None, y=None):
+        super().__init__((self.POS, "LEVEL"))
+        self.fade_type = fade_type
+        self.pos = [x, y]
+        self.fader = None
+
+    def get_value(self):
+        if self.fader is None:
+            player_pos = self.context[self.POS]
+            if self.pos[0] is None:
+                self.pos[0] = player_pos[0]
+            if self.pos[1] is None:
+                self.pos[1] = player_pos[1]
+            if self.fade_type in {self.IN_CIRCLE, self.OUT_CIRCLE}:
+                self.fader = self.FADES[self.fade_type](util_draw.RESOLUTION, self.pos, speed=192)
+            else:
+                # TODO: other fades...?
+                pass
+            self.context["LEVEL"].add_effect(self.fader)
+            return snek.UNFINISHED
+        if self.fader.done:
+            return snek.NULL
+        return snek.UNFINISHED
+
+
+def cutscene(script, runner=snek.NULL, level=None):
+    if runner is not snek.NULL:
+        level = runner.level
     return snek.SNEKProgram(
         script,
         {
-            "LEVEL": runner.level,
-            "PLANET": runner.level.name.split("_")[0],
+            "RUNNER": runner,
+            "LEVEL": level,
+            "PLANET": level.name.split("_")[0],
+            "LEVEL_NAME": level.name,
+            "FADEIN_CIRCLE": Fade.IN_CIRCLE,
+            "FADEOUT_CIRCLE": Fade.OUT_CIRCLE,
         },
         {
-            "lock_player": snek.snek_command(runner.level.player.lock_input),
-            "unlock_player": snek.snek_command(runner.level.player.unlock_input),
+            "lock_player": snek.snek_command(level.player.lock),
+            "unlock_player": snek.snek_command(level.player.unlock),
+            "lock": snek.snek_command(level.lock),
+            "unlock": snek.snek_command(level.unlock),
             "write": Write,
             "ask": Ask,
-            "pop_state": snek.snek_command(runner.level.pop),
+            "pop_state": snek.snek_command(level.pop),
+            "fade": Fade,
+            "get_player_pos": snek.snek_command(lambda: level.player.pos),
         },
     )
-
-
-def cutscene(script, level):
-    pass  # TODO: implement cutscenes

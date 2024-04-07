@@ -1,0 +1,3 @@
+lock();
+fade(FADEOUT_CIRCLE);
+unlock();
