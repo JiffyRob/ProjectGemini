@@ -7,5 +7,5 @@ leave = ask(
 print(leave);
 unlock();
 if leave == "yes" {
-    pop_state();  # always pop state LAST.  Once the level is exited this script will no longer be updated.
+    exit_level();  # always pop state LAST.  Once the level is exited this script will no longer be updated.
 }

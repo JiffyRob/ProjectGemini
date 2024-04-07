@@ -154,19 +154,20 @@ class Player(PhysicsSprite):
             self.image = self.anim_dict[self.state].image
 
     def update(self, dt):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
-            self.walk_left()
-        elif keys[pygame.K_RIGHT]:
-            self.walk_right()
-        else:
-            self.unwalk()
-        if keys[pygame.K_DOWN]:
-            self.duck()
-        if keys[pygame.K_UP]:
-            self.jump()
-        if keys[pygame.K_SPACE]:
-            self.level.game.time_phase(-1)
+        if not self.locked:
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LEFT]:
+                self.walk_left()
+            elif keys[pygame.K_RIGHT]:
+                self.walk_right()
+            else:
+                self.unwalk()
+            if keys[pygame.K_DOWN]:
+                self.duck()
+            if keys[pygame.K_UP]:
+                self.jump()
+            if keys[pygame.K_SPACE]:
+                self.level.game.time_phase(-1)
         if not self.on_ground:
             self.swap_state("jump")
         elif self.velocity.x:

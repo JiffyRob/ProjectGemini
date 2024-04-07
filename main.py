@@ -46,6 +46,9 @@ class Game:
                 util_draw.RESOLUTION[1] / self.window.size[1],
             )
 
+    def pop_state(self):
+        self.stack.popleft()
+
     def load_map(self, map_name):
         self.stack.appendleft(level.Level.load(self, map_name))
 

@@ -8,7 +8,7 @@ class Interactable(sprite.Sprite):
 
     def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, script="oops"):
         super().__init__(level, image, rect, z)
-        self.script = self.level.game.loader.get_text(f"scripts/{script}.snek")
+        self.script = script
         self.running_script = False
         self.interpreter = None
 

@@ -47,7 +47,9 @@ class PhysicsSprite(sprite.Sprite):
                 if self.rect.right > self.level.map_rect.right:
                     self.rect.right = self.level.map_rect.right
                     departure_directions.append("right")
-                for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
+                for collided in sorted(
+                    self.level.collision_rects, key=lambda rect: rect.x
+                ):
                     if self.collision_rect.colliderect(collided):
                         self.on_xy_collision()
                         self.rect.x += collided.left - self.collision_rect.right
@@ -69,7 +71,9 @@ class PhysicsSprite(sprite.Sprite):
                 if self.rect.bottom > self.level.map_rect.bottom:
                     self.rect.bottom = self.level.map_rect.bottom
                     departure_directions.append("down")
-                for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
+                for collided in sorted(
+                    self.level.collision_rects, key=lambda rect: rect.y
+                ):
                     if self.collision_rect.colliderect(collided):
                         self.rect.y += collided.top - self.collision_rect.bottom
                         vel.y = 0
@@ -113,7 +117,7 @@ class Player(PhysicsSprite):
         )
 
     def on_map_departure(self, directions):
-        self.level.game.load_map(f"{self.level.name}_{directions[0]}")
+        self.level.switch_level(f"{self.level.name}_{directions[0]}")
 
     @property
     def facing(self):

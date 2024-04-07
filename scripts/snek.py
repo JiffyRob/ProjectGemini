@@ -277,7 +277,9 @@ class SNEKProgram:
                         # command has requested to evaluate an expression for context
                         # ugh too many nested loops
                         expr = next(callback)
-                        eval_callback = self._evaluate_expression(Lexer.tokenize(expr + ";\n"))
+                        eval_callback = self._evaluate_expression(
+                            Lexer.tokenize(expr + ";\n")
+                        )
                         while (eval_value := next(eval_callback)) == UNFINISHED:
                             yield eval_value
                         callback.get_var(expr, eval_value)

@@ -1,0 +1,9 @@
+# Don't ACTUALLY exit the last level.  That way after an exit you can appear right back on the doorway.
+lock();
+fade(FADEOUT_CIRCLE);
+unlock();
+map_switch(NEXT_LEVEL);
+# this will run once this level is reentered
+lock();
+fade(FADEIN_CIRCLE);
+unlock();

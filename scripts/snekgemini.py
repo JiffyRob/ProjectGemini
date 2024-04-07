@@ -1,4 +1,4 @@
-from scripts import snek, visual_fx, util_draw
+from scripts import snek, util_draw, visual_fx
 
 
 class Write(snek.SnekCommand):
@@ -81,7 +81,9 @@ class Fade(snek.SnekCommand):
             if self.pos[1] is None:
                 self.pos[1] = player_pos[1]
             if self.fade_type in {self.IN_CIRCLE, self.OUT_CIRCLE}:
-                self.fader = self.FADES[self.fade_type](util_draw.RESOLUTION, self.pos, speed=192)
+                self.fader = self.FADES[self.fade_type](
+                    util_draw.RESOLUTION, self.pos, speed=400
+                )
             else:
                 # TODO: other fades...?
                 pass
@@ -92,11 +94,13 @@ class Fade(snek.SnekCommand):
         return snek.UNFINISHED
 
 
-def cutscene(script, runner=snek.NULL, level=None):
+def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
     if runner is not snek.NULL:
         level = runner.level
+    if extra_constants is None:
+        extra_constants = {}
     return snek.SNEKProgram(
-        script,
+        level.game.loader.get_text(f"scripts/{script_name}.snek"),
         {
             "RUNNER": runner,
             "LEVEL": level,
@@ -104,6 +108,7 @@ def cutscene(script, runner=snek.NULL, level=None):
             "LEVEL_NAME": level.name,
             "FADEIN_CIRCLE": Fade.IN_CIRCLE,
             "FADEOUT_CIRCLE": Fade.OUT_CIRCLE,
+            **extra_constants,
         },
         {
             "lock_player": snek.snek_command(level.player.lock),
@@ -112,8 +117,10 @@ def cutscene(script, runner=snek.NULL, level=None):
             "unlock": snek.snek_command(level.unlock),
             "write": Write,
             "ask": Ask,
-            "pop_state": snek.snek_command(level.pop),
+            "exit_level": snek.snek_command(level.exit_level),
+            "pop_state": snek.snek_command(level.game.pop_state),
             "fade": Fade,
             "get_player_pos": snek.snek_command(lambda: level.player.pos),
+            "map_switch": snek.snek_command(level.game.load_map),
         },
     )

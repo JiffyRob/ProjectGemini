@@ -3,7 +3,15 @@ from collections import defaultdict, namedtuple
 
 import pygame
 
-from scripts import game_state, gui2d, platformer, sprite, topdown, util_draw, snekgemini
+from scripts import (
+    game_state,
+    gui2d,
+    platformer,
+    snekgemini,
+    sprite,
+    topdown,
+    util_draw,
+)
 
 Parallax = namedtuple(
     "Parallax",
@@ -62,12 +70,19 @@ class Level(game_state.GameState):
         self.map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(self.game.screen_rect)
         self.effects = []
-        self.script = snekgemini.cutscene(self.game.loader.get_text("scripts/level_begin.snek"), level=self)
-        self.pop_after_script = False
+        self.script = None
+        self.run_cutscene("level_begin")
 
-    def pop(self):
-        self.script = snekgemini.cutscene(self.game.loader.get_text("scripts/level_exit.snek"), level=self)
-        self.pop_after_script = True
+    def run_cutscene(self, cutscene_id, extra_constants=None):
+        self.script = snekgemini.cutscene(
+            cutscene_id, level=self, extra_constants=extra_constants
+        )
+
+    def exit_level(self):
+        self.run_cutscene("level_exit")
+
+    def switch_level(self, dest):
+        self.run_cutscene("level_switch", extra_constants={"NEXT_LEVEL": dest})
 
     def lock(self):
         for sprite in self.sprites:
@@ -192,15 +207,12 @@ class Level(game_state.GameState):
         for sprite in self.gui:
             sprite.update(dt)
         # update visual effects
-        for effect in self.effects:
-            effect.update(dt)
+        self.effects = [effect.update(dt) for effect in self.effects if not effect.done]
         # update script
         if self.script is not None:
             self.script.cycle()
             if self.script.done():
                 self.script = None
-                if self.pop_after_script:
-                    super().pop()
         return super().update(dt) and True
 
     def draw(self):

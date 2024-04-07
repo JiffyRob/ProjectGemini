@@ -1,3 +1,4 @@
 lock();
 fade(FADEOUT_CIRCLE);
 unlock();
+pop_state();
