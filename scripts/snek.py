@@ -272,7 +272,6 @@ class SNEKProgram:
                 callback = self.api[func_name](*args)
                 while True:
                     value = next(callback)
-                    print("got", value, "from callback", func_name)
                     if value == GET_VAR:
                         # command has requested to evaluate an expression for context
                         # ugh too many nested loops
