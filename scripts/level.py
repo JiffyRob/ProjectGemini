@@ -77,6 +77,7 @@ class Level(game_state.GameState):
         self.script = snekgemini.cutscene(
             cutscene_id, level=self, extra_constants=extra_constants
         )
+        self.script.cycle()
 
     def exit_level(self):
         self.run_cutscene("level_exit")
@@ -189,6 +190,12 @@ class Level(game_state.GameState):
                     level.down_rects.append(rect)
         level.player.z = entity_layer
         return level
+
+    def world_to_screen(self, pos):
+        return pygame.Vector2(pos) - self.viewport_rect.topleft
+
+    def screen_to_world(self, pos):
+        return pygame.Vector2(pos) + self.viewport_rect.topleft
 
     def update(self, dt):
         # removes dead sprites from the list

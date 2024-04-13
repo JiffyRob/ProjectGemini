@@ -66,12 +66,16 @@ class Fade(snek.SnekCommand):
         visual_fx.GrowingCircle,
         visual_fx.ShrinkingCircle,
     )
+    UNIT_SCREEN = 0
+    UNIT_WORLD = 1
 
-    def __init__(self, fade_type, x=None, y=None):
+    def __init__(self, fade_type, x=None, y=None, unit=None):
         super().__init__((self.POS, "LEVEL"))
         self.fade_type = fade_type
         self.pos = [x, y]
+        self.coord = self.pos
         self.fader = None
+        self.unit = unit or self.UNIT_WORLD
 
     def get_value(self):
         if self.fader is None:
@@ -80,7 +84,11 @@ class Fade(snek.SnekCommand):
                 self.pos[0] = player_pos[0]
             if self.pos[1] is None:
                 self.pos[1] = player_pos[1]
+            self.coord = self.pos
+            if self.unit == self.UNIT_WORLD:
+                self.pos = lambda: self.context["LEVEL"].world_to_screen(self.coord)
             if self.fade_type in {self.IN_CIRCLE, self.OUT_CIRCLE}:
+
                 self.fader = self.FADES[self.fade_type](
                     util_draw.RESOLUTION, self.pos, speed=400
                 )
