@@ -25,61 +25,59 @@ class PhysicsSprite(sprite.Sprite):
 
     def update(self, dt):
         # physics
-        # locked sprites don't move
-        if not self.locked:
-            vel = self.velocity * dt
-            self.rect.clamp_ip(self.level.map_rect)
-            self.rect.x += vel.x
-            departure_directions = []
-            if vel.x < 0:
-                if self.rect.left < self.level.map_rect.left:
-                    self.rect.left = self.level.map_rect.left
-                    departure_directions.append("left")
-                for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: -rect.x
-                ):
-                    if self.collision_rect.colliderect(collided):
-                        self.on_xy_collision()
-                        self.rect.x += collided.right - self.collision_rect.left
-                        vel.x = 0
-                        break
-            else:
-                if self.rect.right > self.level.map_rect.right:
-                    self.rect.right = self.level.map_rect.right
-                    departure_directions.append("right")
-                for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: rect.x
-                ):
-                    if self.collision_rect.colliderect(collided):
-                        self.on_xy_collision()
-                        self.rect.x += collided.left - self.collision_rect.right
-                        vel.x = 0
-                        break
-            self.rect.y += vel.y
-            if vel.y < 0:
-                if self.rect.top < self.level.map_rect.top:
-                    self.rect.top = self.level.map_rect.top
-                    departure_directions.append("up")
-                for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: -rect.y
-                ):
-                    if self.collision_rect.colliderect(collided):
-                        self.rect.y += collided.bottom - self.collision_rect.top
-                        vel.y = 0
-                        break
-            else:
-                if self.rect.bottom > self.level.map_rect.bottom:
-                    self.rect.bottom = self.level.map_rect.bottom
-                    departure_directions.append("down")
-                for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: rect.y
-                ):
-                    if self.collision_rect.colliderect(collided):
-                        self.rect.y += collided.top - self.collision_rect.bottom
-                        vel.y = 0
-                        break
-            if departure_directions:
-                self.on_map_departure(departure_directions)
+        vel = self.velocity * dt * (not self.locked)
+        self.rect.clamp_ip(self.level.map_rect)
+        self.rect.x += vel.x
+        departure_directions = []
+        if vel.x < 0:
+            if self.rect.left < self.level.map_rect.left:
+                self.rect.left = self.level.map_rect.left
+                departure_directions.append("left")
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: -rect.x
+            ):
+                if self.collision_rect.colliderect(collided):
+                    self.on_xy_collision()
+                    self.rect.x += collided.right - self.collision_rect.left
+                    vel.x = 0
+                    break
+        else:
+            if self.rect.right > self.level.map_rect.right:
+                self.rect.right = self.level.map_rect.right
+                departure_directions.append("right")
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: rect.x
+            ):
+                if self.collision_rect.colliderect(collided):
+                    self.on_xy_collision()
+                    self.rect.x += collided.left - self.collision_rect.right
+                    vel.x = 0
+                    break
+        self.rect.y += vel.y
+        if vel.y < 0:
+            if self.rect.top < self.level.map_rect.top:
+                self.rect.top = self.level.map_rect.top
+                departure_directions.append("up")
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: -rect.y
+            ):
+                if self.collision_rect.colliderect(collided):
+                    self.rect.y += collided.bottom - self.collision_rect.top
+                    vel.y = 0
+                    break
+        else:
+            if self.rect.bottom > self.level.map_rect.bottom:
+                self.rect.bottom = self.level.map_rect.bottom
+                departure_directions.append("down")
+            for collided in sorted(
+                self.level.collision_rects, key=lambda rect: rect.y
+            ):
+                if self.collision_rect.colliderect(collided):
+                    self.rect.y += collided.top - self.collision_rect.bottom
+                    vel.y = 0
+                    break
+        if departure_directions:
+            self.on_map_departure(departure_directions)
         return True
 
 
