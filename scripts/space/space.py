@@ -70,7 +70,7 @@ class Space(game_state.GameState):
         for pos in numpy.random.uniform(
             low=-2000, high=2000, size=(10000 - len(planets), 3)
         ):
-            self.static_sprites.add_sprite(tuple(pos), "yellow")
+            self.static_sprites.add_sprite(tuple(pos), numpy.random.choice(["blue", "yellow"]))
 
     def update(self, dt):
         keys = pygame.key.get_pressed()

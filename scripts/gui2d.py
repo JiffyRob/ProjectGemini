@@ -116,7 +116,7 @@ class Dialog(sprite.GUISprite):
     def rebuild(self):
         self.image.fill(util_draw.COLORKEY)
         text = self.get_full_text()
-        text_surface = self.font.render_to(
+        self.font.render_to(
             self.image,
             self.image.get_rect().inflate(-self.pad * 2, -self.pad * 2),
             text,
