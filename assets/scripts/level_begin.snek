@@ -1,3 +1,4 @@
 lock();
 fade(FADEIN_CIRCLE);
+play_soundtrack(LEVEL_SOUNDTRACK);
 unlock();

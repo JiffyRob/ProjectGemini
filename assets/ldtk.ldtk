@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 76,
+	"nextUid": 77,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1600,6 +1600,43 @@
 			"allowedRefsEntityUid": null,
 			"allowedRefTags": [],
 			"tilesetUid": null
+		},
+		{
+			"identifier": "Soundtrack",
+			"doc": null,
+			"__type": "String",
+			"uid": 76,
+			"type": "F_String",
+			"isArray": false,
+			"canBeNull": true,
+			"arrayMinLength": null,
+			"arrayMaxLength": null,
+			"editorDisplayMode": "Hidden",
+			"editorDisplayScale": 1,
+			"editorDisplayPos": "Above",
+			"editorLinkStyle": "StraightArrow",
+			"editorDisplayColor": null,
+			"editorAlwaysShow": false,
+			"editorShowInWorld": true,
+			"editorCutLongValues": true,
+			"editorTextSuffix": null,
+			"editorTextPrefix": null,
+			"useForSmartColor": false,
+			"exportToToc": false,
+			"searchable": false,
+			"min": null,
+			"max": null,
+			"regex": null,
+			"acceptFileTypes": null,
+			"defaultOverride": null,
+			"textLanguageMode": null,
+			"symmetricalRef": false,
+			"autoChainRef": true,
+			"allowOutOfLevelRef": true,
+			"allowedRefs": "OnlySame",
+			"allowedRefsEntityUid": null,
+			"allowedRefTags": [],
+			"tilesetUid": null
 		}
 	] },
 	"levels": [
@@ -1646,6 +1683,10 @@
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Mushroom_Plat", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Mushroom_Plat"]
+				}] },
+				{ "__identifier": "Soundtrack", "__type": "String", "__value": "FungalBoogie", "__tile": null, "defUid": 76, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["FungalBoogie"]
 				}] }
 			],
 			"layerInstances": [
@@ -2225,6 +2266,10 @@
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Mushroom_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Mushroom_Topdown"]
+				}] },
+				{ "__identifier": "Soundtrack", "__type": "String", "__value": "FungalBoogie", "__tile": null, "defUid": 76, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["FungalBoogie"]
 				}] }
 			],
 			"layerInstances": [

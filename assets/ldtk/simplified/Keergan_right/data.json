@@ -25,7 +25,8 @@
 			0.5
 		],
 		"platformer": true,
-		"Biome": "Mushroom_Plat"
+		"Biome": "Mushroom_Plat",
+		"Soundtrack": "FungalBoogie"
 	},
 	"layers": [
 		"Collision.png",

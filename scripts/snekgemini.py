@@ -114,6 +114,7 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "LEVEL": level,
             "PLANET": level.name.split("_")[0],
             "LEVEL_NAME": level.name,
+            "LEVEL_SOUNDTRACK": level.soundtrack,
             "FADEIN_CIRCLE": Fade.IN_CIRCLE,
             "FADEOUT_CIRCLE": Fade.OUT_CIRCLE,
             **extra_constants,
@@ -130,5 +131,6 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "fade": Fade,
             "get_player_pos": snek.snek_command(lambda: level.player.pos),
             "map_switch": snek.snek_command(level.game.load_map),
+            "play_soundtrack": snek.snek_command(level.game.play_soundtrack)
         },
     )

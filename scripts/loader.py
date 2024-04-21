@@ -13,12 +13,12 @@ class Loader:
 
     @functools.cache
     def get_text(self, path):
-        with pathlib.Path(self.base_path, path).open() as file:
+        with self.join(path).open() as file:
             return file.read()
 
     @functools.cache
     def get_json(self, path):
-        return json.load((self.base_path / path).open())
+        return json.load(self.join(path).open())
 
     @functools.cache
     def get_csv(self, path, item_delimiter=",", line_delimiter="\n"):
@@ -39,6 +39,9 @@ class Loader:
         new_surface.set_colorkey(COLORKEY)
         return new_surface
 
+    def join(self, path):
+        return pathlib.Path(self.base_path, path)
+
     @classmethod
     def create_surface(cls, size):
         return cls.convert(pygame.Surface(size))
@@ -48,24 +51,22 @@ class Loader:
         if rect:
             return self.convert(
                 pygame.image.load(
-                    pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
+                    self.join(path).with_suffix(".png")
                 ).subsurface(rect)
             )
         else:
             return self.convert(
                 pygame.image.load(
-                    pathlib.Path(self.base_path, pathlib.Path(path).with_suffix(".png"))
+                    self.join(path).with_suffix(".png")
                 )
             )
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):
-        path = pathlib.Path(path)
         return self.convert(pygame.transform.scale_by(self.get_surface(path), factor))
 
     @functools.cache
     def get_surface_scaled_to(self, path, size=(16, 16)):
-        path = pathlib.Path(path)
         return self.convert(pygame.transform.scale(self.get_surface(path), size))
 
     @functools.cache
@@ -91,3 +92,8 @@ class Loader:
         if isinstance(area, str):
             area = self.get_json(path.with_suffix(".json"))[area]
         return self.convert(surface.subsurface(area))
+
+    @functools.cache
+    def get_sound(self, path):
+        path = self.join(path).with_suffix(".wav")
+        return pygame.mixer.Sound(path)

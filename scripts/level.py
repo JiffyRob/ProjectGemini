@@ -48,11 +48,13 @@ class Level(game_state.GameState):
         player_pos=(0, 0),
         map_size=(256, 256),
         is_platformer=False,
+        soundtrack=None,
     ):
         super().__init__(game)
         self.name = name
         self.backgrounds = []
         self.groups = defaultdict(set)
+        self.soundtrack = soundtrack
         if is_platformer:
             self.player = platformer.mobile.Player(self)
         else:
@@ -124,6 +126,7 @@ class Level(game_state.GameState):
         data = game.loader.get_json(folder / "data.json")
         size = data["width"], data["height"]
         is_platformer = data["customFields"]["platformer"]
+        soundtrack = data["customFields"]["Soundtrack"]
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
         level = cls(
@@ -132,6 +135,7 @@ class Level(game_state.GameState):
             player_pos=data["customFields"]["start"],
             map_size=size,
             is_platformer=is_platformer,
+            soundtrack=soundtrack,
         )
         # background creation
         level.bgcolor = data["bgColor"]

@@ -1,12 +1,11 @@
 import asyncio
 from collections import deque
 
-import numpy
 import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import level, loader, space, util_draw
+from scripts import level, loader, space, util_draw, sound
 
 pygame.init()
 
@@ -23,6 +22,7 @@ class Game:
         self.running = False
         self.loader = None
         self.display_surface = None
+        self.sound_manager = None
 
     @property
     def window_surface(self):
@@ -55,6 +55,9 @@ class Game:
     def time_phase(self, mult):
         self.dt_mult = mult
 
+    def play_soundtrack(self, track_name):
+        self.sound_manager.switch_track(f"music/{track_name}.wav")
+
     async def run(self):
         self.running = True
         self.window = sdl2.Window(
@@ -67,6 +70,7 @@ class Game:
         self.window.get_surface()  # allows convert() calls to happen
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
+        self.sound_manager = sound.SoundManager(self.loader)
         self.stack.appendleft(space.Space(self))
         self.stack.appendleft(level.Level.load(self, "Keergan"))
         dt = 0
