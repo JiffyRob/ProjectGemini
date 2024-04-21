@@ -49,7 +49,7 @@ class Space(game_state.GameState):
             yellow_textures,
         )
         self.planet_ids = {}
-        planets = (("Terra", (0, 0, 1000)), ("Keergan", (0, 0, -1000)))
+        planets = (("GeminiII", (0, 0, 1000)), ("Keergan", (0, 0, -1000)))
         for name, position in planets:
             planet_textures = {
                 (size, size): AnimatedSurface(

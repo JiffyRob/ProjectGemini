@@ -1969,6 +1969,22 @@
 							"fieldInstances": [],
 							"__worldX": 608,
 							"__worldY": 160
+						},
+						{
+							"__identifier": "End",
+							"__grid": [3,7],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#BE4A2F",
+							"iid": "36bac290-fec0-11ee-8f1a-fbee1929b56e",
+							"width": 16,
+							"height": 16,
+							"defUid": 8,
+							"px": [48,112],
+							"fieldInstances": [],
+							"__worldX": 352,
+							"__worldY": 112
 						}
 					]
 				},

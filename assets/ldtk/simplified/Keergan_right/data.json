@@ -220,6 +220,19 @@
 				"color": 15389866,
 				"customFields" : {}
 			}
+		],
+		"End": [
+			{
+				"id": "End",
+				"iid": "36bac290-fec0-11ee-8f1a-fbee1929b56e",
+				"layer": "Entities",
+				"x": 48,
+				"y": 112,
+				"width": 16,
+				"height": 16,
+				"color": 12470831,
+				"customFields" : {}
+			}
 		]
 	}
 }
