@@ -1,0 +1,6 @@
+# The Runner sets a TEXT variable for a dialog if interaction should post one.
+if TEXT {
+    lock();
+    write(TEXT);
+    unlock();
+}

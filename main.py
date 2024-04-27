@@ -73,7 +73,7 @@ class Game:
         self.loader = loader.Loader()
         self.sound_manager = sound.SoundManager(self.loader)
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(level.Level.load(self, "Keergan"))
+        self.stack.appendleft(level.Level.load(self, "GeminiII"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 

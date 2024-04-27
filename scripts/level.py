@@ -30,6 +30,7 @@ class Level(game_state.GameState):
             "Ship": topdown.immobile.Ship,
             "BrokenShip": topdown.immobile.BrokenShip,
             "House": topdown.immobile.House,
+            "Furniture": topdown.immobile.Furniture,
         },
         # platformer
         {

@@ -29,5 +29,64 @@
 		"Below.png",
 		"Above.png"
 	],
-	"entities" : {}
+	"entities": {
+		"Furniture": [
+			{
+				"id": "Furniture",
+				"iid": "7a4a8560-fec0-11ee-b89c-b9a4326f1aac",
+				"layer": "Entities",
+				"x": 64,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 14984818,
+				"customFields": {
+					"Type": "Stool",
+					"Info": null
+				}
+			},
+			{
+				"id": "Furniture",
+				"iid": "81f71710-fec0-11ee-b89c-8f82911bd8e8",
+				"layer": "Entities",
+				"x": 16,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 12470831,
+				"customFields": {
+					"Type": "Table_Left",
+					"Info": null
+				}
+			},
+			{
+				"id": "Furniture",
+				"iid": "83a478f0-fec0-11ee-b89c-3f5cdc14e082",
+				"layer": "Entities",
+				"x": 32,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 7552569,
+				"customFields": {
+					"Type": "Table_Paper",
+					"Info": "Out shopping.  Will return soon.\n\n --Father"
+				}
+			},
+			{
+				"id": "Furniture",
+				"iid": "85ee41e0-fec0-11ee-b89c-95816e43a9bc",
+				"layer": "Entities",
+				"x": 48,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 14120515,
+				"customFields": {
+					"Type": "Table_Right",
+					"Info": null
+				}
+			}
+		]
+	}
 }

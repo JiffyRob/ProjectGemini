@@ -44,6 +44,19 @@
 					"map": "Home"
 				}
 			}
+		],
+		"Ship": [
+			{
+				"id": "Ship",
+				"iid": "4d07d460-fec0-11ee-b89c-8b81a36bc3c0",
+				"layer": "Entities",
+				"x": 272,
+				"y": 128,
+				"width": 16,
+				"height": 16,
+				"color": 14984818,
+				"customFields" : {}
+			}
 		]
 	}
 }
