@@ -70,7 +70,9 @@ class Space(game_state.GameState):
         for pos in numpy.random.uniform(
             low=-2000, high=2000, size=(10000 - len(planets), 3)
         ):
-            self.static_sprites.add_sprite(tuple(pos), numpy.random.choice(["blue", "yellow"]))
+            self.static_sprites.add_sprite(
+                tuple(pos), numpy.random.choice(["blue", "yellow"])
+            )
         self.turn_speeds = {
             "up": 0,
             "down": 0,
@@ -126,15 +128,33 @@ class Space(game_state.GameState):
         else:
             self.forward_speed -= self.forward_delta
             self.game.play_soundtrack("SpaceshipMain")
-        self.turn_speeds["up"] = pygame.math.clamp(self.turn_speeds["up"], 0, self.max_turn_speed)
-        self.turn_speeds["down"] = pygame.math.clamp(self.turn_speeds["down"], 0, self.max_turn_speed)
-        self.turn_speeds["left"] = pygame.math.clamp(self.turn_speeds["left"], 0, self.max_turn_speed)
-        self.turn_speeds["right"] = pygame.math.clamp(self.turn_speeds["right"], 0, self.max_turn_speed)
-        self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["up"], (1, 0, 0))
-        self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["down"], (1, 0, 0))
-        self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["left"], (0, 1, 0))
-        self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["right"], (0, 1, 0))
-        self.forward_speed = pygame.math.clamp(self.forward_speed, self.min_forward_speed, self.max_forward_speed)
+        self.turn_speeds["up"] = pygame.math.clamp(
+            self.turn_speeds["up"], 0, self.max_turn_speed
+        )
+        self.turn_speeds["down"] = pygame.math.clamp(
+            self.turn_speeds["down"], 0, self.max_turn_speed
+        )
+        self.turn_speeds["left"] = pygame.math.clamp(
+            self.turn_speeds["left"], 0, self.max_turn_speed
+        )
+        self.turn_speeds["right"] = pygame.math.clamp(
+            self.turn_speeds["right"], 0, self.max_turn_speed
+        )
+        self.camera.rotation *= math3d.Quaternion(
+            dt * self.turn_speeds["up"], (1, 0, 0)
+        )
+        self.camera.rotation *= math3d.Quaternion(
+            -dt * self.turn_speeds["down"], (1, 0, 0)
+        )
+        self.camera.rotation *= math3d.Quaternion(
+            -dt * self.turn_speeds["left"], (0, 1, 0)
+        )
+        self.camera.rotation *= math3d.Quaternion(
+            dt * self.turn_speeds["right"], (0, 1, 0)
+        )
+        self.forward_speed = pygame.math.clamp(
+            self.forward_speed, self.min_forward_speed, self.max_forward_speed
+        )
         motion = pygame.Vector3(0, 0, self.forward_speed * dt)
         if keys[pygame.K_LSHIFT]:
             motion.z -= 300 * dt

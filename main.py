@@ -5,7 +5,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import level, loader, space, util_draw, sound
+from scripts import level, loader, sound, space, util_draw
 
 pygame.init()
 
@@ -50,6 +50,7 @@ class Game:
         self.stack.popleft()
 
     def load_map(self, map_name):
+        print("loading", map_name)
         self.stack.appendleft(level.Level.load(self, map_name))
 
     def time_phase(self, mult):

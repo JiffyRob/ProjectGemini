@@ -19,7 +19,7 @@ Parallax = namedtuple(
     defaults=(pygame.FRect((0, 0), util_draw.RESOLUTION), (1, 1), True, True),
 )
 
-LERP_SPEED = 0.15
+LERP_SPEED = 1
 
 
 class Level(game_state.GameState):
@@ -29,6 +29,7 @@ class Level(game_state.GameState):
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
             "Ship": topdown.immobile.Ship,
             "BrokenShip": topdown.immobile.BrokenShip,
+            "House": topdown.immobile.House,
         },
         # platformer
         {
@@ -48,6 +49,7 @@ class Level(game_state.GameState):
         player_pos=(0, 0),
         map_size=(256, 256),
         is_platformer=False,
+        is_house=False,
         soundtrack=None,
     ):
         super().__init__(game)
@@ -59,6 +61,7 @@ class Level(game_state.GameState):
             self.player = platformer.mobile.Player(self)
         else:
             self.player = topdown.mobile.Player(self)
+        self.is_house = is_house
         self.player.rect.center = player_pos
         self.sprites = {self.player}
         self.collision_rects = []
@@ -103,6 +106,8 @@ class Level(game_state.GameState):
         for group in sprite.groups:
             if group == "static-collision":
                 self.collision_rects.append(sprite.collision_rect)
+                if hasattr(sprite, "extra_collision_rects"):
+                    self.collision_rects.extend(sprite.extra_collision_rects)
                 continue
             self.groups[group].add(sprite)
 
@@ -126,6 +131,7 @@ class Level(game_state.GameState):
         data = game.loader.get_json(folder / "data.json")
         size = data["width"], data["height"]
         is_platformer = data["customFields"]["platformer"]
+        is_house = data["customFields"]["house"]
         soundtrack = data["customFields"]["Soundtrack"]
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
@@ -136,6 +142,7 @@ class Level(game_state.GameState):
             map_size=size,
             is_platformer=is_platformer,
             soundtrack=soundtrack,
+            is_house=is_house,
         )
         # background creation
         level.bgcolor = data["bgColor"]
@@ -155,7 +162,7 @@ class Level(game_state.GameState):
                         loop_y=data["customFields"]["LoopY"],
                     )
                 )
-        # layer and entity creation
+        # tile layers
         entity_layer = data["customFields"]["entity_layer"]
         for layer_ind, layer in enumerate(data["layers"]):
             level.add_sprite(
@@ -166,6 +173,7 @@ class Level(game_state.GameState):
                     z=layer_ind * 3 + 1,
                 )
             )
+        # sprites
         for key, value in data["entities"].items():
             sprite_cls = cls.sprite_classes[is_platformer][key]
             if sprite_cls is None:
@@ -176,6 +184,7 @@ class Level(game_state.GameState):
                         level,
                         (entity["x"], entity["y"], entity["width"], entity["height"]),
                         z=entity_layer,
+                        **entity["customFields"]
                     )
                 )
         level.player.z = entity_layer
@@ -241,7 +250,7 @@ class Level(game_state.GameState):
                     )
                     offset.x += background.rect.width
         # draw map + sprites
-        for sprite in sorted(self.sprites, key=lambda sprite: sprite.z):
+        for sprite in sorted(self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery):
             if sprite.image is not None:
                 self.game.window_surface.blit(
                     sprite.image,

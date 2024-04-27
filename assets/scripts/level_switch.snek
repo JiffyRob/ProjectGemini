@@ -6,4 +6,5 @@ map_switch(NEXT_LEVEL);
 # this will run once this level is reentered
 lock();
 fade(FADEIN_CIRCLE);
+play_soundtrack(LEVEL_SOUNDTRACK);
 unlock();

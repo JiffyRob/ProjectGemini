@@ -11,7 +11,7 @@ JUMP_SPEED = 240
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10):
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields):
         super().__init__(level, image=image, rect=rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -90,7 +90,7 @@ class PhysicsSprite(sprite.Sprite):
 
 
 class BoingerBeetle(PhysicsSprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, weight=3, z=z)
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[8:12],
@@ -132,7 +132,7 @@ class BoingerBeetle(PhysicsSprite):
 
 
 class Player(PhysicsSprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, image=None, z=z)
         images = level.game.loader.get_spritesheet("me-Sheet.png")
         self.anim_dict = {
@@ -179,6 +179,7 @@ class Player(PhysicsSprite):
         self.anim_dict[self.state].update(dt)
         self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
+        print("player update")
         return super().update(dt) and self.health > 0
 
     def hurt(self, amount):

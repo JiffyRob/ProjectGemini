@@ -7,7 +7,7 @@ WALK_SPEED = 64
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10):
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields):
         super().__init__(level, image=image, rect=rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -45,9 +45,7 @@ class PhysicsSprite(sprite.Sprite):
             if self.rect.right > self.level.map_rect.right:
                 self.rect.right = self.level.map_rect.right
                 departure_directions.append("right")
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: rect.x
-            ):
+            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
                 if self.collision_rect.colliderect(collided):
                     self.on_xy_collision()
                     self.rect.x += collided.left - self.collision_rect.right
@@ -69,9 +67,7 @@ class PhysicsSprite(sprite.Sprite):
             if self.rect.bottom > self.level.map_rect.bottom:
                 self.rect.bottom = self.level.map_rect.bottom
                 departure_directions.append("down")
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: rect.y
-            ):
+            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
                 if self.collision_rect.colliderect(collided):
                     self.rect.y += collided.top - self.collision_rect.bottom
                     vel.y = 0
@@ -82,7 +78,7 @@ class PhysicsSprite(sprite.Sprite):
 
 
 class Player(PhysicsSprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, image=None, z=z)
         images = level.game.loader.get_spritesheet("me-Sheet.png")
         self.anim_dict = {
@@ -114,8 +110,17 @@ class Player(PhysicsSprite):
             }[self.facing]
         )
 
+    @property
+    def collision_rect(self):
+        rect = pygame.FRect(0, 0, 14, 8)
+        rect.midbottom = self.rect.midbottom
+        return rect
+
     def on_map_departure(self, directions):
-        self.level.switch_level(f"{self.level.name}_{directions[0]}")
+        if not self.level.is_house:
+            self.level.switch_level(f"{self.level.name}_{directions[0]}")
+        else:
+            self.level.run_cutscene("level_exit")
 
     @property
     def facing(self):

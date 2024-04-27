@@ -20,7 +20,8 @@
 		"BackgroundYMult": [],
 		"platformer": false,
 		"Biome": "Mushroom_Topdown",
-		"Soundtrack": "FungalBoogie"
+		"Soundtrack": "FungalBoogie",
+		"house": false
 	},
 	"layers": [
 		"Collision.png",

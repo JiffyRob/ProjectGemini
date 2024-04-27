@@ -8,7 +8,7 @@ from scripts.animation import Animation
 
 
 class Emerald(sprite.Sprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, image=None, rect=rect, z=z)
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[0:5], 0.08
@@ -35,7 +35,7 @@ class Prop(sprite.Sprite):
     LAST = 15
     SPEED = 0.6
 
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, image=None, rect=rect, z=z)
         self.anim = Animation(
             level.game.loader.get_spritesheet("platformer-sprites.png")[
@@ -58,7 +58,7 @@ class BrownShroom(Prop):
 
 
 class BustedParts(sprite.Sprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, image=None, rect=rect, z=z)
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[16:20]
@@ -88,7 +88,7 @@ class BustedParts(sprite.Sprite):
 
 
 class CollisionSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0):
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, **custom_fields):
         if image is None:
             image = pygame.Surface(rect[2:]).convert_alpha()
         super().__init__(level, image=image, rect=rect, z=z)

@@ -50,16 +50,10 @@ class Loader:
     def get_surface(self, path, rect=None):
         if rect:
             return self.convert(
-                pygame.image.load(
-                    self.join(path).with_suffix(".png")
-                ).subsurface(rect)
+                pygame.image.load(self.join(path).with_suffix(".png")).subsurface(rect)
             )
         else:
-            return self.convert(
-                pygame.image.load(
-                    self.join(path).with_suffix(".png")
-                )
-            )
+            return self.convert(pygame.image.load(self.join(path).with_suffix(".png")))
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):

@@ -131,6 +131,6 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "fade": Fade,
             "get_player_pos": snek.snek_command(lambda: level.player.pos),
             "map_switch": snek.snek_command(level.game.load_map),
-            "play_soundtrack": snek.snek_command(level.game.play_soundtrack)
+            "play_soundtrack": snek.snek_command(level.game.play_soundtrack),
         },
     )

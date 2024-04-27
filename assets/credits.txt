@@ -1,0 +1,15 @@
+Created and Developed by JiffyRob
+
+Art uses the "New Worlds 46" palette by Count Moriarty:
+https://lospec.com/palette-list/new-worlds-46
+
+Planet art generated using Deepfold's excellent shader code:
+https://deep-fold.itch.io/pixel-planet-generator
+
+Source Code released under MIT License.  Feel free to peruse at:
+https://github.com/jiffyrob/projectgemini
+
+Art and Music for Project Gemini © 2023-2024 by John Robinson (JiffyRob) is licensed under Creative Commons Attribution-NonCommercial 4.0 International
+It is at the same link
+
+Special thanks to the Pygame Community for their wonderful support and continuous development of the Pygame-CE game framework

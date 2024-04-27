@@ -1,0 +1,33 @@
+{
+	"identifier": "Home",
+	"uniqueIdentifer": "6ec05e10-fec0-11ee-85ba-e9ddb5f08779",
+	"x": 0,
+	"y": -576,
+	"width": 112,
+	"height": 96,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"start": [
+			72,
+			82
+		],
+		"entity_layer": 8,
+		"Background": null,
+		"BackgroundXMult": [],
+		"LoopX": false,
+		"LoopY": false,
+		"BackgroundYMult": [],
+		"platformer": false,
+		"Biome": "N_A",
+		"Soundtrack": "BlueVictoria",
+		"house": true
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities" : {}
+}
