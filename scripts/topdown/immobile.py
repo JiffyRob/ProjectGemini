@@ -61,35 +61,39 @@ class BrokenShip(Interactable):
         )
 
 
-class House(sprite.Sprite):
-    groups = {"static-collision"}
+class House(Interactable):
+    groups = {"static-collision", "interactable"}
 
     def __init__(self, level, rect=(0, 0, 64, 48), z=0, **custom_fields):
         # three rects to represent the house without the doorway
-        self.collision_rect = pygame.FRect(rect[0], rect[1] + 10, 64, 22)
+        roof_rect = pygame.FRect(rect[0], rect[1] + 10, 64, 22)
         self.extra_collision_rects = (
-            pygame.FRect(self.collision_rect.left, self.collision_rect.bottom, 32, 16),
-            pygame.FRect(
-                self.collision_rect.left + 48,
-                self.collision_rect.bottom,
-                16,
-                16,
-            ),
+            pygame.FRect(roof_rect.left, roof_rect.bottom, 32, 16),
+            roof_rect,
+        )
+        # use right side of door as collision rect as that's what interaction uses
+        # this way you interact with the rect that has the sign on it
+        self.collision_rect = pygame.FRect(
+            roof_rect.left + 48,
+            roof_rect.bottom,
+            16,
+            16,
         )
         # the doorway
         self.teleport_rect = pygame.FRect(
-            self.collision_rect.left + 32,
-            self.collision_rect.bottom,
+            roof_rect.left + 32,
+            roof_rect.bottom,
             16,
             16,
         )
-        print(custom_fields)
         self.dest_map = custom_fields["map"]
         super().__init__(
             level,
             image=level.game.loader.get_surface("tileset.png", rect=(0, 208, 64, 48)),
             rect=rect,
             z=z,
+            script="furniture",
+            extra_constants={"TEXT": custom_fields["Sign"]}
         )
 
     def update(self, dt):

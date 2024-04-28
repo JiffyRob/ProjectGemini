@@ -1,0 +1,13 @@
+if randint(1, 5) {
+    x = randint(1, 10)
+    switch x {
+        case 1 {
+            write("Stop bothering the bushes...");
+        }
+        case 2 {
+            write("I SAID: Stop bothering the bushes!");
+        }
+        case 3 {
+            write("Here - take this and GO AWAY!");
+        }
+}

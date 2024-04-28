@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 101,
+	"nextUid": 103,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1360,6 +1360,43 @@
 					"__type": "String",
 					"uid": 93,
 					"type": "F_String",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Sign",
+					"doc": null,
+					"__type": "String",
+					"uid": 102,
+					"type": "F_Text",
 					"isArray": false,
 					"canBeNull": true,
 					"arrayMinLength": null,
@@ -2931,10 +2968,16 @@
 							"height": 16,
 							"defUid": 92,
 							"px": [144,80],
-							"fieldInstances": [{ "__identifier": "map", "__type": "String", "__value": "Home", "__tile": null, "defUid": 93, "realEditorValues": [{
-								"id": "V_String",
-								"params": ["Home"]
-							}] }],
+							"fieldInstances": [
+								{ "__identifier": "map", "__type": "String", "__value": "Home", "__tile": null, "defUid": 93, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["Home"]
+								}] },
+								{ "__identifier": "Sign", "__type": "String", "__value": "My House", "__tile": null, "defUid": 102, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["My House"]
+								}] }
+							],
 							"__worldX": 144,
 							"__worldY": -384
 						},

@@ -144,9 +144,30 @@ class Player(PhysicsSprite):
         self.jump_forced = False
         self.image = self.anim_dict[self.state].image
         self.facing_left = False
-        self.health = 16
-        self.health_capacity = 16
-        self.emeralds = 10
+
+    @property
+    def health(self):
+        return self.level.game.save.health
+
+    @health.setter
+    def health(self, value):
+        self.level.game.save.health = value
+
+    @property
+    def health_capacity(self):
+        return self.level.game.save.health_capacity
+
+    @health_capacity.setter
+    def health_capacity(self, value):
+        self.level.game.save.health_capacity = value
+
+    @property
+    def emeralds(self):
+        return self.level.game.save.emeralds
+
+    @emeralds.setter
+    def emeralds(self, value):
+        self.level.game.save.emeralds = value
 
     def swap_state(self, new):
         if self.state != new:

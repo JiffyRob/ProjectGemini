@@ -65,9 +65,32 @@ class Player(PhysicsSprite):
         self.last_facing = "right"
         self.image = self.anim_dict["idle-right"].image
 
-        self.health = 16
-        self.health_capacity = 16
         self.emeralds = 10
+
+    @property
+    def health(self):
+        return self.level.game.save.health
+
+    @health.setter
+    def health(self, value):
+        self.level.game.save.health = value
+
+    @property
+    def health_capacity(self):
+        return self.level.game.save.health_capacity
+
+    @health_capacity.setter
+    def health_capacity(self, value):
+        self.level.game.save.health_capacity = value
+
+    @property
+    def emeralds(self):
+        return self.level.game.save.emeralds
+
+    @emeralds.setter
+    def emeralds(self, value):
+        self.level.game.save.emeralds = value
+
 
     @property
     def interaction_rect(self):
@@ -126,7 +149,7 @@ class Player(PhysicsSprite):
             if keys[pygame.K_SPACE]:
                 for sprite in self.level.groups["interactable"]:
                     print(sprite.rect, self.interaction_rect)
-                    if sprite.rect.colliderect(self.interaction_rect):
+                    if sprite.collision_rect.colliderect(self.interaction_rect):
                         print("interact w/", sprite)
                         sprite.interact()
             self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)

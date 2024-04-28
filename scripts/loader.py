@@ -1,6 +1,7 @@
 import functools
 import json
 import pathlib
+import gzip
 
 import pygame
 
@@ -91,3 +92,15 @@ class Loader:
     def get_sound(self, path):
         path = self.join(path).with_suffix(".wav")
         return pygame.mixer.Sound(path)
+
+    @staticmethod
+    # not cached because save files change
+    def get_save(path):
+        path = "saves" / pathlib.Path(path).with_suffix("sav")
+        with gzip.open(path) as file:
+            return json.load(file)
+
+    def save_data(self, path, data):
+        path = "saves" / pathlib.Path(path).with_suffix("sav")
+        with gzip.open(path, "wb") as file:
+            json.dump(data, file)

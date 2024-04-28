@@ -5,7 +5,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import level, loader, sound, space, util_draw
+from scripts import level, loader, sound, space, util_draw, game_save
 
 pygame.init()
 
@@ -23,6 +23,7 @@ class Game:
         self.loader = None
         self.display_surface = None
         self.sound_manager = None
+        self.save = game_save.GameSave(self)
 
     @property
     def window_surface(self):

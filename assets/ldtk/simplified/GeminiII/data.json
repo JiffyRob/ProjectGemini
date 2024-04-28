@@ -41,7 +41,8 @@
 				"height": 16,
 				"color": 12087120,
 				"customFields": {
-					"map": "Home"
+					"map": "Home",
+					"Sign": "My House"
 				}
 			}
 		],
