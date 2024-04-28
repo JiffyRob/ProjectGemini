@@ -35,32 +35,25 @@ def nine_slice(images, size):
     return image
 
 
-class Background(sprite.GUISprite):
-    ...  # TODO
+class Background(sprite.GUISprite): ...  # TODO
 
 
-class Button(sprite.GUISprite):
-    ...  # TODO
+class Button(sprite.GUISprite): ...  # TODO
 
 
-class Save(sprite.GUISprite):
-    ...  # TODO
+class Save(sprite.GUISprite): ...  # TODO
 
 
-class Label(sprite.GUISprite):
-    ...  # TODO
+class Label(sprite.GUISprite): ...  # TODO
 
 
-class ToggleSwitch(sprite.GUISprite):
-    ...  # TODO
+class ToggleSwitch(sprite.GUISprite): ...  # TODO
 
 
-class Image(sprite.GUISprite):
-    ...  # TODO...?
+class Image(sprite.GUISprite): ...  # TODO...?
 
 
-class KnifeIndicator(sprite.GUISprite):
-    ...  # TODO
+class KnifeIndicator(sprite.GUISprite): ...  # TODO
 
 
 class MainMenu(game_state.GameState):
@@ -71,10 +64,7 @@ class MainMenu(game_state.GameState):
         ]
 
 
-class PauseMenu(game_state.GameState):
-    ...  # TODO: Save & Quit, Quit, Save
+class PauseMenu(game_state.GameState): ...  # TODO: Save & Quit, Quit, Save
 
 
-class ItemMenu(game_state.GameState):
-    ...  # TODO
-
+class ItemMenu(game_state.GameState): ...  # TODO

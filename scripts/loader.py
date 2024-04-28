@@ -10,20 +10,46 @@ from scripts.util_draw import COLORKEY
 
 class Loader:
     def __init__(self):
-        self.base_path = pathlib.Path("assets/")
+        self.base_path = pathlib.Path(".")
+        self.asset_path = self.base_path / "assets"
+        self.data_path = self.base_path / "data"
+        self.save_path = self.data_path / "saves"
+        self.sound_path = self.base_path / "sound"
+        self.music_path = self.base_path / "music"
+
+    def join(self, path):
+        return pathlib.Path(self.base_path, path)
+
+    def join_asset(self, path):
+        return self.asset_path / path
+
+    def join_sound(self, path):
+        return self.sound_path / path
+
+    def join_music(self, path):
+        return self.music_path / path
+
+    def join_data(self, path, for_map=False):
+        if for_map:
+            # Map data in the asset folder bc that's where ldtk saves it
+            return self.join_asset(path)
+        return self.data_path / path
+
+    def join_save(self, path):
+        return self.save_path / path
 
     @functools.cache
-    def get_text(self, path):
-        with self.join(path).open() as file:
+    def get_text(self, path, for_map=False):
+        with self.join_data(path, for_map).open() as file:
             return file.read()
 
     @functools.cache
-    def get_json(self, path):
-        return json.load(self.join(path).open())
+    def get_json(self, path, for_map=False):
+        return json.load(self.join_data(path, for_map).open())
 
     @functools.cache
-    def get_csv(self, path, item_delimiter=",", line_delimiter="\n"):
-        text = self.get_text(path)
+    def get_csv(self, path, item_delimiter=",", line_delimiter="\n", for_map=False):
+        text = self.get_text(path, for_map)
         lines = []
         for line in text.split(line_delimiter):
             if not line:
@@ -40,9 +66,6 @@ class Loader:
         new_surface.set_colorkey(COLORKEY)
         return new_surface
 
-    def join(self, path):
-        return pathlib.Path(self.base_path, path)
-
     @classmethod
     def create_surface(cls, size):
         return cls.convert(pygame.Surface(size))
@@ -51,10 +74,10 @@ class Loader:
     def get_surface(self, path, rect=None):
         if rect:
             return self.convert(
-                pygame.image.load(self.join(path).with_suffix(".png")).subsurface(rect)
+                pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(rect)
             )
         else:
-            return self.convert(pygame.image.load(self.join(path).with_suffix(".png")))
+            return self.convert(pygame.image.load(self.join_asset(path).with_suffix(".png")))
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):
@@ -90,17 +113,16 @@ class Loader:
 
     @functools.cache
     def get_sound(self, path):
-        path = self.join(path).with_suffix(".wav")
+        path = self.join_sound(path).with_suffix(".wav")
         return pygame.mixer.Sound(path)
 
-    @staticmethod
     # not cached because save files change
-    def get_save(path):
-        path = "saves" / pathlib.Path(path).with_suffix("sav")
+    def get_save(self, path):
+        path = self.join_save(path).with_suffix("sav")
         with gzip.open(path) as file:
             return json.load(file)
 
     def save_data(self, path, data):
-        path = "saves" / pathlib.Path(path).with_suffix("sav")
+        path = self.join_save(path).with_suffix("sav")
         with gzip.open(path, "wb") as file:
             json.dump(data, file)

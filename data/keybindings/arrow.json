@@ -1,0 +1,15 @@
+{
+  "up": ["KeyDown_up", null],
+  "stop_up": ["KeyUp_up", null],
+  "down": ["KeyDown_down", null],
+  "stop_down": ["KeyUp_down", null],
+  "left": ["KeyDown_left", null],
+  "stop_left": ["KeyUp_left", null],
+  "right": ["KeyDown_right", null],
+  "stop_right": ["KeyUp_right", null],
+  "interact": ["KeyDown_space", null],
+  "time-phase": ["KeyDown_left ctrl", "KeyDown_right ctrl"],
+  "items": ["KeyDown_tab", null],
+  "quit": ["KeyDown_escape", null],
+  "pause": ["KeyDown_p", null]
+}

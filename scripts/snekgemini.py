@@ -108,7 +108,7 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
     if extra_constants is None:
         extra_constants = {}
     return snek.SNEKProgram(
-        level.game.loader.get_text(f"scripts/{script_name}.snek"),
+        level.game.loader.get_text(f"snek/{script_name}.snek"),
         {
             "RUNNER": runner,
             "LEVEL": level,

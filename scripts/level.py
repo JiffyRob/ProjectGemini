@@ -129,7 +129,7 @@ class Level(game_state.GameState):
     def load(cls, game, name):
         # basic metadata
         folder = pathlib.Path("ldtk/simplified", name)
-        data = game.loader.get_json(folder / "data.json")
+        data = game.loader.get_json(folder / "data.json", for_map=True)
         size = data["width"], data["height"]
         is_platformer = data["customFields"]["platformer"]
         is_house = data["customFields"]["house"]
@@ -190,7 +190,7 @@ class Level(game_state.GameState):
                 )
         level.player.z = entity_layer
         # collision data creation
-        for row, line in enumerate(game.loader.get_csv(folder / "Collision.csv")):
+        for row, line in enumerate(game.loader.get_csv(folder / "Collision.csv", for_map=True)):
             for col, value in enumerate(line):
                 value = int(value)
                 if value == 0 and not is_platformer:
