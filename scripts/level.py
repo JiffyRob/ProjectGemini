@@ -251,7 +251,9 @@ class Level(game_state.GameState):
                     )
                     offset.x += background.rect.width
         # draw map + sprites
-        for sprite in sorted(self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery):
+        for sprite in sorted(
+            self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery
+        ):
             if sprite.image is not None:
                 self.game.window_surface.blit(
                     sprite.image,

@@ -1,7 +1,7 @@
 import functools
+import gzip
 import json
 import pathlib
-import gzip
 
 import pygame
 

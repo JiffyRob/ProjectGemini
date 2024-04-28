@@ -11,7 +11,9 @@ JUMP_SPEED = 240
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields):
+    def __init__(
+        self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields
+    ):
         super().__init__(level, image=image, rect=rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -134,7 +136,7 @@ class BoingerBeetle(PhysicsSprite):
 class Player(PhysicsSprite):
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, image=None, z=z)
-        images = level.game.loader.get_spritesheet("me-Sheet.png")
+        images = level.game.loader.get_spritesheet("me.png")
         self.anim_dict = {
             "walk": Animation(images[8:12]),
             "idle": Animation((images[9],)),

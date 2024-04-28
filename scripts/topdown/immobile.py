@@ -6,7 +6,15 @@ from scripts import snekgemini, sprite
 class Interactable(sprite.Sprite):
     groups = {"interactable"}
 
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, script="oops", extra_constants=None):
+    def __init__(
+        self,
+        level,
+        image=None,
+        rect=(0, 0, 16, 16),
+        z=0,
+        script="oops",
+        extra_constants=None,
+    ):
         super().__init__(level, image, rect, z)
         self.script = script
         if extra_constants is None:
@@ -19,7 +27,9 @@ class Interactable(sprite.Sprite):
     def interact(self):
         if not self.running_script:
             self.running_script = True
-            self.interpreter = snekgemini.cutscene(self.script, self, extra_constants=self.extra_constants)
+            self.interpreter = snekgemini.cutscene(
+                self.script, self, extra_constants=self.extra_constants
+            )
 
     def update(self, dt):
         if self.running_script:
@@ -93,13 +103,15 @@ class House(Interactable):
             rect=rect,
             z=z,
             script="furniture",
-            extra_constants={"TEXT": custom_fields["Sign"]}
+            extra_constants={"TEXT": custom_fields["Sign"]},
         )
 
     def update(self, dt):
         super().update(dt)
         if self.level.player.collision_rect.colliderect(self.teleport_rect):
-            self.level.player.rect.top += self.teleport_rect.bottom - self.level.player.collision_rect.top
+            self.level.player.rect.top += (
+                self.teleport_rect.bottom - self.level.player.collision_rect.top
+            )
             self.level.switch_level(self.dest_map)
         return True
 
@@ -118,7 +130,7 @@ class Furniture(Interactable):
         TABLE_CENTER: 179,
         TABLE_RIGHT: 180,
         TABLE_PAPER: 164,
-        STOOL: 181
+        STOOL: 181,
     }
 
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
@@ -128,12 +140,13 @@ class Furniture(Interactable):
         super().__init__(
             level,
             rect=rect,
-            image=level.game.loader.get_spritesheet("tileset.png", (16, 16))[self.IMAGES[self.type]],
+            image=level.game.loader.get_spritesheet("tileset.png", (16, 16))[
+                self.IMAGES[self.type]
+            ],
             z=z,
             script="furniture",
-            extra_constants={"TEXT": self.info}
+            extra_constants={"TEXT": self.info},
         )
         self.collision_rect = self.rect.copy()
         self.collision_rect.height *= 0.7
         self.collision_rect.centery = self.rect.centery
-
