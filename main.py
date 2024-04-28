@@ -5,7 +5,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import game_save, level, loader, sound, space, util_draw
+from scripts import game_save, level, loader, sound, space, util_draw, input_binding
 
 pygame.init()
 
@@ -24,6 +24,7 @@ class Game:
         self.display_surface = None
         self.sound_manager = None
         self.save = game_save.GameSave(self)
+        self.input_handler = input_binding.InputQueue()
 
     @property
     def window_surface(self):
@@ -60,6 +61,48 @@ class Game:
     def play_soundtrack(self, track_name):
         self.sound_manager.switch_track(f"music/{track_name}.wav")
 
+    def update(self, dt):
+        kill_state = False
+        if not self.stack[0].update(dt * self.dt_mult):
+            kill_state = True
+        # if fps drops below 10 the game will start to lag
+        dt = pygame.math.clamp(
+            self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
+        )
+        if kill_state:
+            self.stack.popleft()
+        self.dt_mult = 1
+        return dt
+
+    def draw(self):
+        self.window_surface.fill(self.stack[0].bgcolor)
+        self.window.get_surface().fill("black")
+        self.window_surface.fill(self.stack[0].bgcolor)
+        self.window.get_surface().fill("black")
+        self.stack[0].draw()
+        if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
+            factor = min(
+                self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
+                self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
+            )
+            rect = pygame.Rect(
+                0,
+                0,
+                util_draw.RESOLUTION[0] * factor,
+                util_draw.RESOLUTION[1] * factor,
+            )
+            rect.center = self.window.get_surface().get_rect().center
+            self.window.get_surface().blit(
+                pygame.transform.scale_by(self.display_surface, (factor, factor)),
+                rect.topleft,
+            )
+        if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
+            self.window.get_surface().blit(
+                pygame.transform.scale(self.display_surface, self.window.size),
+                (0, 0),
+            )
+        self.window.flip()
+
     async def run(self):
         self.running = True
         self.window = sdl2.Window(
@@ -79,48 +122,13 @@ class Game:
         pygame.key.set_repeat(0, 0)
 
         while self.running and len(self.stack):
-            kill_state = False
-            self.window_surface.fill(self.stack[0].bgcolor)
-            self.window.get_surface().fill("black")
-            if not self.stack[0].update(dt * self.dt_mult):
-                kill_state = True
-            self.stack[0].draw()
-            # if fps drops below 10 the game will start to lag
-            dt = pygame.math.clamp(
-                self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
-            )
-            self.dt_mult = 1
-            # window scaling
-            if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
-                factor = min(
-                    self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
-                    self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
-                )
-                rect = pygame.Rect(
-                    0,
-                    0,
-                    util_draw.RESOLUTION[0] * factor,
-                    util_draw.RESOLUTION[1] * factor,
-                )
-                rect.center = self.window.get_surface().get_rect().center
-                self.window.get_surface().blit(
-                    pygame.transform.scale_by(self.display_surface, (factor, factor)),
-                    rect.topleft,
-                )
-            if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
-                self.window.get_surface().blit(
-                    pygame.transform.scale(self.display_surface, self.window.size),
-                    (0, 0),
-                )
-            self.window.flip()
-            self.window.title = str(int(self.clock.get_fps())).zfill(3)
+            self.draw()
+            dt = self.update(dt)
+            self.window.title = str(int(self.clock.get_fps())).zfill(3)  # TODO: Remove this
             await asyncio.sleep(0)
-            if kill_state:
-                self.stack.popleft()
 
         self.window.destroy()
-        self.renderer = None
-        self.loader = None
+        pygame.quit()
 
     def quit(self):
         self.running = False
