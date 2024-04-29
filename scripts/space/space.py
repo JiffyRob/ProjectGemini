@@ -93,7 +93,11 @@ class Space(game_state.GameState):
         if "enter" in pressed:
             for name, id in self.planet_ids.items():
                 rect = self.static_sprites.get_rect(id)
-                if rect.width > 100 and self.screen_rect.contains(rect) and self.static_sprites.screen_positions[id][2] > 0:
+                if (
+                    rect.width > 100
+                    and self.screen_rect.contains(rect)
+                    and self.static_sprites.screen_positions[id][2] > 0
+                ):
                     print(f"entering {name}!")
                     self.game.load_map(name)
         held = self.game.input_queue.held
