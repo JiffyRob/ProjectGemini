@@ -132,5 +132,7 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "get_player_pos": snek.snek_command(lambda: level.player.pos),
             "map_switch": snek.snek_command(level.game.load_map),
             "play_soundtrack": snek.snek_command(level.game.play_soundtrack),
+            "save": snek.snek_command(level.game.save_to_disk),
+            "quit": snek.snek_command(level.game.quit),
         },
     )

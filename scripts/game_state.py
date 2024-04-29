@@ -16,8 +16,8 @@ class GameState:
         self.live = False
 
     def update(self, dt):
-        if "quit" in self.game.input_queue.just_pressed:
-            self.game.quit()
+        # if "quit" in self.game.input_queue.just_pressed:
+        #     self.game.quit()
         return self.live
 
     def draw(self):

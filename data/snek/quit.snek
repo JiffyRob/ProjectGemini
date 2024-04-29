@@ -1,0 +1,7 @@
+lock();
+answer = ask("", "Continue Game", "Save and Quit");
+unlock();
+if (answer == "Save and Quit") {
+    save();
+    quit();
+}

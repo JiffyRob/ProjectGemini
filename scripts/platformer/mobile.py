@@ -187,6 +187,8 @@ class Player(PhysicsSprite):
                 self.jump()
             if held_input["duck"]:
                 self.duck()
+            if "quit" in self.level.game.input_queue.just_pressed:
+                self.level.run_cutscene("quit")
         if not self.on_ground:
             self.swap_state("jump")
         elif self.velocity.x:

@@ -143,16 +143,19 @@ class Player(PhysicsSprite):
     def update(self, dt):
         self.desired_velocity *= 0
         if not self.locked:
-            if "interact" in self.level.game.input_queue.just_pressed:
+            pressed = self.level.game.input_queue.just_pressed
+            if "interact" in pressed:
                 self.interact()
-            held_input = self.level.game.input_queue.held
-            if held_input["up"]:
+            if "quit" in pressed:
+                self.level.run_cutscene("quit")
+            held = self.level.game.input_queue.held
+            if held["up"]:
                 self.walk_up()
-            if held_input["down"]:
+            if held["down"]:
                 self.walk_down()
-            if held_input["left"]:
+            if held["left"]:
                 self.walk_left()
-            if held_input["right"]:
+            if held["right"]:
                 self.walk_right()
             self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)
             self.velocity = self.desired_velocity

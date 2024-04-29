@@ -130,7 +130,7 @@ class Game:
         self.add_input_binding("jiffycontroller")
         self.sound_manager = sound.SoundManager(self.loader)
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(level.Level.load(self, "Keergan_right"))
+        self.stack.appendleft(level.Level.load(self, "GeminiII"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 
@@ -145,6 +145,10 @@ class Game:
 
         self.window.destroy()
         pygame.quit()
+
+    def save_to_disk(self):
+        print("Not saving actually until save files can be set up")
+        # self.save.save()
 
     def quit(self):
         self.running = False
