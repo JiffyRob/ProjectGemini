@@ -1,15 +1,16 @@
 {
   "up": ["HatAxisMotion_0_1_1", null],
-  "stop_up": ["HatAxisMotion_0_1_0", null],
   "down": ["HatAxisMotion_0_1_-1", null],
-  "stop_down": ["HatAxisMotion_0_1_0", null],
   "left": ["HatAxisMotion_0_0_-1", null],
-  "stop_left": ["HatAxisMotion_0_0_0", null],
   "right": ["HatAxisMotion_0_0_1", null],
-  "stop_right": ["HatAxisMotion_0_1_0", null],
+  "jump": ["JoyButtonDown_2", null],
+  "duck": ["HatAxisMotion_0_1_-1"],
   "interact": ["JoyButtonDown_2", null],
-  "time-phase": ["JoyButtonDown_1", "KeyDown_right ctrl"],
+  "interact_platformer": ["JoyButtonDown_1"],
+  "time-phase": ["JoyButtonDown_3", null],
   "items": ["JoyButtonDown_0", null],
   "quit": ["JoyButtonDown_8", null],
-  "pause": ["JoyButtonDown_9", null]
+  "pause": ["JoyButtonDown_9", null],
+  "turbo_ship": ["JoyButtonDown_2", null],
+  "enter": ["JoyButtonDown_1", null]
 }

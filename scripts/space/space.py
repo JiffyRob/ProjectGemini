@@ -87,42 +87,37 @@ class Space(game_state.GameState):
         self.forward_speed = self.min_forward_speed
 
     def update(self, dt):
-        keys = pygame.key.get_pressed()
-        for event in pygame.event.get():
-            match event:
-                case pygame.Event(type=pygame.QUIT):
-                    self.game.quit()
-                case pygame.Event(type=pygame.MOUSEWHEEL, y=motion):
-                    rotation = math3d.Quaternion(motion * dt, (0, 0, 1))
-                    self.camera.rotation *= rotation
-                    pass
-                case pygame.Event(type=pygame.KEYDOWN, key=pygame.K_RETURN):
-                    for name, id in self.planet_ids.items():
-                        rect = self.static_sprites.get_rect(id)
-                        if rect.width > 100:
-                            print(f"entering {name}!")
-                            self.game.load_map(name)
-        if keys[pygame.K_UP]:
+        pressed = self.game.input_queue.just_pressed
+        if "quit" in pressed:
+            self.game.quit()
+        if "enter" in pressed:
+            for name, id in self.planet_ids.items():
+                rect = self.static_sprites.get_rect(id)
+                if rect.width > 100 and self.screen_rect.contains(rect) and self.static_sprites.screen_positions[id][2] > 0:
+                    print(f"entering {name}!")
+                    self.game.load_map(name)
+        held = self.game.input_queue.held
+        if held["up"]:
             self.turn_speeds["up"] += self.turn_delta
             self.ship.up()
         else:
             self.turn_speeds["up"] -= self.turn_delta
-        if keys[pygame.K_DOWN]:
+        if held["down"]:
             self.turn_speeds["down"] += self.turn_delta
             self.ship.down()
         else:
             self.turn_speeds["down"] -= self.turn_delta
-        if keys[pygame.K_LEFT]:
+        if held["left"]:
             self.turn_speeds["left"] += self.turn_delta
             self.ship.left()
         else:
             self.turn_speeds["left"] -= self.turn_delta
-        if keys[pygame.K_RIGHT]:
+        if held["right"]:
             self.turn_speeds["right"] += self.turn_delta
             self.ship.right()
         else:
             self.turn_speeds["right"] -= self.turn_delta
-        if keys[pygame.K_SPACE]:
+        if held["turbo_ship"]:
             self.forward_speed += self.forward_delta
             self.game.play_soundtrack("Lightspeed")
         else:
@@ -156,12 +151,8 @@ class Space(game_state.GameState):
             self.forward_speed, self.min_forward_speed, self.max_forward_speed
         )
         motion = pygame.Vector3(0, 0, self.forward_speed * dt)
-        if keys[pygame.K_LSHIFT]:
-            motion.z -= 300 * dt
         self.static_sprites.update(dt)
         self.camera.pos += self.camera.rotation * motion
-        if keys[pygame.K_ESCAPE]:
-            self.game.quit()
         for sprite in self.gui:
             sprite.update(dt)
         return True

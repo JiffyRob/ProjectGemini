@@ -134,31 +134,32 @@ class Player(PhysicsSprite):
             self.state = new
             self.image = self.anim_dict[f"{self.state}-{self.facing}"].image
 
+    def interact(self):
+        for sprite in self.level.groups["interactable"]:
+            if sprite.collision_rect.colliderect(self.interaction_rect):
+                print("interact w/", sprite)
+                sprite.interact()
+
     def update(self, dt):
         self.desired_velocity *= 0
         if not self.locked:
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_UP]:
+            if "interact" in self.level.game.input_queue.just_pressed:
+                self.interact()
+            held_input = self.level.game.input_queue.held
+            if held_input["up"]:
                 self.walk_up()
-            if keys[pygame.K_DOWN]:
+            if held_input["down"]:
                 self.walk_down()
-            if keys[pygame.K_LEFT]:
+            if held_input["left"]:
                 self.walk_left()
-            if keys[pygame.K_RIGHT]:
+            if held_input["right"]:
                 self.walk_right()
-            keys = pygame.key.get_just_pressed()
-            if keys[pygame.K_SPACE]:
-                for sprite in self.level.groups["interactable"]:
-                    print(sprite.rect, self.interaction_rect)
-                    if sprite.collision_rect.colliderect(self.interaction_rect):
-                        print("interact w/", sprite)
-                        sprite.interact()
             self.desired_velocity.clamp_magnitude_ip(WALK_SPEED)
             self.velocity = self.desired_velocity
-            if self.velocity:
-                self.swap_state("walk")
-            else:
-                self.swap_state("idle")
+        if self.velocity and not self.locked:
+            self.swap_state("walk")
+        else:
+            self.swap_state("idle")
         state = f"{self.state}-{self.facing}"
         self.anim_dict[state].update(dt)
         self.image = self.anim_dict[state].image

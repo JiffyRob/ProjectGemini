@@ -20,7 +20,9 @@ def event_magnitude(event):
     return 1
 
 
-def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, split_hats=False):
+def event_to_strings(
+    event, joystick_deadzone=0.3, controller_unique=False, split_hats=False
+):
     if event.type == HAT_AXIS_MOTION:
         identifiers = ["HatAxisMotion"]
     else:
@@ -39,14 +41,18 @@ def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, spli
 
     if event.type in {pygame.JOYHATMOTION}:
         if split_hats:
-            yield from event_to_strings(pygame.Event(
-                HAT_AXIS_MOTION,
-                {"hat": event.hat, "axis": 0, "value": event.value[0]},
-            ))
-            yield from event_to_strings(pygame.Event(
-                HAT_AXIS_MOTION,
-                {"hat": event.hat, "axis": 1, "value": event.value[1]}
-            ))
+            yield from event_to_strings(
+                pygame.Event(
+                    HAT_AXIS_MOTION,
+                    {"hat": event.hat, "axis": 0, "value": event.value[0]},
+                )
+            )
+            yield from event_to_strings(
+                pygame.Event(
+                    HAT_AXIS_MOTION,
+                    {"hat": event.hat, "axis": 1, "value": event.value[1]},
+                )
+            )
         else:
             identifiers.append(event.hat)
             identifiers.append(event.value)
@@ -66,6 +72,21 @@ def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, spli
         identifiers.append(axis_direction(event.value, joystick_deadzone))
 
     yield "_".join([str(i) for i in identifiers])
+
+
+def releaser_string(event_string):
+    event_string = event_string.replace("KeyDown", "KeyUp")
+    event_string = event_string.replace("MouseButtonDown", "MouseButtonUp")
+    event_string = event_string.replace("JoyButtonDown", "JoyButtonUp")
+
+    if "JoyAxisMotion" in event_string:
+        event_string = event_string.replace("forward", "center")
+        event_string = event_string.replace("back", "center")
+    if "HatAxisMotion" in event_string:
+        event_string = event_string.replace("-", "")
+        event_string = event_string[:-1] + "0"
+
+    return event_string
 
 
 def init_joysticks():
@@ -100,40 +121,70 @@ def interactive_id_printer():
     pygame.quit()
 
 
-class UserAction:
+class InputQueue:
     JOYSTICK_DEADZONE = 0.3
     CONTROLLER_UNIQUE = False
     SPLIT_HATS = True
 
-    def __init__(self, identifier, magnitude, original, original_name):
-        self.identifier = identifier
-        self.magnitude = magnitude
-        self.original = original
-        self.original_name = original_name
-
-
-class InputQueue:
     def __init__(self):
-        self.events = []
-        self.originals = []
-        self.bindings = {}
+        self.joysticks = {}
+        self.press_bindings = {}
+        self.release_bindings = {}
+        self.held = {}
+        self.magnitudes = {}
+        self.just_pressed = set()
+        self.no_hold = set()
 
     def update(self, events=None):
-        self.events.clear()
-        self.originals.clear()
+        self.just_pressed.clear()
         if events is None:
             events = pygame.event.get()
+
         for raw_event in events:
-            for action_id in event_to_strings(raw_event):
-                if action_id in self.bindings:
-                    for bound_identifier in self.bindings[action_id]:
-                        self.events.append(UserAction(bound_identifier, event_magnitude(raw_event), raw_event, action_id))
-            self.originals.append(raw_event)
+            if raw_event.type == pygame.JOYDEVICEADDED:
+                print("New JOYSTICK!")
+                self.joysticks[raw_event.device_index] = pygame.Joystick(
+                    raw_event.device_index
+                )
+            if raw_event.type == pygame.JOYDEVICEREMOVED:
+                self.joysticks[raw_event.device_index].quit()
+            for action_id in event_to_strings(
+                raw_event,
+                joystick_deadzone=self.JOYSTICK_DEADZONE,
+                controller_unique=self.CONTROLLER_UNIQUE,
+                split_hats=self.SPLIT_HATS,
+            ):
+                if action_id in self.press_bindings:
+                    print(action_id, "down")
+                    for bound_identifier in self.press_bindings[action_id]:
+                        if action_id not in self.no_hold:
+                            self.held[bound_identifier] = True
+                        self.just_pressed.add(bound_identifier)
+                if action_id in self.release_bindings:
+                    for bound_identifier in self.release_bindings[action_id]:
+                        self.held[bound_identifier] = False
 
-    def get(self):
-        yield from self.events
-
-    def load_bindings(self, bindings):
-        self.bindings.clear()
-        for identifier, action in bindings.items():
-            self.bindings.setdefault(identifier, set()).add(action)
+    def load_bindings(self, bindings, delete_old=True):
+        if delete_old:
+            self.press_bindings = {
+                # These input bindings are non-configurable
+                "Quit": {"quit"},
+                "KeyDown-f11": {"toggle_fullscreen"},
+            }
+            self.release_bindings.clear()
+            self.held.clear()
+            self.just_pressed.clear()
+        for identifier, user_actions in bindings.items():
+            for user_action in user_actions:
+                if user_action is None:
+                    continue
+                self.press_bindings.setdefault(user_action, set()).add(identifier)
+                release_action = releaser_string(user_action)
+                if release_action != user_action:
+                    self.release_bindings.setdefault(release_action, set()).add(
+                        identifier
+                    )
+                    self.held[identifier] = False
+                else:
+                    print(user_action, "Not releasable")
+                    self.no_hold.add(user_action)

@@ -138,20 +138,20 @@ class Dialog(sprite.GUISprite):
         super().update(time_delta)
         self.kill_timer.update(time_delta)
         self.add_letter_timer.update(time_delta)
-        keys = pygame.key.get_just_pressed()
+        pressed = self.level.game.input_queue.just_pressed
         if self.state == self.STATE_GETTING_ANSWER:
-            if keys[pygame.K_UP]:
+            if "up" in pressed:
                 self.answer_index = max(self.answer_index - 1, 0)
                 self.update_text()
-            if keys[pygame.K_DOWN]:
+            if "down" in pressed:
                 self.answer_index = min(self.answer_index + 1, len(self.answers) - 1)
                 self.update_text()
-            if keys[pygame.K_RETURN]:
+            if "interact" in pressed:
                 self.choose()
         if (
             self.state == self.STATE_COMPLETE
             and not self.answers
-            and keys[pygame.K_RETURN]
+            and "interact" in pressed
         ):
             self.choose()
         return self.live

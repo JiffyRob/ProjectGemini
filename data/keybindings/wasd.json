@@ -1,15 +1,16 @@
 {
   "up": ["KeyDown_w", null],
-  "stop_up": ["KeyUp_w", null],
   "down": ["KeyDown_s", null],
-  "stop_down": ["KeyUp_s", null],
   "left": ["KeyDown_a", null],
-  "stop_left": ["KeyUp_a", null],
   "right": ["KeyDown_d", null],
-  "stop_right": ["KeyUp_d", null],
+  "jump": ["KeyDown_w", null],
+  "duck": ["KeyDown_s", null],
   "interact": ["KeyDown_q", null],
+  "interact_platformer": ["KeyDown_q", null],
   "time-phase": ["KeyDown_e", null],
   "items": ["KeyDown_tab", null],
   "quit": ["KeyDown_escape", null],
-  "pause": ["KeyDown_p", null]
+  "pause": ["KeyDown_p", null],
+  "turbo_ship": ["KeyDown_space", null],
+  "enter": ["KeyDown_enter", null]
 }

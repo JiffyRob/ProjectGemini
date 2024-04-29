@@ -8,6 +8,7 @@ import pygame._sdl2.video as sdl2  # needed for WASM compat
 from scripts import game_save, level, loader, sound, space, util_draw, input_binding
 
 pygame.init()
+pygame.joystick.init()
 
 
 class Game:
@@ -24,7 +25,7 @@ class Game:
         self.display_surface = None
         self.sound_manager = None
         self.save = game_save.GameSave(self)
-        self.input_handler = input_binding.InputQueue()
+        self.input_queue = input_binding.InputQueue()
 
     @property
     def window_surface(self):
@@ -54,6 +55,16 @@ class Game:
     def load_map(self, map_name):
         print("loading", map_name)
         self.stack.appendleft(level.Level.load(self, map_name))
+
+    def load_input_binding(self, name):
+        self.input_queue.load_bindings(
+            self.loader.get_json(f"keybindings/{name}"), delete_old=True
+        )
+
+    def add_input_binding(self, name):
+        self.input_queue.load_bindings(
+            self.loader.get_json(f"keybindings/{name}"), delete_old=False
+        )
 
     def time_phase(self, mult):
         self.dt_mult = mult
@@ -115,16 +126,21 @@ class Game:
         self.window.get_surface()  # allows convert() calls to happen
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
+        self.load_input_binding("arrow")
+        self.add_input_binding("jiffycontroller")
         self.sound_manager = sound.SoundManager(self.loader)
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(level.Level.load(self, "GeminiII"))
+        self.stack.appendleft(level.Level.load(self, "Keergan_right"))
         dt = 0
         pygame.key.set_repeat(0, 0)
 
         while self.running and len(self.stack):
+            self.input_queue.update()
             self.draw()
             dt = self.update(dt)
-            self.window.title = str(int(self.clock.get_fps())).zfill(3)  # TODO: Remove this
+            self.window.title = str(int(self.clock.get_fps())).zfill(
+                3
+            )  # TODO: Remove this
             await asyncio.sleep(0)
 
         self.window.destroy()

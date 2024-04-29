@@ -190,7 +190,9 @@ class Level(game_state.GameState):
                 )
         level.player.z = entity_layer
         # collision data creation
-        for row, line in enumerate(game.loader.get_csv(folder / "Collision.csv", for_map=True)):
+        for row, line in enumerate(
+            game.loader.get_csv(folder / "Collision.csv", for_map=True)
+        ):
             for col, value in enumerate(line):
                 value = int(value)
                 if value == 0 and not is_platformer:

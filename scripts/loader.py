@@ -45,7 +45,7 @@ class Loader:
 
     @functools.cache
     def get_json(self, path, for_map=False):
-        return json.load(self.join_data(path, for_map).open())
+        return json.load(self.join_data(path, for_map).with_suffix(".json").open())
 
     @functools.cache
     def get_csv(self, path, item_delimiter=",", line_delimiter="\n", for_map=False):
@@ -74,10 +74,14 @@ class Loader:
     def get_surface(self, path, rect=None):
         if rect:
             return self.convert(
-                pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(rect)
+                pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(
+                    rect
+                )
             )
         else:
-            return self.convert(pygame.image.load(self.join_asset(path).with_suffix(".png")))
+            return self.convert(
+                pygame.image.load(self.join_asset(path).with_suffix(".png"))
+            )
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):

@@ -6,6 +6,7 @@ class GameSave:
             "health_capacity": 6,
             "planet": "GeminiII",
             "bush_interactions": 0,
+            "emeralds": 10,
         }
 
     def __getattr__(self, attr):

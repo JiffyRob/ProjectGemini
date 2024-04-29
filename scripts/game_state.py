@@ -12,17 +12,12 @@ class GameState:
         self.scale_mode = scale_mode
         self.live = True
 
-    def handle_event(self, event):
-        pass
-
     def pop(self):
         self.live = False
 
     def update(self, dt):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.game.quit()
-            self.handle_event(event)
+        if "quit" in self.game.input_queue.just_pressed:
+            self.game.quit()
         return self.live
 
     def draw(self):

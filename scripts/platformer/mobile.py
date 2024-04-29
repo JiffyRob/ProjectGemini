@@ -178,19 +178,15 @@ class Player(PhysicsSprite):
 
     def update(self, dt):
         if not self.locked:
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_LEFT]:
+            held_input = self.level.game.input_queue.held
+            if held_input["left"]:
                 self.walk_left()
-            elif keys[pygame.K_RIGHT]:
+            if held_input["right"]:
                 self.walk_right()
-            else:
-                self.unwalk()
-            if keys[pygame.K_DOWN]:
-                self.duck()
-            if keys[pygame.K_UP]:
+            if held_input["jump"]:
                 self.jump()
-            if keys[pygame.K_SPACE]:
-                self.level.game.time_phase(-1)
+            if held_input["duck"]:
+                self.duck()
         if not self.on_ground:
             self.swap_state("jump")
         elif self.velocity.x:
@@ -202,7 +198,6 @@ class Player(PhysicsSprite):
         self.anim_dict[self.state].update(dt)
         self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
-        print("player update")
         return super().update(dt) and self.health > 0
 
     def hurt(self, amount):
