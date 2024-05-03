@@ -9,6 +9,7 @@ class GrowingCircle:
     def __init__(self, size, position, speed=64):
         self.size = pygame.Vector2(size)
         self.surface = loader.Loader.create_surface(size)
+        self.surface.fill("black")
         self.radius = 0
         if callable(position):
             self.position_getter = position

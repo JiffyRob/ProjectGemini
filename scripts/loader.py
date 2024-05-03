@@ -59,7 +59,6 @@ class Loader:
 
     @staticmethod
     def convert(surface):
-        # for palette swapping
         new_surface = pygame.Surface(surface.get_size()).convert()
         new_surface.fill(COLORKEY)
         new_surface.blit(surface, (0, 0))
@@ -68,7 +67,9 @@ class Loader:
 
     @classmethod
     def create_surface(cls, size):
-        return cls.convert(pygame.Surface(size))
+        surface = cls.convert(pygame.Surface(size))
+        surface.fill(COLORKEY)
+        return surface
 
     @functools.cache
     def get_surface(self, path, rect=None):

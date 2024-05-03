@@ -5,7 +5,7 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import game_save, input_binding, level, loader, sound, space, util_draw
+from scripts import game_save, input_binding, level, loader, sound, space, util_draw, menu
 
 pygame.init()
 pygame.joystick.init()
@@ -131,6 +131,7 @@ class Game:
         self.sound_manager = sound.SoundManager(self.loader)
         self.stack.appendleft(space.Space(self))
         self.stack.appendleft(level.Level.load(self, "GeminiII"))
+        self.stack.appendleft(menu.MainMenu(self))
         dt = 0
         pygame.key.set_repeat(0, 0)
 

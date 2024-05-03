@@ -2,7 +2,7 @@ from math import sin
 
 import pygame
 
-from scripts import animation, game_state, loader, sprite
+from scripts import animation, game_state, loader, sprite, pixelfont
 
 
 def nine_slice(images, size):
@@ -37,12 +37,20 @@ def nine_slice(images, size):
     return image
 
 
+def three_slice(images, width):
+    image = loader.Loader.create_surface((width, images[0].get_height()))
+    image.blit(images[0], (0, 0))
+    image.blit(pygame.transform.scale(images[1], (width - images[0].get_width() - images[1].get_width(), images[1].get_height())), (images[0].get_width(), 0))
+    image.blit(images[2], (width - images[2].get_width(), 0))
+    return image
+
+
 class Background(sprite.GUISprite):
     def __init__(self, level, rect, z=0):
         super().__init__(
             level,
             nine_slice(
-                [level.loader.get_image("gui.png", f"Border{i}") for i in range(9)],
+                [level.game.loader.get_image("gui.png", f"Border{i}") for i in range(9)],
                 rect.size,
             ),
             rect,
@@ -55,12 +63,14 @@ class Button(sprite.GUISprite):
     STATE_DISABLED = 1
     STATE_SELECTED = 2
 
-    def __init__(self, level, rect, on_click=lambda: None, z=0):
+    def __init__(self, level, top_image, rect, on_click=lambda: None, z=0):
         self.image_dict = {
-            self.STATE_NORMAL: level.loader.get_image("gui.png", "ButtonNormal"),
-            self.STATE_SELECTED: level.loader.get_image("gui.png", "ButtonSelected"),
-            self.STATE_DISABLED: level.loader.get_image("gui.png", "ButtonDisabled"),
+            self.STATE_NORMAL: three_slice([level.game.loader.get_image("gui.png", f"ButtonNormal{i}") for i in range(3)], rect.width),
+            self.STATE_SELECTED: three_slice([level.game.loader.get_image("gui.png", f"ButtonSelected{i}") for i in range(3)], rect.width),
+            self.STATE_DISABLED: three_slice([level.game.loader.get_image("gui.png", f"ButtonDisabled{i}") for i in range(3)], rect.width),
         }
+        self.top_image = top_image
+        self.top_image_rect = self.top_image.get_rect(center=rect.center)
         self.state = self.STATE_NORMAL
         self.click = on_click
         super().__init__(level, None, rect, z)
@@ -79,6 +89,7 @@ class Button(sprite.GUISprite):
 
     def draw(self, surface):
         surface.blit(self.image_dict[self.state], self.rect)
+        surface.blit(self.top_image, self.top_image_rect)
 
 
 class KnifeIndicator(sprite.GUISprite):
@@ -87,13 +98,13 @@ class KnifeIndicator(sprite.GUISprite):
         button_xs = [i[0] for i in button_coords]
         button_ys = [i[1] for i in button_coords]
         self.button_dict = button_dict
-        self.button_bounds = pygame.Rect(min(button_xs), min(button_ys), 0, 0)
-        self.button_bounds.size = max(button_xs), max(button_ys)
+        self.button_bounds = pygame.Rect(min(button_xs), min(button_ys), max(button_xs) + 1, max(button_ys) + 1)
         self.anim = animation.Animation(
-            [self.level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)]
+            [level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)]
         )
         self.age = 0
         self.button_coord = start_pos
+        self.button.select()
         super().__init__(
             level,
             None,
@@ -124,7 +135,7 @@ class KnifeIndicator(sprite.GUISprite):
             return None
         old_button = self.button
         self.button_coord = new_coord
-        self.rect.midright = self.button.rect.left
+        self.rect.midright = self.button.rect.midleft
         old_button.deselect()
         self.button.select()
 
@@ -138,12 +149,15 @@ class KnifeIndicator(sprite.GUISprite):
             self.move((-1, 0))
         if "right" in pressed:
             self.move((1, 0))
-        if "enter" in pressed:
+        if "interact" in pressed:
             self.button.click()
         self.age += dt
+        self.rect.midright = self.button.rect.midleft
+        self.anim.update(dt)
+        return True
 
     def draw(self, surface):
-        surface.blit(self.anim.image, self.rect.move(sin(self.age * 1.5) * 2, 0))
+        surface.blit(self.anim.image, self.rect.move(sin(self.age * 3) * 2, 0))
 
 
 class Save(sprite.GUISprite): ...  # TODO
@@ -155,15 +169,81 @@ class Label(sprite.GUISprite): ...  # TODO
 class ToggleSwitch(sprite.GUISprite): ...  # TODO
 
 
-class Image(sprite.GUISprite): ...  # TODO...?
+class Image(sprite.GUISprite):
+    pass
 
 
 class MainMenu(game_state.GameState):
     def __init__(self, game):
         super().__init__(game, "black")
+        background_rect = game.screen_rect.inflate(-16, -16)
+        title1 = game.loader.get_image("gui.png", "PROJECT")
+        title1_rect = pygame.Rect(20, background_rect.top + 10, *title1.get_size())
+
+        title2 = game.loader.get_image("gui.png", "GEMINI")
+        title2_rect = pygame.Rect(0, title1_rect.bottom, *title2.get_size())
+        title2_rect.centerx = background_rect.centerx
+
+        button1_rect = pygame.Rect(0, 0, 128, 16)
+        button1_rect.top = title2_rect.bottom + 3
+        button1_rect.centerx = background_rect.centerx
+
+        button2_rect = button1_rect.move(0, button1_rect.height + 3)
+
+        button_font = pixelfont.PixelFont(
+            self.game.loader.get_spritesheet("font.png", (7, 8))
+        )
+
         self.gui = [
-            # TODO: Add sprites here, to be rendered in order
+            Background(
+                self,
+                background_rect,
+                -1
+            ),
+            Image(
+                self,
+                title1,
+                title1_rect,
+            ),
+            Image(
+                self,
+                title2,
+                title2_rect,
+            ),
+            (button0 := Button(
+                self,
+                button_font.render("Start", 0),
+                button1_rect,
+                self.start,
+            )),
+            (button1 := Button(
+                self,
+                button_font.render("Quit", 0),
+                button2_rect,
+                self.quit,
+            ))
         ]
+        self.gui.append(KnifeIndicator(self, {
+            (0, 0): button0,
+            (0, 1): button1,
+        }))
+
+    def update(self, dt):
+        self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
+        if "quit" in self.game.input_queue.just_pressed:
+            self.game.quit()
+        return super().update(dt)
+
+    def draw(self):
+        super().draw()
+        for sprite in self.gui:
+            sprite.draw(self.game.window_surface)
+
+    def start(self):
+        self.pop()
+
+    def quit(self):
+        self.game.quit()
 
 
 class PauseMenu(game_state.GameState): ...  # TODO: Save & Quit, Quit, Save

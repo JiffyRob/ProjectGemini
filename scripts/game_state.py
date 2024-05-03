@@ -1,5 +1,4 @@
 import pygame
-import pygame._sdl2 as sdl2
 
 from scripts import util_draw
 
@@ -16,8 +15,6 @@ class GameState:
         self.live = False
 
     def update(self, dt):
-        # if "quit" in self.game.input_queue.just_pressed:
-        #     self.game.quit()
         return self.live
 
     def draw(self):

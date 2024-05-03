@@ -3,8 +3,8 @@
   "GEMINI": [0, 16, 128, 32],
   "Knife0": [0, 48, 16, 16],
   "Knife1": [0, 64, 16, 16],
-  "Knife2": [0, 72, 16, 16],
-  "Knife3": [0, 88, 16, 16],
+  "Knife2": [0, 80, 16, 16],
+  "Knife3": [0, 96, 16, 16],
   "Save": [64, 48, 64, 32],
   "Border0": [80, 80, 16, 16],
   "Border1": [96, 80, 16, 16],
@@ -15,7 +15,13 @@
   "Border6": [80, 112, 16, 16],
   "Border7": [96, 112, 16, 16],
   "Border8": [112, 112, 16, 16],
-  "ButtonSelected": [16, 48, 48, 16],
-  "ButtonNormal": [16, 64, 48, 16],
-  "ButtonDisabled": [16, 80, 48, 16]
+  "ButtonSelected0": [16, 48, 16, 16],
+  "ButtonSelected1": [32, 48, 16, 16],
+  "ButtonSelected2": [48, 48, 16, 16],
+  "ButtonNormal0": [16, 64, 16, 16],
+  "ButtonNormal1": [32, 64, 16, 16],
+  "ButtonNormal2": [48, 64, 16, 16],
+  "ButtonDisabled0": [16, 80, 16, 16],
+  "ButtonDisabled1": [32, 80, 16, 16],
+  "ButtonDisabled2": [48, 80, 16, 16]
 }
