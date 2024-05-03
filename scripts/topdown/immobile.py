@@ -94,7 +94,7 @@ class House(Interactable):
             roof_rect.left + 32,
             roof_rect.bottom,
             16,
-            16,
+            10,
         )
         self.dest_map = custom_fields["map"]
         super().__init__(

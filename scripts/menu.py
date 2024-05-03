@@ -189,7 +189,7 @@ class KnifeIndicator(sprite.GUISprite):
         return True
 
     def draw(self, surface):
-        surface.blit(self.anim.image, self.rect.move(sin(self.age * 3) * 2, 0))
+        surface.blit(self.anim.image, self.rect.move(sin(self.age * 5) * 2, 0))
 
 
 class Save(sprite.GUISprite): ...  # TODO

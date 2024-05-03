@@ -8,7 +8,7 @@ from scripts.space import gui3d, math3d, sprite3d
 
 class Space(game_state.GameState):
     def __init__(self, game):
-        super().__init__(game, color="black", scale_mode=util_draw.SCALEMODE_STRETCH)
+        super().__init__(game, color="black")
         # self.game.renderer.logical_size = (1920, 1080)
         # in world space y is vertical, and x and z are horizontal
         # on screen with no rotation x is left-right, y is up-down, and z is depth
