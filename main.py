@@ -5,7 +5,16 @@ import pygame
 import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
-from scripts import game_save, input_binding, level, loader, sound, space, util_draw, menu
+from scripts import (
+    game_save,
+    input_binding,
+    level,
+    loader,
+    menu,
+    sound,
+    space,
+    util_draw,
+)
 
 pygame.init()
 pygame.joystick.init()

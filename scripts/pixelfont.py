@@ -70,7 +70,6 @@ class PixelFont:
 
     def render(self, text, width=0):
         # TODO: Optimize?
-        print("TSize", self.size(text, width))
         surface = pygame.Surface(self.size(text, width)).convert_alpha()
         surface.fill((0, 0, 0, 0))
         self.render_to(surface, surface.get_rect(), text)

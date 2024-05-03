@@ -2,7 +2,7 @@ from math import sin
 
 import pygame
 
-from scripts import animation, game_state, loader, sprite, pixelfont
+from scripts import animation, game_state, loader, pixelfont, sprite
 
 
 def nine_slice(images, size):
@@ -40,7 +40,16 @@ def nine_slice(images, size):
 def three_slice(images, width):
     image = loader.Loader.create_surface((width, images[0].get_height()))
     image.blit(images[0], (0, 0))
-    image.blit(pygame.transform.scale(images[1], (width - images[0].get_width() - images[1].get_width(), images[1].get_height())), (images[0].get_width(), 0))
+    image.blit(
+        pygame.transform.scale(
+            images[1],
+            (
+                width - images[0].get_width() - images[1].get_width(),
+                images[1].get_height(),
+            ),
+        ),
+        (images[0].get_width(), 0),
+    )
     image.blit(images[2], (width - images[2].get_width(), 0))
     return image
 
@@ -50,7 +59,10 @@ class Background(sprite.GUISprite):
         super().__init__(
             level,
             nine_slice(
-                [level.game.loader.get_image("gui.png", f"Border{i}") for i in range(9)],
+                [
+                    level.game.loader.get_image("gui.png", f"Border{i}")
+                    for i in range(9)
+                ],
                 rect.size,
             ),
             rect,
@@ -65,9 +77,27 @@ class Button(sprite.GUISprite):
 
     def __init__(self, level, top_image, rect, on_click=lambda: None, z=0):
         self.image_dict = {
-            self.STATE_NORMAL: three_slice([level.game.loader.get_image("gui.png", f"ButtonNormal{i}") for i in range(3)], rect.width),
-            self.STATE_SELECTED: three_slice([level.game.loader.get_image("gui.png", f"ButtonSelected{i}") for i in range(3)], rect.width),
-            self.STATE_DISABLED: three_slice([level.game.loader.get_image("gui.png", f"ButtonDisabled{i}") for i in range(3)], rect.width),
+            self.STATE_NORMAL: three_slice(
+                [
+                    level.game.loader.get_image("gui.png", f"ButtonNormal{i}")
+                    for i in range(3)
+                ],
+                rect.width,
+            ),
+            self.STATE_SELECTED: three_slice(
+                [
+                    level.game.loader.get_image("gui.png", f"ButtonSelected{i}")
+                    for i in range(3)
+                ],
+                rect.width,
+            ),
+            self.STATE_DISABLED: three_slice(
+                [
+                    level.game.loader.get_image("gui.png", f"ButtonDisabled{i}")
+                    for i in range(3)
+                ],
+                rect.width,
+            ),
         }
         self.top_image = top_image
         self.top_image_rect = self.top_image.get_rect(center=rect.center)
@@ -98,7 +128,9 @@ class KnifeIndicator(sprite.GUISprite):
         button_xs = [i[0] for i in button_coords]
         button_ys = [i[1] for i in button_coords]
         self.button_dict = button_dict
-        self.button_bounds = pygame.Rect(min(button_xs), min(button_ys), max(button_xs) + 1, max(button_ys) + 1)
+        self.button_bounds = pygame.Rect(
+            min(button_xs), min(button_ys), max(button_xs) + 1, max(button_ys) + 1
+        )
         self.anim = animation.Animation(
             [level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)]
         )
@@ -195,11 +227,7 @@ class MainMenu(game_state.GameState):
         )
 
         self.gui = [
-            Background(
-                self,
-                background_rect,
-                -1
-            ),
+            Background(self, background_rect, -1),
             Image(
                 self,
                 title1,
@@ -210,23 +238,32 @@ class MainMenu(game_state.GameState):
                 title2,
                 title2_rect,
             ),
-            (button0 := Button(
-                self,
-                button_font.render("Start", 0),
-                button1_rect,
-                self.start,
-            )),
-            (button1 := Button(
-                self,
-                button_font.render("Quit", 0),
-                button2_rect,
-                self.quit,
-            ))
+            (
+                button0 := Button(
+                    self,
+                    button_font.render("Start", 0),
+                    button1_rect,
+                    self.start,
+                )
+            ),
+            (
+                button1 := Button(
+                    self,
+                    button_font.render("Quit", 0),
+                    button2_rect,
+                    self.quit,
+                )
+            ),
         ]
-        self.gui.append(KnifeIndicator(self, {
-            (0, 0): button0,
-            (0, 1): button1,
-        }))
+        self.gui.append(
+            KnifeIndicator(
+                self,
+                {
+                    (0, 0): button0,
+                    (0, 1): button1,
+                },
+            )
+        )
 
     def update(self, dt):
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]

@@ -100,7 +100,6 @@ def init_joysticks():
 def interactive_id_printer():
     pygame.init()
     pygame.font.init()
-    print(pygame.joystick.get_init())
     joys = list(init_joysticks())
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 40)
@@ -142,7 +141,6 @@ class InputQueue:
 
         for raw_event in events:
             if raw_event.type == pygame.JOYDEVICEADDED:
-                print("New JOYSTICK!")
                 self.joysticks[raw_event.device_index] = pygame.Joystick(
                     raw_event.device_index
                 )
@@ -155,7 +153,6 @@ class InputQueue:
                 split_hats=self.SPLIT_HATS,
             ):
                 if action_id in self.press_bindings:
-                    print(action_id, "down")
                     for bound_identifier in self.press_bindings[action_id]:
                         if action_id not in self.no_hold:
                             self.held[bound_identifier] = True
