@@ -5,8 +5,8 @@ import pathlib
 
 import pygame
 
-from scripts.util_draw import COLORKEY
 from scripts import pixelfont
+from scripts.util_draw import COLORKEY
 
 
 class Loader:
@@ -17,9 +17,7 @@ class Loader:
         self.save_path = self.data_path / "saves"
         self.sound_path = self.base_path / "sound"
         self.music_path = self.base_path / "music"
-        self.font = pixelfont.PixelFont(
-            self.get_spritesheet("font.png", (7, 8))
-        )
+        self.font = pixelfont.PixelFont(self.get_spritesheet("font.png", (7, 8)))
 
     def join(self, path):
         return pathlib.Path(self.base_path, path)

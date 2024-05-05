@@ -6,12 +6,7 @@ from scripts import sprite, util_draw
 from scripts.animation import Animation
 
 WALK_SPEED = 64
-REVERSE = {
-    "up": "down",
-    "down": "up",
-    "left": "right",
-    "right": "left"
-}
+REVERSE = {"up": "down", "down": "up", "left": "right", "right": "left"}
 
 
 class PhysicsSprite(sprite.Sprite):

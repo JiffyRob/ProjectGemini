@@ -1,7 +1,19 @@
 lock();
-answer = ask("", "Continue Game", "Save and Quit");
+answer = ask("", "Resume", "Save", "Quit", "Save & Quit");
 unlock();
-if (answer == "Save and Quit") {
-    save();
-    quit();
+switch answer {
+    case "Save" {
+        save();
+    }
+    case "Quit" {
+        lock();
+        if ask("Quit without saving?", "Yes", "No") == "Yes" {
+            quit();
+        }
+        unlock();
+    }
+    case "Save & Quit" {
+        save();
+        quit();
+    }
 }

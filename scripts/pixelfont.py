@@ -31,11 +31,7 @@ class PixelFont:
     def chunkify(self, text):
         current = ""
         for char in text:
-            whitespace_type = {
-                " ": SPACE,
-                "\n": NEWLINE,
-                "\r": NEWLINE
-            }.get(char)
+            whitespace_type = {" ": SPACE, "\n": NEWLINE, "\r": NEWLINE}.get(char)
             if char not in {" ", "\n", "\r"}:
                 current += char
             else:
@@ -61,7 +57,9 @@ class PixelFont:
 
     @cache
     def size(self, text, width=0):
-        (last_x, last_y), last_chunk = tuple(self.positions(self.chunkify(text), width))[-1]
+        (last_x, last_y), last_chunk = tuple(
+            self.positions(self.chunkify(text), width)
+        )[-1]
         width = width or (last_x + last_chunk.size[0])
         height = last_y + last_chunk.size[1]
         return width, height

@@ -62,8 +62,16 @@ class Game:
         self.stack.popleft()
 
     def load_map(self, map_name):
-        print("loading", map_name)
+        print("loading level:", map_name)
         self.stack.appendleft(level.Level.load(self, map_name))
+        self.save.planet = map_name
+
+    def load_save(self, save_name):
+        print("opening save:", save_name)
+        self.stack.clear()
+        self.save.load(save_name)
+        self.stack.appendleft(space.Space(self))
+        self.stack.appendleft(level.Level.load(self, self.save.planet))
 
     def load_input_binding(self, name):
         self.input_queue.load_bindings(
@@ -157,8 +165,7 @@ class Game:
         pygame.quit()
 
     def save_to_disk(self):
-        print("Not saving actually until save files can be set up")
-        # self.save.save()
+        self.save.save()
 
     def quit(self):
         self.running = False

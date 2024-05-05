@@ -217,7 +217,7 @@ class Save(TextButton):
         )
 
     def load(self):
-        self.level.pop() # self.level.game.load_save(self.name)
+        self.level.game.load_save(self.name)
 
 
 class Label(sprite.GUISprite): ...  # TODO
@@ -259,25 +259,15 @@ class MainMenu(game_state.GameState):
                 self,
                 title2,
                 title2_rect,
-            )
+            ),
         ]
         for i, save_name in enumerate(save_names):
-            button = Save(
-                self,
-                button_rect,
-                i + 1,
-                save_name
-            )
+            button = Save(self, button_rect, i + 1, save_name)
             self.gui.append(button)
             button_dict[(0, i)] = button
             button_rect.top = button_rect.bottom + 3
 
-        self.gui.append(
-            KnifeIndicator(
-                self,
-                button_dict=button_dict
-            )
-        )
+        self.gui.append(KnifeIndicator(self, button_dict=button_dict))
 
     def update(self, dt):
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
