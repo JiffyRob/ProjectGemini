@@ -6,6 +6,7 @@ import pathlib
 import pygame
 
 from scripts.util_draw import COLORKEY
+from scripts import pixelfont
 
 
 class Loader:
@@ -16,6 +17,9 @@ class Loader:
         self.save_path = self.data_path / "saves"
         self.sound_path = self.base_path / "sound"
         self.music_path = self.base_path / "music"
+        self.font = pixelfont.PixelFont(
+            self.get_spritesheet("font.png", (7, 8))
+        )
 
     def join(self, path):
         return pathlib.Path(self.base_path, path)
@@ -123,11 +127,24 @@ class Loader:
 
     # not cached because save files change
     def get_save(self, path):
-        path = self.join_save(path).with_suffix("sav")
+        path = self.join_save(path).with_suffix(".sav")
+        return json.load(path.open())
+        # compress save files later - leave for debug
         with gzip.open(path) as file:
             return json.load(file)
 
     def save_data(self, path, data):
-        path = self.join_save(path).with_suffix("sav")
+        path = self.join_save(path).with_suffix(".sav")
+        return json.dump(data, path.open("w"))
+        # compress save files later - leave for debug
         with gzip.open(path, "wb") as file:
             json.dump(data, file)
+
+    def get_save_names(self, amount=5):
+        names = []
+        i = 0
+        for i, save_path in enumerate(self.save_path.glob("*")):
+            names.append(save_path.stem)
+        if i < amount:
+            names.extend(("" for _ in range(amount - i)))
+        return names[:amount]

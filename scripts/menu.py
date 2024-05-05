@@ -2,7 +2,7 @@ from math import sin
 
 import pygame
 
-from scripts import animation, game_state, loader, pixelfont, sprite
+from scripts import animation, game_state, loader, sprite, util_draw
 
 
 def nine_slice(images, size):
@@ -75,7 +75,7 @@ class Button(sprite.GUISprite):
     STATE_DISABLED = 1
     STATE_SELECTED = 2
 
-    def __init__(self, level, top_image, rect, on_click=lambda: None, z=0):
+    def __init__(self, level, rect, top_image, on_click=lambda: None, z=0):
         self.image_dict = {
             self.STATE_NORMAL: three_slice(
                 [
@@ -192,7 +192,32 @@ class KnifeIndicator(sprite.GUISprite):
         surface.blit(self.anim.image, self.rect.move(sin(self.age * 5) * 2, 0))
 
 
-class Save(sprite.GUISprite): ...  # TODO
+class TextButton(Button):
+    def __init__(self, level, rect, text, on_click=lambda: None):
+        super().__init__(
+            level,
+            rect,
+            level.game.loader.font.render(text),
+            on_click=on_click,
+        )
+
+    def draw(self, surface):
+        surface.blit(self.top_image, self.rect)
+
+
+class Save(TextButton):
+
+    def __init__(self, level, rect, index, name):
+        self.name = name
+        super().__init__(
+            level,
+            rect,
+            f"{index}. {name}",
+            self.load,
+        )
+
+    def load(self):
+        self.level.pop() # self.level.game.load_save(self.name)
 
 
 class Label(sprite.GUISprite): ...  # TODO
@@ -216,15 +241,12 @@ class MainMenu(game_state.GameState):
         title2_rect = pygame.Rect(0, title1_rect.bottom, *title2.get_size())
         title2_rect.centerx = background_rect.centerx
 
-        button1_rect = pygame.Rect(0, 0, 128, 16)
-        button1_rect.top = title2_rect.bottom + 3
-        button1_rect.centerx = background_rect.centerx
+        button_rect = pygame.Rect(0, 0, 150, 8)
+        button_rect.top = title2_rect.bottom + 3
+        button_rect.centerx = background_rect.centerx
+        button_dict = {}
 
-        button2_rect = button1_rect.move(0, button1_rect.height + 3)
-
-        button_font = pixelfont.PixelFont(
-            self.game.loader.get_spritesheet("font.png", (7, 8))
-        )
+        save_names = self.game.loader.get_save_names(5)
 
         self.gui = [
             Background(self, background_rect, -1),
@@ -237,31 +259,23 @@ class MainMenu(game_state.GameState):
                 self,
                 title2,
                 title2_rect,
-            ),
-            (
-                button0 := Button(
-                    self,
-                    button_font.render("Start", 0),
-                    button1_rect,
-                    self.start,
-                )
-            ),
-            (
-                button1 := Button(
-                    self,
-                    button_font.render("Quit", 0),
-                    button2_rect,
-                    self.quit,
-                )
-            ),
+            )
         ]
+        for i, save_name in enumerate(save_names):
+            button = Save(
+                self,
+                button_rect,
+                i + 1,
+                save_name
+            )
+            self.gui.append(button)
+            button_dict[(0, i)] = button
+            button_rect.top = button_rect.bottom + 3
+
         self.gui.append(
             KnifeIndicator(
                 self,
-                {
-                    (0, 0): button0,
-                    (0, 1): button1,
-                },
+                button_dict=button_dict
             )
         )
 
