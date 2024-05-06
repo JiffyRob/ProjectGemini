@@ -1,4 +1,5 @@
-from math import sin
+from functools import partial
+from math import ceil, sin
 
 import pygame
 
@@ -38,6 +39,8 @@ def nine_slice(images, size):
 
 
 def three_slice(images, width):
+    if width < images[0].get_width() + images[2].get_width():
+        return images[1]
     image = loader.Loader.create_surface((width, images[0].get_height()))
     image.blit(images[0], (0, 0))
     image.blit(
@@ -119,23 +122,26 @@ class Button(sprite.GUISprite):
 
     def draw(self, surface):
         surface.blit(self.image_dict[self.state], self.rect)
-        surface.blit(self.top_image, self.top_image_rect)
+        surface.blit(self.top_image, self.top_image.get_rect(center=self.rect.center))
 
 
 class KnifeIndicator(sprite.GUISprite):
     def __init__(self, level, button_dict, start_pos=(0, 0), z=0):
         button_coords = list(button_dict.keys())
-        button_xs = [i[0] for i in button_coords]
-        button_ys = [i[1] for i in button_coords]
+        button_xs = [i[0] for i in button_coords if i[0] is not None]
+        button_ys = [i[1] for i in button_coords if i[1] is not None]
         self.button_dict = button_dict
         self.button_bounds = pygame.Rect(
-            min(button_xs), min(button_ys), max(button_xs) + 1, max(button_ys) + 1
-        )
+            min(button_xs), min(button_ys), max(button_xs), max(button_ys)
+        ).inflate(5, 5)
         self.anim = animation.Animation(
             [level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)]
         )
         self.age = 0
         self.button_coord = start_pos
+        self.last_coord = start_pos
+        self.last_x = start_pos[0]
+        self.last_y = start_pos[1]
         self.button.select()
         super().__init__(
             level,
@@ -148,8 +154,9 @@ class KnifeIndicator(sprite.GUISprite):
         return self.button_dict[self.button_coord]
 
     def search(self, direction):
+        current_x = self.last_x
+        current_y = self.last_y
         delta_x, delta_y = direction
-        current_x, current_y = self.button_coord
         while self.button_bounds.collidepoint(current_x, current_y):
             current_x += delta_x
             current_y += delta_y
@@ -159,16 +166,32 @@ class KnifeIndicator(sprite.GUISprite):
                 and self.button_dict[current_coord].state == Button.STATE_NORMAL
             ):
                 return current_coord
+            x_only_coord = (current_coord[0], None)
+            y_only_coord = (None, current_coord[1])
+            if (
+                x_only_coord in self.button_dict
+                and self.button_dict[x_only_coord].state == Button.STATE_NORMAL
+            ):
+                return x_only_coord
+            if (
+                y_only_coord in self.button_dict
+                and self.button_dict[y_only_coord].state == Button.STATE_NORMAL
+            ):
+                return y_only_coord
         return None
 
     def move(self, direction):
         new_coord = self.search(direction)
         if new_coord is None:
             return None
-        old_button = self.button
+        self.last_coord = self.button_coord
         self.button_coord = new_coord
+        if new_coord[0] is not None:
+            self.last_x = new_coord[0]
+        if new_coord[1] is not None:
+            self.last_y = new_coord[1]
         self.rect.midright = self.button.rect.midleft
-        old_button.deselect()
+        self.button_dict[self.last_coord].deselect()
         self.button.select()
 
     def update(self, dt):
@@ -200,9 +223,42 @@ class TextButton(Button):
             level.game.loader.font.render(text),
             on_click=on_click,
         )
+        self.text = text
 
     def draw(self, surface):
-        surface.blit(self.top_image, self.rect)
+        surface.blit(self.top_image, self.top_image.get_rect(midleft=self.rect.midleft))
+
+
+class TextInput(sprite.GUISprite):
+    def __init__(self, level, rect, z=0, max_chars=16):
+        super().__init__(level, None, rect, z)
+        self.text = ["_"] * max_chars
+        self.cursor_position = 0
+        self.age = 0
+
+    def update(self, dt):
+        self.age += dt
+        return super().update(dt)
+
+    def draw(self, surface):
+        text_copy = self.text.copy()
+        if self.age % 1 < 0.5:
+            text_copy[self.cursor_position] = "|"
+        text = self.level.game.loader.font.render("".join(text_copy))
+        surface.blit(text, text.get_rect(center=self.rect.center))
+
+    def input_character(self, char):
+        if char == "\b":
+            self.cursor_position -= 1
+            self.text[self.cursor_position] = "_"
+        else:
+            if char == "_":
+                char = " "
+            self.text[self.cursor_position] = char
+            self.cursor_position += 1
+        self.cursor_position = pygame.math.clamp(
+            self.cursor_position, 0, len(self.text) - 1
+        )
 
 
 class Save(TextButton):
@@ -217,7 +273,10 @@ class Save(TextButton):
         )
 
     def load(self):
-        self.level.game.load_save(self.name)
+        if self.name:
+            self.level.game.load_save(self.name)
+        else:
+            self.level.game.stack.appendleft(NameInputMenu(self.level.game))
 
 
 class Label(sprite.GUISprite): ...  # TODO
@@ -285,6 +344,94 @@ class MainMenu(game_state.GameState):
 
     def quit(self):
         self.game.quit()
+
+
+class NameInputMenu(game_state.GameState):
+    MAX_CHARS = 16
+
+    def __init__(self, game):
+        super().__init__(game, "black")
+        background_rect = game.screen_rect.inflate(-16, -16)
+        self.gui = [
+            Background(self, background_rect, -1),
+        ]
+
+        per_row = 14
+        letters = "abcdefghijklmnopqrstuvwxyz_'ABCDEFGHIJKLMNOPQRSTUVWXYZ-\b"
+        letter_size = (10, 16)
+        keyboard_rect = pygame.Rect(
+            0,
+            0,
+            letter_size[0] * per_row,
+            ceil(len(letters) / per_row) * letter_size[1],
+        )
+        keyboard_rect.bottom = background_rect.bottom - 20
+        keyboard_rect.centerx = background_rect.centerx
+        letter_rect = pygame.Rect(keyboard_rect.topleft, letter_size)
+
+        button_x = 0
+        button_y = 0
+        button_dict = {}
+
+        for i, letter in enumerate(letters):
+            button = TextButton(
+                self, letter_rect, letter, partial(self.click_letter, letter)
+            )
+            self.gui.append(button)
+            button_dict[(button_x, button_y)] = button
+            letter_rect.left = letter_rect.right
+            button_x += 1
+            if letter_rect.right > keyboard_rect.right:
+                letter_rect.top = letter_rect.bottom
+                letter_rect.left = keyboard_rect.left
+                button_x = 0
+                button_y += 1
+
+        button_rect = pygame.Rect(
+            (0, keyboard_rect.bottom), self.game.loader.font.size("ABCD")
+        )
+        button_rect.centerx = keyboard_rect.centerx
+        cancel_button = TextButton(self, button_rect, "Back", self.cancel)
+        self.gui.append(cancel_button)
+        button_dict[(None, button_y + 1)] = cancel_button
+
+        button_rect.bottom = keyboard_rect.top
+        confirm_button = TextButton(self, button_rect, "Done", self.confirm_name)
+        self.gui.append(confirm_button)
+        button_dict[(None, -1)] = confirm_button
+
+        self.gui.append(KnifeIndicator(self, button_dict, (0, 0), 1))
+
+        start_text = "_" * self.MAX_CHARS
+        name_rect = pygame.Rect((0, 0), self.game.loader.font.size(start_text))
+        name_rect.bottom = button_rect.top - 10
+        name_rect.centerx = background_rect.centerx
+        self.input = TextInput(self, name_rect)
+        self.gui.append(self.input)
+
+    def update(self, dt):
+        self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
+        if "quit" in self.game.input_queue.just_pressed:
+            self.game.quit()
+        return super().update(dt)
+
+    def draw(self):
+        super().draw()
+        for sprite in self.gui:
+            sprite.draw(self.game.window_surface)
+
+    def click_letter(self, letter):
+        self.input.input_character(letter)
+
+    def confirm_name(self):
+        self.game.save.load("start1")
+        save_name = "".join(self.input.text).replace("_", "")
+        self.game.save.loaded_path = save_name
+        self.game.save.save()
+        self.game.load_save(save_name)
+
+    def cancel(self):
+        self.pop()
 
 
 class PauseMenu(game_state.GameState): ...  # TODO: Save & Quit, Quit, Save
