@@ -291,7 +291,9 @@ class Save(TextButton):
 
     def load(self):
         if self.level.delete_mode:
-            self.level.game.stack.appendleft(DeleteConfirmationMenu(self.level.game, self.name))
+            self.level.game.stack.appendleft(
+                DeleteConfirmationMenu(self.level.game, self.name)
+            )
             self.level.delete_mode_toggle()
             return
         if self.name:
@@ -351,7 +353,12 @@ class MainMenu(game_state.GameState):
             button_rect.top = button_rect.bottom + 3
 
         button_rect.height = 16
-        delete_button = Button(self, button_rect, self.game.loader.font.render("Delete Mode"), self.delete_mode_toggle)
+        delete_button = Button(
+            self,
+            button_rect,
+            self.game.loader.font.render("Delete Mode"),
+            self.delete_mode_toggle,
+        )
         button_dict[(0, i + 1)] = delete_button
         self.gui.append(delete_button)
 
@@ -477,13 +484,31 @@ class DeleteConfirmationMenu(game_state.GameState):
         super().__init__(level, (0, 0, 0, 0))
         background_rect = pygame.Rect(0, 0, 256, 48)
         background_rect.center = self.game.screen_rect.center
-        button1_rect = pygame.Rect(background_rect.left, background_rect.top + 8, 100, 16)
-        button2_rect = pygame.Rect(background_rect.left, background_rect.top + 24, 100, 16)
+        button1_rect = pygame.Rect(
+            background_rect.left, background_rect.top + 8, background_rect.width, 16
+        )
+        button2_rect = pygame.Rect(
+            background_rect.left, background_rect.top + 24, background_rect.width, 16
+        )
         button_dict = {
-            (0, 0): Button(self, button1_rect, self.game.loader.font.render(f"Keep '{save_name}'"), self.keep),
-            (0, 1): Button(self, button2_rect, self.game.loader.font.render(f"Delete '{save_name}'"), self.delete),
+            (0, 0): Button(
+                self,
+                button1_rect,
+                self.game.loader.font.render(f"Keep '{save_name}'"),
+                self.keep,
+            ),
+            (0, 1): Button(
+                self,
+                button2_rect,
+                self.game.loader.font.render(f"Delete '{save_name}'"),
+                self.delete,
+            ),
         }
-        self.gui = [Background(self, background_rect, -1), *button_dict.values(), KnifeIndicator(self, button_dict)]
+        self.gui = [
+            Background(self, background_rect, -1),
+            *button_dict.values(),
+            KnifeIndicator(self, button_dict),
+        ]
 
     def update(self, dt):
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
