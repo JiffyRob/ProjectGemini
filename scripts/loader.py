@@ -1,6 +1,7 @@
 import functools
 import gzip
 import json
+import os
 import pathlib
 
 import pygame
@@ -137,6 +138,9 @@ class Loader:
         # compress save files later - leave for debug
         with gzip.open(path, "wb") as file:
             json.dump(data, file)
+
+    def delete_save(self, path):
+        self.join_save(path).with_suffix(".sav").unlink()
 
     def get_save_names(self, amount=5):
         names = []

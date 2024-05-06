@@ -126,6 +126,9 @@ class Button(sprite.GUISprite):
 
 
 class KnifeIndicator(sprite.GUISprite):
+    STATE_GREEN = 0
+    STATE_RED = 1
+
     def __init__(self, level, button_dict, start_pos=(0, 0), z=0):
         button_coords = list(button_dict.keys())
         button_xs = [i[0] for i in button_coords if i[0] is not None]
@@ -137,6 +140,10 @@ class KnifeIndicator(sprite.GUISprite):
         self.anim = animation.Animation(
             [level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)]
         )
+        self.red_anim = animation.Animation(
+            [level.game.loader.get_image("gui.png", f"RedKnife{i}") for i in range(4)]
+        )
+        self.state = self.STATE_GREEN
         self.age = 0
         self.button_coord = start_pos
         self.last_coord = start_pos
@@ -209,10 +216,20 @@ class KnifeIndicator(sprite.GUISprite):
         self.age += dt
         self.rect.midright = self.button.rect.midleft
         self.anim.update(dt)
+        self.red_anim.update(dt)
         return True
 
     def draw(self, surface):
-        surface.blit(self.anim.image, self.rect.move(sin(self.age * 5) * 2, 0))
+        anim = self.anim
+        if self.state == self.STATE_RED:
+            anim = self.red_anim
+        surface.blit(anim.image, self.rect.move(sin(self.age * 5) * 2, 0))
+
+    def make_red(self):
+        self.state = self.STATE_RED
+
+    def make_green(self):
+        self.state = self.STATE_GREEN
 
 
 class TextButton(Button):
@@ -273,6 +290,10 @@ class Save(TextButton):
         )
 
     def load(self):
+        if self.level.delete_mode:
+            self.level.game.stack.appendleft(DeleteConfirmationMenu(self.level.game, self.name))
+            self.level.delete_mode_toggle()
+            return
         if self.name:
             self.level.game.load_save(self.name)
         else:
@@ -292,6 +313,8 @@ class Image(sprite.GUISprite):
 class MainMenu(game_state.GameState):
     def __init__(self, game):
         super().__init__(game, "black")
+        self.delete_mode = False
+
         background_rect = game.screen_rect.inflate(-16, -16)
         title1 = game.loader.get_image("gui.png", "PROJECT")
         title1_rect = pygame.Rect(20, background_rect.top + 10, *title1.get_size())
@@ -320,13 +343,27 @@ class MainMenu(game_state.GameState):
                 title2_rect,
             ),
         ]
+        i = 0
         for i, save_name in enumerate(save_names):
             button = Save(self, button_rect, i + 1, save_name)
             self.gui.append(button)
             button_dict[(0, i)] = button
             button_rect.top = button_rect.bottom + 3
 
-        self.gui.append(KnifeIndicator(self, button_dict=button_dict))
+        button_rect.height = 16
+        delete_button = Button(self, button_rect, self.game.loader.font.render("Delete Mode"), self.delete_mode_toggle)
+        button_dict[(0, i + 1)] = delete_button
+        self.gui.append(delete_button)
+
+        self.knife = KnifeIndicator(self, button_dict=button_dict)
+        self.gui.append(self.knife)
+
+    def delete_mode_toggle(self):
+        self.delete_mode = not self.delete_mode
+        if self.delete_mode:
+            self.knife.make_red()
+        else:
+            self.knife.make_green()
 
     def update(self, dt):
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
@@ -432,6 +469,41 @@ class NameInputMenu(game_state.GameState):
 
     def cancel(self):
         self.pop()
+
+
+class DeleteConfirmationMenu(game_state.GameState):
+    def __init__(self, level, save_name):
+        self.save_name = save_name
+        super().__init__(level, (0, 0, 0, 0))
+        background_rect = pygame.Rect(0, 0, 256, 48)
+        background_rect.center = self.game.screen_rect.center
+        button1_rect = pygame.Rect(background_rect.left, background_rect.top + 8, 100, 16)
+        button2_rect = pygame.Rect(background_rect.left, background_rect.top + 24, 100, 16)
+        button_dict = {
+            (0, 0): Button(self, button1_rect, self.game.loader.font.render(f"Keep '{save_name}'"), self.keep),
+            (0, 1): Button(self, button2_rect, self.game.loader.font.render(f"Delete '{save_name}'"), self.delete),
+        }
+        self.gui = [Background(self, background_rect, -1), *button_dict.values(), KnifeIndicator(self, button_dict)]
+
+    def update(self, dt):
+        self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
+        if "quit" in self.game.input_queue.just_pressed:
+            self.game.quit()
+        return super().update(dt)
+
+    def draw(self):
+        super().draw()
+        for sprite in self.gui:
+            sprite.draw(self.game.window_surface)
+
+    def keep(self):
+        self.pop()
+
+    def delete(self):
+        self.game.save.delete(self.save_name)
+        print(self.game.loader.get_save_names())
+        self.game.stack.clear()
+        self.game.stack.appendleft(MainMenu(self.game))
 
 
 class PauseMenu(game_state.GameState): ...  # TODO: Save & Quit, Quit, Save

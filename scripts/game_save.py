@@ -28,3 +28,8 @@ class GameSave:
         if path is None:
             path = self.loaded_path
         self.game.loader.save_data(path, self.data)
+
+    def delete(self, path=None):
+        if path is None:
+            path = self.loaded_path
+        self.game.loader.delete_save(path)
