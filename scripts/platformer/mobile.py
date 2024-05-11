@@ -6,7 +6,11 @@ from scripts import sprite
 from scripts.animation import Animation, flip_surface
 
 GRAVITY = pygame.Vector2(0, 50)  # TODO: sideways gravity?????
-WALK_SPEED = 64
+ACCEL_SPEED = 6
+DECCEL_SPEED = 6
+WALK_SPEED = 84
+MAX_X_SPEED = 256
+MAX_Y_SPEED = 512
 JUMP_SPEED = 240
 
 
@@ -31,6 +35,9 @@ class PhysicsSprite(sprite.Sprite):
 
     def update(self, dt):
         # physics
+        # lock velocity
+        self.velocity.x = pygame.math.clamp(self.velocity.x, -MAX_X_SPEED, MAX_X_SPEED)
+        self.velocity.y = pygame.math.clamp(self.velocity.y, -MAX_Y_SPEED, MAX_Y_SPEED)
         # locked sprites do not move
         if self.locked:
             self.velocity.x *= 0
@@ -86,7 +93,6 @@ class PhysicsSprite(sprite.Sprite):
                         self.on_ground = True
                         self.on_downer = True
                         break
-        self.velocity.x = 0
         self.ducking = False
         return True
 
@@ -114,7 +120,7 @@ class BoingerBeetle(PhysicsSprite):
         self.facing_left = not self.facing_left
 
     def update(self, dt):
-        self.velocity.x = WALK_SPEED * 0.3 * (-1 + self.facing_left * 2)
+        self.velocity.x = WALK_SPEED * 0.3  * (-1 + self.facing_left * 2)
         self.anim.flip_x = self.facing_left
         if not super().update(dt):
             return False
@@ -141,6 +147,7 @@ class Player(PhysicsSprite):
             "walk": Animation(images[8:12]),
             "idle": Animation((images[9],)),
             "jump": Animation((images[12],)),
+
         }
         self.state = "jump"
         self.jump_forced = False
@@ -183,6 +190,10 @@ class Player(PhysicsSprite):
                 self.walk_left()
             if held_input["right"]:
                 self.walk_right()
+            if not held_input["left"] and not held_input["right"]:
+                self.decelerate()
+            # TODO: May need IF statements here
+            self.velocity.x = pygame.math.clamp(self.velocity.x, -WALK_SPEED, WALK_SPEED)
             if held_input["jump"]:
                 self.jump()
             if held_input["duck"]:
@@ -215,10 +226,14 @@ class Player(PhysicsSprite):
         self.emeralds = max(0, self.emeralds - emeralds)
 
     def walk_left(self):
-        self.velocity.x -= WALK_SPEED
+        self.velocity.x -= ACCEL_SPEED
 
     def walk_right(self):
-        self.velocity.x += WALK_SPEED
+        self.velocity.x += ACCEL_SPEED
+
+    def decelerate(self):
+        if self.velocity.x:
+            self.velocity.x -= self.velocity.x / abs(self.velocity.x) * min(DECCEL_SPEED, abs(self.velocity.x))
 
     def unwalk(self):
         pass
