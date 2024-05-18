@@ -78,7 +78,7 @@ class BustedParts(sprite.Sprite):
         if self.collision_rect.colliderect(self.level.player.collision_rect):
             self.image = self.hit_image
             self.hit_time = 0.2
-            self.level.player.jump(True, 0.7)
+            self.level.player.jump(self.level.player.JUMP_PAIN)
             self.level.player.hurt(2)
         if self.hit_time > 0:
             self.hit_time -= dt

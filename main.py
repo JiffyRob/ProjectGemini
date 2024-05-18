@@ -35,6 +35,7 @@ class Game:
         self.sound_manager = None
         self.save = game_save.GameSave(self)
         self.input_queue = input_binding.InputQueue()
+        self.timers = []
 
     @property
     def window_surface(self):
@@ -73,6 +74,9 @@ class Game:
         self.stack.appendleft(space.Space(self))
         self.stack.appendleft(level.Level.load(self, self.save.planet))
 
+    def delayed_callback(self, dt, callback):
+        self.timers.append((dt, callback))
+
     def load_input_binding(self, name):
         self.input_queue.load_bindings(
             self.loader.get_json(f"keybindings/{name}"), delete_old=True
@@ -97,6 +101,15 @@ class Game:
         dt = pygame.math.clamp(
             self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
         )
+        # update delayed callbacks
+        still_waiting = []
+        for index in range(len(self.timers)):
+            self.timers[index][0] -= dt
+            if self.timers[index][0] <= 0:
+                self.timers[index][1]()
+            else:
+                still_waiting.append(self.timers[index])
+        self.timers = still_waiting
         if kill_state:
             self.stack.popleft()
         self.dt_mult = 1

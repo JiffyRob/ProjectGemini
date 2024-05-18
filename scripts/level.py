@@ -1,5 +1,6 @@
 import pathlib
 from collections import defaultdict, namedtuple
+from random import uniform
 
 import pygame
 
@@ -23,6 +24,9 @@ LERP_SPEED = 1
 
 
 class Level(game_state.GameState):
+    AXIS_X = 1
+    AXIS_Y = 2
+
     sprite_classes = (
         # topdown
         {
@@ -78,6 +82,15 @@ class Level(game_state.GameState):
         self.effects = []
         self.script = None
         self.run_cutscene("level_begin")
+
+        self.shake_magnitude = 0
+        self.shake_delta = 0
+        self.shake_axes = 0
+
+    def shake(self, magnitude=5, delta=8, axes=AXIS_X | AXIS_Y):
+        self.shake_magnitude += magnitude
+        self.shake_delta += delta
+        self.shake_axes = axes
 
     def run_cutscene(self, cutscene_id, extra_constants=None):
         self.script = snekgemini.cutscene(
@@ -236,14 +249,18 @@ class Level(game_state.GameState):
             self.script.cycle()
             if self.script.done():
                 self.script = None
+        self.shake_magnitude = max(self.shake_magnitude - self.shake_delta * dt, 0)
+        if not self.shake_magnitude:
+            self.shake_delta *= 0
         return super().update(dt) and True
 
     def draw(self):
         super().draw()
         # draw backgrounds
+        shake_offset = pygame.Vector2(uniform(-self.shake_magnitude, self.shake_magnitude) * bool(self.shake_axes & self.AXIS_X), uniform(-self.shake_magnitude, self.shake_magnitude) * bool(self.shake_axes & self.AXIS_Y))
         for background in self.backgrounds:
             offset = (
-                -pygame.Vector2(self.viewport_rect.topleft)
+                -pygame.Vector2(self.viewport_rect.topleft) + shake_offset
             ).elementwise() * background.mult
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
@@ -260,7 +277,7 @@ class Level(game_state.GameState):
                 self.game.window_surface.blit(
                     sprite.image,
                     sprite.rect.move(
-                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
+                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top)) + shake_offset
                     ),
                 )
         # draw visual effects

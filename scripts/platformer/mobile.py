@@ -3,14 +3,14 @@ from itertools import cycle
 import pygame
 
 from scripts import sprite
-from scripts.animation import Animation, flip_surface
+from scripts.animation import Animation, NoLoopAnimation, flip_surface
 
 GRAVITY = pygame.Vector2(0, 50)  # TODO: sideways gravity?????
 ACCEL_SPEED = 6
 DECCEL_SPEED = 6
 WALK_SPEED = 84
 MAX_X_SPEED = 256
-MAX_Y_SPEED = 512
+MAX_Y_SPEED = 256
 JUMP_SPEED = 240
 
 
@@ -131,7 +131,7 @@ class BoingerBeetle(PhysicsSprite):
         ):
             self.image = flip_surface(self.hit_image, self.anim.flip_x, False)
             self.hit_timer = self.hit_wait
-            self.level.player.jump(True, 1.5)
+            self.level.player.jump(self.level.player.JUMP_BOOSTED)
         if self.hit_timer > 0:
             self.hit_timer -= dt
         else:
@@ -140,6 +140,11 @@ class BoingerBeetle(PhysicsSprite):
 
 
 class Player(PhysicsSprite):
+    JUMP_PAIN = 0
+    JUMP_NORMAL = 2
+    JUMP_BOOSTED = 3
+    JUMP_KNIFE = 1
+
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, image=None, z=z)
         images = level.game.loader.get_spritesheet("me.png")
@@ -147,10 +152,12 @@ class Player(PhysicsSprite):
             "walk": Animation(images[8:12]),
             "idle": Animation((images[9],)),
             "jump": Animation((images[12],)),
-
+            "pound": NoLoopAnimation((images[12:20]), 0.03),
+            "pound-recover": NoLoopAnimation((images[20:28]), 0.1),
         }
         self.state = "jump"
         self.jump_forced = False
+        self.jump_cause = None
         self.image = self.anim_dict[self.state].image
         self.facing_left = False
 
@@ -181,17 +188,24 @@ class Player(PhysicsSprite):
     def swap_state(self, new):
         if self.state != new:
             self.state = new
+            self.anim_dict[self.state].restart()
             self.image = self.anim_dict[self.state].image
 
     def update(self, dt):
         if not self.locked:
             held_input = self.level.game.input_queue.held
-            if held_input["left"]:
-                self.walk_left()
-            if held_input["right"]:
-                self.walk_right()
-            if not held_input["left"] and not held_input["right"]:
-                self.decelerate()
+            just_input = self.level.game.input_queue.just_pressed
+            if self.state == "jump" and "duck" in just_input:
+                self.knife_pound()
+            if self.state in {"idle", "walk", "jump"}:
+                if held_input["left"]:
+                    self.walk_left()
+                if held_input["right"]:
+                    self.walk_right()
+                if not held_input["left"] and not held_input["right"]:
+                    self.decelerate()
+            else:
+                self.velocity.x = 0
             # TODO: May need IF statements here
             self.velocity.x = pygame.math.clamp(self.velocity.x, -WALK_SPEED, WALK_SPEED)
             if held_input["jump"]:
@@ -200,14 +214,23 @@ class Player(PhysicsSprite):
                 self.duck()
             if "quit" in self.level.game.input_queue.just_pressed:
                 self.level.run_cutscene("quit")
-        if not self.on_ground:
+        if self.state == "pound":
+            if self.on_ground:
+                self.swap_state("pound-recover")
+                self.level.shake(axes=self.level.AXIS_Y)
+                # TODO: Stab logic here
+        elif not self.on_ground:
             self.swap_state("jump")
-        elif self.velocity.x:
+        elif self.velocity.x and self.state != "pound-recover":
             self.swap_state("walk")
-        else:
+        elif self.state != "pound-recover":
+            self.swap_state("idle")
+        if self.state == "pound-recover" and self.anim_dict[self.state].done():
             self.swap_state("idle")
         if self.velocity.x:
             self.facing_left = self.velocity.x < 0
+        if self.velocity.y > 0 and self.state == "pound":
+            self.level.game.time_phase(self.velocity.y / 64)
         self.anim_dict[self.state].update(dt)
         self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
@@ -225,6 +248,12 @@ class Player(PhysicsSprite):
     def charge(self, emeralds):
         self.emeralds = max(0, self.emeralds - emeralds)
 
+    def knife_pound(self):
+        self.velocity *= 0
+        self.velocity.y = 10
+        self.swap_state("pound")
+        self.jump(self.JUMP_KNIFE)
+
     def walk_left(self):
         self.velocity.x -= ACCEL_SPEED
 
@@ -235,15 +264,19 @@ class Player(PhysicsSprite):
         if self.velocity.x:
             self.velocity.x -= self.velocity.x / abs(self.velocity.x) * min(DECCEL_SPEED, abs(self.velocity.x))
 
-    def unwalk(self):
-        pass
-
-    def jump(self, pain=False, amp=1):
-        if self.on_ground or pain:
+    def jump(self, cause=JUMP_NORMAL):
+        forced = cause in {self.JUMP_KNIFE, self.JUMP_PAIN, self.JUMP_BOOSTED}
+        if forced or (self.on_ground and self.state in {"idle", "walk"}):
+            amp = {
+                self.JUMP_NORMAL: 1,
+                self.JUMP_PAIN: 1.1,
+                self.JUMP_BOOSTED: 1.5,
+                self.JUMP_KNIFE: 0.3,
+            }[cause]
             self.velocity.y = -JUMP_SPEED * amp
             self.on_ground = False
             self.on_downer = False
-            self.jump_forced = pain
+            self.jump_cause = cause
 
     def duck(self):
         self.ducking = True
