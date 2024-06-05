@@ -47,7 +47,10 @@ class NoLoopAnimation:
         self.time = 0
 
     def done(self):
-        return min(round(self.time / self.speed), len(self.frames) - 1) == len(self.frames) - 1
+        return (
+            min(round(self.time / self.speed), len(self.frames) - 1)
+            == len(self.frames) - 1
+        )
 
     @property
     def image(self):

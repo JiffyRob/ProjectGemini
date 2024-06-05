@@ -43,7 +43,8 @@ class Level(game_state.GameState):
             "BoingerBeetle": platformer.mobile.BoingerBeetle,
             "RedShroom": platformer.immobile.Prop,
             "BrownShroom": platformer.immobile.BrownShroom,
-            "Player": platformer.mobile.Player,
+            "Player": platformer.player.Player,
+            "Battery": platformer.puzzle.Battery,
         },
     )
 
@@ -63,7 +64,7 @@ class Level(game_state.GameState):
         self.groups = defaultdict(set)
         self.soundtrack = soundtrack
         if is_platformer:
-            self.player = platformer.mobile.Player(self)
+            self.player = platformer.player.Player(self)
         else:
             self.player = topdown.mobile.Player(self)
         self.is_house = is_house
@@ -123,6 +124,10 @@ class Level(game_state.GameState):
                 if hasattr(sprite, "extra_collision_rects"):
                     self.collision_rects.extend(sprite.extra_collision_rects)
                 continue
+            if group == "vertical-collision":
+                self.down_rects.append(sprite.collision_rect)
+                if hasattr(sprite, "extra_collision_rects"):
+                    self.down_rects.extend(sprite.extra_collision_rects)
             self.groups[group].add(sprite)
 
     def start_dialog(self, text, *answers, face=None, on_finish=lambda answer: None):
@@ -201,7 +206,6 @@ class Level(game_state.GameState):
                         **entity["customFields"]
                     )
                 )
-        level.player.z = entity_layer
         # collision data creation
         for row, line in enumerate(
             game.loader.get_csv(folder / "Collision.csv", for_map=True)
@@ -257,7 +261,12 @@ class Level(game_state.GameState):
     def draw(self):
         super().draw()
         # draw backgrounds
-        shake_offset = pygame.Vector2(uniform(-self.shake_magnitude, self.shake_magnitude) * bool(self.shake_axes & self.AXIS_X), uniform(-self.shake_magnitude, self.shake_magnitude) * bool(self.shake_axes & self.AXIS_Y))
+        shake_offset = pygame.Vector2(
+            uniform(-self.shake_magnitude, self.shake_magnitude)
+            * bool(self.shake_axes & self.AXIS_X),
+            uniform(-self.shake_magnitude, self.shake_magnitude)
+            * bool(self.shake_axes & self.AXIS_Y),
+        )
         for background in self.backgrounds:
             offset = (
                 -pygame.Vector2(self.viewport_rect.topleft) + shake_offset
@@ -277,7 +286,8 @@ class Level(game_state.GameState):
                 self.game.window_surface.blit(
                     sprite.image,
                     sprite.rect.move(
-                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top)) + shake_offset
+                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
+                        + shake_offset
                     ),
                 )
         # draw visual effects

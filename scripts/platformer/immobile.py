@@ -88,12 +88,12 @@ class BustedParts(sprite.Sprite):
 
 
 class CollisionSprite(sprite.Sprite):
+    groups = {"static-collision"}
+
     def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, **custom_fields):
         if image is None:
             image = pygame.Surface(rect[2:]).convert_alpha()
         super().__init__(level, image=image, rect=rect, z=z)
-        # self.level.groups["collision"].add(self)
-        self.level.collision_rects.add(self.collision_rect)
 
     def update(self, dt):
         pass  # No physics on a static sprite

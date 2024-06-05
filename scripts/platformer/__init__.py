@@ -1,1 +1,1 @@
-from . import immobile, mobile
+from . import immobile, mobile, player, puzzle

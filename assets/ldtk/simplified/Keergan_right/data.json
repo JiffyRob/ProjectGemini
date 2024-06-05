@@ -3,7 +3,7 @@
 	"uniqueIdentifer": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
 	"x": 304,
 	"y": 0,
-	"width": 592,
+	"width": 768,
 	"height": 256,
 	"bgColor": "#F8CD7C",
 	"neighbourLevels": [],
@@ -219,6 +219,19 @@
 				"width": 16,
 				"height": 16,
 				"color": 15389866,
+				"customFields" : {}
+			}
+		],
+		"Battery": [
+			{
+				"id": "Battery",
+				"iid": "b3e0bad0-fec0-11ee-8684-4f8f23c54744",
+				"layer": "Entities",
+				"x": 624,
+				"y": 224,
+				"width": 16,
+				"height": 16,
+				"color": 1496242,
 				"customFields" : {}
 			}
 		]
