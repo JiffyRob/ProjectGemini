@@ -71,6 +71,7 @@ class Level(game_state.GameState):
         self.is_house = is_house
         self.player.rect.center = player_pos
         self.sprites = {self.player}
+        self.to_add = set()
         self.collision_rects = []
         self.down_rects = []
         self.gui = [
@@ -118,6 +119,9 @@ class Level(game_state.GameState):
         self.effects.append(effect)
 
     def add_sprite(self, sprite):
+        self.to_add.add(sprite)
+
+    def add_sprite_internal(self, sprite):
         self.sprites.add(sprite)
         for group in sprite.groups:
             if group == "static-collision":
@@ -232,6 +236,10 @@ class Level(game_state.GameState):
         return pygame.Vector2(pos) + self.viewport_rect.topleft
 
     def update(self, dt):
+        # adds new sprites to the list
+        for sprite in self.to_add:
+            self.add_sprite_internal(sprite)
+        self.to_add.clear()
         # removes dead sprites from the list
         self.sprites = {sprite for sprite in self.sprites if sprite.update(dt)}
         for group in self.groups.values():

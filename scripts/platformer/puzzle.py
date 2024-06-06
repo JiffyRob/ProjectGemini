@@ -1,8 +1,9 @@
 import math
 import pygame
 
-from scripts import sprite, easings
-from scripts.animation import Animation, SingleAnimation
+from scripts import sprite, easings, timer
+from scripts.animation import NoLoopAnimation, SingleAnimation
+from scripts.platformer import projectile
 
 
 class Battery(sprite.Sprite):
@@ -57,7 +58,7 @@ class GunPlatform(sprite.Sprite):
             self.STATE_OFF: SingleAnimation(off_frame),
             self.STATE_MOVING: SingleAnimation(on_frame),
             self.STATE_ARRIVED: SingleAnimation(on_frame),
-            self.STATE_SHOOTING: Animation(shoot_frames)
+            self.STATE_SHOOTING: NoLoopAnimation(shoot_frames)
         }
         self.state = self.STATE_OFF
         self.triggers = custom_fields["triggers"]
@@ -67,9 +68,16 @@ class GunPlatform(sprite.Sprite):
         self.radius = 32
         self.dest = pygame.Vector2(custom_fields["dest"]["cx"] * 16 + 8, custom_fields["dest"]["cy"] * 16 + 8)
         self.dest_dt = 0
+        self.shoot_timer = timer.DTimer(2000, self.shoot, True)
+
+    def shoot(self):
+        if self.state == self.STATE_ARRIVED:
+            self.state = self.STATE_SHOOTING
+            self.anim_dict[self.state].restart()
 
     def update(self, dt):
         super().update(dt)
+        self.shoot_timer.update(dt)
         for trigger in self.triggers:
             triggered = False
             for sprite in self.level.groups[trigger]:
@@ -86,8 +94,14 @@ class GunPlatform(sprite.Sprite):
             self.rect.center = self.start.lerp(self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1)))
             if self.dest_dt > 1:
                 self.state = self.STATE_ARRIVED
-        if self.state == self.STATE_ARRIVED:
+        if self.state in {self.STATE_ARRIVED, self.STATE_SHOOTING}:
             self.angle += dt * self.rotation_speed
             self.rect.center = self.dest + circle_offset
+        if self.state == self.STATE_SHOOTING and self.anim_dict[self.state].done():
+            self.level.add_sprite(
+                projectile.Laser(self.level, pygame.Rect(self.rect.right, self.rect.top + 4, 4, 1), self.z, pygame.Vector2(76, 0))
+            )
+            self.state = self.STATE_ARRIVED
+        self.anim_dict[self.state].update(dt)
         self.image = self.anim_dict[self.state].image
         return True
