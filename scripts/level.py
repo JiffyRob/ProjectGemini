@@ -291,14 +291,17 @@ class Level(game_state.GameState):
         for sprite in sorted(
             self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery
         ):
+            rect = sprite.rect.move(
+                (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
+                + shake_offset
+            )
             if sprite.image is not None:
                 self.game.window_surface.blit(
                     sprite.image,
-                    sprite.rect.move(
-                        (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
-                        + shake_offset
-                    ),
+                    rect,
                 )
+                for effect in sprite.effects:
+                    effect.draw(self.game.window_surface, rect)
         # draw visual effects
         for effect in self.effects:
             effect.draw(self.game.window_surface)

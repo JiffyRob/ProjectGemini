@@ -12,6 +12,7 @@ class Sprite:
         self.velocity = pygame.Vector2()
         self.dead = False
         self.locked = False
+        self.effects = []
 
     def lock(self):
         self.locked = True
@@ -24,6 +25,7 @@ class Sprite:
         return pygame.Vector2(self.rect.center)
 
     def update(self, dt):
+        self.effects = [effect.update(dt) for effect in self.effects if not effect.done]
         return True
 
 

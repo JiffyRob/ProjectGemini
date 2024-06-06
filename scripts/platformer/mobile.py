@@ -19,6 +19,7 @@ class PhysicsSprite(sprite.Sprite):
         self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields
     ):
         super().__init__(level, image=image, rect=rect, z=z)
+        self.collision_rect = self.rect
         self.weight = weight
         self.velocity = pygame.Vector2()
         self.desired_velocity = pygame.Vector2()
@@ -28,18 +29,18 @@ class PhysicsSprite(sprite.Sprite):
         self.ground_rect_relative = pygame.Vector2()
         self.ground_rect = None
 
-    @property
-    def collision_rect(self):
-        return self.rect.copy()
-
     def on_xy_collision(self):
         pass
+
+    def update_rects(self):
+        self.collision_rect = self.rect
 
     def update(self, dt):
         # physics
         # moving platforms
         if self.ground_rect:
             self.rect.center = self.ground_rect.center + self.ground_rect_relative
+            self.update_rects()
         self.ground_rect = None
         self.ground_rect_relative = None
         # lock velocity
@@ -52,6 +53,7 @@ class PhysicsSprite(sprite.Sprite):
         vel = self.velocity * dt + 0.5 * GRAVITY * self.weight * dt**2
         self.velocity += GRAVITY * self.weight * dt
         self.rect.x += vel.x
+        self.update_rects()
         # bottom of the map
         if self.collision_rect.bottom > self.level.map_rect.bottom:
             self.dead = True
@@ -64,6 +66,7 @@ class PhysicsSprite(sprite.Sprite):
                     self.on_xy_collision()
                     self.rect.x += collided.right - self.collision_rect.left
                     self.velocity.x = 0
+                    self.update_rects()
                     break
         else:
             for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
@@ -71,8 +74,10 @@ class PhysicsSprite(sprite.Sprite):
                     self.on_xy_collision()
                     self.rect.x += collided.left - self.collision_rect.right
                     self.velocity.x = 0
+                    self.update_rects()
                     break
         self.rect.y += vel.y
+        self.update_rects()
         if vel.y < 0:
             for collided in sorted(
                 self.level.collision_rects, key=lambda rect: -rect.y
@@ -80,6 +85,7 @@ class PhysicsSprite(sprite.Sprite):
                 if self.collision_rect.colliderect(collided):
                     self.rect.y += collided.bottom - self.collision_rect.top
                     self.velocity.y = 0
+                    self.update_rects()
                     break
         else:
             for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
@@ -89,6 +95,7 @@ class PhysicsSprite(sprite.Sprite):
                     self.on_ground = True
                     self.ground_rect = collided
                     self.ground_rect_relative = self.pos - self.ground_rect.center
+                    self.update_rects()
                     break
             if not self.ducking:
                 for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):
@@ -102,6 +109,7 @@ class PhysicsSprite(sprite.Sprite):
                         self.on_downer = True
                         self.ground_rect = collided
                         self.ground_rect_relative = self.pos - self.ground_rect.center
+                        self.update_rects()
                         break
         self.ducking = False
         return True
@@ -110,6 +118,7 @@ class PhysicsSprite(sprite.Sprite):
 class BoingerBeetle(PhysicsSprite):
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, weight=3, z=z)
+        self.collision_rect = self.rect.inflate(-4, -10).move(0, 5)
         self.anim = Animation(
             self.level.game.loader.get_spritesheet("platformer-sprites.png")[8:12],
             0.15,
@@ -122,19 +131,18 @@ class BoingerBeetle(PhysicsSprite):
         self.facing_left = True
         self.image = self.anim.image
 
-    @property
-    def collision_rect(self):
-        return self.rect.inflate(-4, -10).move(0, 5)
-
     def on_xy_collision(self):
         self.facing_left = not self.facing_left
+
+    def update_rects(self):
+        self.collision_rect.center = self.rect.center
+        self.collision_rect.top += 5
 
     def update(self, dt):
         self.velocity.x = WALK_SPEED * 0.3 * (-1 + self.facing_left * 2)
         self.anim.flip_x = self.facing_left
         if not super().update(dt):
             return False
-        self.anim.update(dt)
         if (
             self.collision_rect.colliderect(self.level.player.collision_rect)
             and self.level.player.velocity.y > 0

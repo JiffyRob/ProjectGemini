@@ -118,8 +118,6 @@ class Game:
     def draw(self):
         self.window_surface.fill(self.stack[0].bgcolor)
         self.window.get_surface().fill("black")
-        self.window_surface.fill(self.stack[0].bgcolor)
-        self.window.get_surface().fill("black")
         self.stack[0].draw()
         if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
             factor = min(

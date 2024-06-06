@@ -43,8 +43,12 @@ class GrowingCircle:
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
         return self
 
-    def draw(self, surface):
-        surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
+    def draw(self, surface, rect=None):
+        if rect is None:
+            rect = pygame.Rect(0, 0, 0, 0)
+        surface.blit(
+            self.surface, (rect.topleft, rect.topleft), None, pygame.BLEND_RGB_MULT
+        )
         self.done = self.radius >= self.max_radius
 
 
@@ -86,6 +90,10 @@ class ShrinkingCircle:
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
         return self
 
-    def draw(self, surface):
-        surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
+    def draw(self, surface, rect=None):
+        if rect is None:
+            rect = pygame.Rect(0, 0, 0, 0)
+        surface.blit(
+            self.surface, (rect.topleft, rect.topleft), None, pygame.BLEND_RGB_MULT
+        )
         self.done = self.radius <= 0
