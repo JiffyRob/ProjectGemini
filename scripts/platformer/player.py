@@ -69,7 +69,7 @@ class Player(mobile.PhysicsSprite):
         if not self.locked:
             held_input = self.level.game.input_queue.held
             just_input = self.level.game.input_queue.just_pressed
-            if self.state == "jump" and "duck" in just_input and self.velocity.y <= 0:
+            if self.state == "jump" and "duck" in just_input and self.jump_cause == self.JUMP_NORMAL:
                 self.knife_pound()
             if self.state in {"idle", "walk", "jump"}:
                 if held_input["left"]:
@@ -80,12 +80,13 @@ class Player(mobile.PhysicsSprite):
                     self.decelerate()
             else:
                 self.velocity.x = 0
-            # TODO: May need IF statements here
             self.velocity.x = pygame.math.clamp(
                 self.velocity.x, -WALK_SPEED, WALK_SPEED
             )
             if held_input["jump"]:
                 self.jump()
+            elif self.jump_cause == self.JUMP_NORMAL:
+                self.velocity.y = max(self.velocity.y, self.velocity.y * .7)
             if held_input["duck"]:
                 self.duck()
             if "quit" in self.level.game.input_queue.just_pressed:

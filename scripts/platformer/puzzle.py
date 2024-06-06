@@ -72,7 +72,7 @@ class GunPlatform(sprite.Sprite):
             custom_fields["dest"]["cx"] * 16 + 8, custom_fields["dest"]["cy"] * 16 + 8
         )
         self.dest_dt = 0
-        self.shoot_timer = timer.DTimer(2000, self.shoot, True)
+        self.shoot_timer = timer.DTimer(2000)
         if self.facing_left:
             self.shoot_direction = pygame.Vector2(-128, 0)
             self.shoot_start = pygame.Vector2(-2, 4)
@@ -88,6 +88,9 @@ class GunPlatform(sprite.Sprite):
     def update(self, dt):
         super().update(dt)
         self.shoot_timer.update(dt)
+        if abs(self.pos.y - self.level.player.pos.y) < 4 and self.shoot_timer.done():
+            self.shoot()
+            self.shoot_timer.reset()
         for trigger in self.triggers:
             triggered = False
             for sprite in self.level.groups[trigger]:
@@ -117,7 +120,7 @@ class GunPlatform(sprite.Sprite):
             self.level.add_sprite(
                 projectile.Laser(
                     self.level,
-                    pygame.Rect(self.rect.center + self.shoot_start, (4, 1)),
+                    pygame.Rect(self.rect.topleft + self.shoot_start, (4, 1)),
                     self.z,
                     self.shoot_direction,
                 )
