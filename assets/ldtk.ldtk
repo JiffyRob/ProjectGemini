@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 476545,
-	"nextUid": 109,
+	"nextUid": 110,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -1760,6 +1760,43 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "facing_left",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 109,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		}
@@ -2576,64 +2613,192 @@
 							"height": 16,
 							"defUid": 103,
 							"px": [624,224],
-							"fieldInstances": [{ "__identifier": "trigger_id", "__type": "String", "__value": "battery0", "__tile": null, "defUid": 105, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "trigger_id", "__type": "String", "__value": "battery1", "__tile": null, "defUid": 105, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["battery0"]
+								"params": ["battery1"]
 							}] }],
 							"__worldX": 928,
 							"__worldY": 224
 						},
 						{
 							"__identifier": "GunPlatform",
-							"__grid": [40,14],
+							"__grid": [41,14],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#5A6988",
-							"iid": "05ca5900-fec0-11ee-9518-0df02bf2d909",
+							"iid": "4ac81140-fec0-11ee-ae91-931fac7d3b89",
 							"width": 32,
 							"height": 8,
 							"defUid": 104,
-							"px": [655,232],
+							"px": [656,233],
 							"fieldInstances": [
-								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery0"], "__tile": null, "defUid": 106, "realEditorValues": [{
+								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery1"], "__tile": null, "defUid": 106, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["battery0"]
+									"params": ["battery1"]
 								}] },
-								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 41, "cy": 10 }, "__tile": null, "defUid": 107, "realEditorValues": [{
+								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 42, "cy": 11 }, "__tile": null, "defUid": 107, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["41,10"]
+									"params": ["42,11"]
 								}] },
-								{ "__identifier": "angle", "__type": "Int", "__value": 0, "__tile": null, "defUid": 108, "realEditorValues": [] }
+								{ "__identifier": "angle", "__type": "Int", "__value": 60, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [60] }] },
+								{ "__identifier": "facing_left", "__type": "Bool", "__value": true, "__tile": null, "defUid": 109, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
-							"__worldX": 959,
-							"__worldY": 232
+							"__worldX": 960,
+							"__worldY": 233
 						},
 						{
 							"__identifier": "GunPlatform",
-							"__grid": [40,13],
+							"__grid": [41,14],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#5A6988",
-							"iid": "16ffdd80-fec0-11ee-9518-8de5a8b57baa",
+							"iid": "4c1db630-fec0-11ee-ae91-a5414157f005",
 							"width": 32,
 							"height": 8,
 							"defUid": 104,
-							"px": [655,222],
+							"px": [656,226],
 							"fieldInstances": [
-								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery0"], "__tile": null, "defUid": 106, "realEditorValues": [{
+								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery1"], "__tile": null, "defUid": 106, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["battery0"]
+									"params": ["battery1"]
 								}] },
-								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 41, "cy": 10 }, "__tile": null, "defUid": 107, "realEditorValues": [{
+								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 42, "cy": 11 }, "__tile": null, "defUid": 107, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["41,10"]
+									"params": ["42,11"]
 								}] },
-								{ "__identifier": "angle", "__type": "Int", "__value": 180, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [180] }] }
+								{ "__identifier": "angle", "__type": "Int", "__value": 0, "__tile": null, "defUid": 108, "realEditorValues": [] },
+								{ "__identifier": "facing_left", "__type": "Bool", "__value": true, "__tile": null, "defUid": 109, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
-							"__worldX": 959,
-							"__worldY": 222
+							"__worldX": 960,
+							"__worldY": 226
+						},
+						{
+							"__identifier": "GunPlatform",
+							"__grid": [43,14],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#5A6988",
+							"iid": "686f9ec0-fec0-11ee-ae91-c38a23dfbfdd",
+							"width": 32,
+							"height": 8,
+							"defUid": 104,
+							"px": [688,226],
+							"fieldInstances": [
+								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery1"], "__tile": null, "defUid": 106, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["battery1"]
+								}] },
+								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 42, "cy": 11 }, "__tile": null, "defUid": 107, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["42,11"]
+								}] },
+								{ "__identifier": "angle", "__type": "Int", "__value": 120, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [120] }] },
+								{ "__identifier": "facing_left", "__type": "Bool", "__value": true, "__tile": null, "defUid": 109, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 992,
+							"__worldY": 226
+						},
+						{
+							"__identifier": "GunPlatform",
+							"__grid": [43,14],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#5A6988",
+							"iid": "c8ab8ba0-fec0-11ee-ae91-77b745cebea1",
+							"width": 32,
+							"height": 8,
+							"defUid": 104,
+							"px": [688,233],
+							"fieldInstances": [
+								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery1"], "__tile": null, "defUid": 106, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["battery1"]
+								}] },
+								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 42, "cy": 11 }, "__tile": null, "defUid": 107, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["42,11"]
+								}] },
+								{ "__identifier": "angle", "__type": "Int", "__value": 180, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [180] }] },
+								{ "__identifier": "facing_left", "__type": "Bool", "__value": true, "__tile": null, "defUid": 109, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 992,
+							"__worldY": 233
+						},
+						{
+							"__identifier": "GunPlatform",
+							"__grid": [45,14],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#5A6988",
+							"iid": "f68efb60-fec0-11ee-ae91-914d8646b08c",
+							"width": 32,
+							"height": 8,
+							"defUid": 104,
+							"px": [720,233],
+							"fieldInstances": [
+								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery1"], "__tile": null, "defUid": 106, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["battery1"]
+								}] },
+								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 42, "cy": 11 }, "__tile": null, "defUid": 107, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["42,11"]
+								}] },
+								{ "__identifier": "angle", "__type": "Int", "__value": 300, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [300] }] },
+								{ "__identifier": "facing_left", "__type": "Bool", "__value": true, "__tile": null, "defUid": 109, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 1024,
+							"__worldY": 233
+						},
+						{
+							"__identifier": "GunPlatform",
+							"__grid": [45,14],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#5A6988",
+							"iid": "085c7a20-fec0-11ee-ae91-5f243cf85578",
+							"width": 32,
+							"height": 8,
+							"defUid": 104,
+							"px": [720,226],
+							"fieldInstances": [
+								{ "__identifier": "triggers", "__type": "Array<String>", "__value": ["battery1"], "__tile": null, "defUid": 106, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["battery1"]
+								}] },
+								{ "__identifier": "dest", "__type": "Point", "__value": { "cx": 42, "cy": 11 }, "__tile": null, "defUid": 107, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["42,11"]
+								}] },
+								{ "__identifier": "angle", "__type": "Int", "__value": 240, "__tile": null, "defUid": 108, "realEditorValues": [{ "id": "V_Int", "params": [240] }] },
+								{ "__identifier": "facing_left", "__type": "Bool", "__value": true, "__tile": null, "defUid": 109, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 1024,
+							"__worldY": 226
 						}
 					]
 				},

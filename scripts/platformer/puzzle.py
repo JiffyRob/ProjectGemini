@@ -1,7 +1,8 @@
 import math
+
 import pygame
 
-from scripts import sprite, easings, timer
+from scripts import easings, sprite, timer
 from scripts.animation import NoLoopAnimation, SingleAnimation
 from scripts.platformer import projectile
 
@@ -54,21 +55,30 @@ class GunPlatform(sprite.Sprite):
         on_frame, *shoot_frames, off_frame = level.game.loader.get_spritesheet(
             "platformer-sprites.png", (32, 8)
         )[24:29]
+        self.facing_left = custom_fields["facing_left"]
         self.anim_dict = {
-            self.STATE_OFF: SingleAnimation(off_frame),
-            self.STATE_MOVING: SingleAnimation(on_frame),
-            self.STATE_ARRIVED: SingleAnimation(on_frame),
-            self.STATE_SHOOTING: NoLoopAnimation(shoot_frames)
+            self.STATE_OFF: SingleAnimation(off_frame, self.facing_left),
+            self.STATE_MOVING: SingleAnimation(on_frame, self.facing_left),
+            self.STATE_ARRIVED: SingleAnimation(on_frame, self.facing_left),
+            self.STATE_SHOOTING: NoLoopAnimation(shoot_frames, 0.1, self.facing_left),
         }
         self.state = self.STATE_OFF
         self.triggers = custom_fields["triggers"]
         self.start = pygame.Vector2(self.pos)
         self.rotation_speed = 100
         self.angle = custom_fields["angle"]
-        self.radius = 32
-        self.dest = pygame.Vector2(custom_fields["dest"]["cx"] * 16 + 8, custom_fields["dest"]["cy"] * 16 + 8)
+        self.radius = 48
+        self.dest = pygame.Vector2(
+            custom_fields["dest"]["cx"] * 16 + 8, custom_fields["dest"]["cy"] * 16 + 8
+        )
         self.dest_dt = 0
         self.shoot_timer = timer.DTimer(2000, self.shoot, True)
+        if self.facing_left:
+            self.shoot_direction = pygame.Vector2(-128, 0)
+            self.shoot_start = pygame.Vector2(-2, 4)
+        else:
+            self.shoot_direction = pygame.Vector2(128, 0)
+            self.shoot_start = pygame.Vector2(self.rect.width + 2, 4)
 
     def shoot(self):
         if self.state == self.STATE_ARRIVED:
@@ -88,18 +98,29 @@ class GunPlatform(sprite.Sprite):
                     break
             if triggered and self.state == self.STATE_OFF:
                 self.state = self.STATE_MOVING
-        circle_offset = (math.cos(self.angle * math.pi / 180) * self.radius, math.sin(self.angle * math.pi / 180) * self.radius)
+        circle_offset = (
+            math.cos(self.angle * math.pi / 180) * self.radius,
+            math.sin(self.angle * math.pi / 180) * self.radius,
+        )
         if self.state == self.STATE_MOVING:
             self.dest_dt += dt
-            self.rect.center = self.start.lerp(self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1)))
+            self.rect.center = self.start.lerp(
+                self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1))
+            )
             if self.dest_dt > 1:
                 self.state = self.STATE_ARRIVED
         if self.state in {self.STATE_ARRIVED, self.STATE_SHOOTING}:
             self.angle += dt * self.rotation_speed
+            self.angle %= 360
             self.rect.center = self.dest + circle_offset
         if self.state == self.STATE_SHOOTING and self.anim_dict[self.state].done():
             self.level.add_sprite(
-                projectile.Laser(self.level, pygame.Rect(self.rect.right, self.rect.top + 4, 4, 1), self.z, pygame.Vector2(76, 0))
+                projectile.Laser(
+                    self.level,
+                    pygame.Rect(self.rect.center + self.shoot_start, (4, 1)),
+                    self.z,
+                    self.shoot_direction,
+                )
             )
             self.state = self.STATE_ARRIVED
         self.anim_dict[self.state].update(dt)

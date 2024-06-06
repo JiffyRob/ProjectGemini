@@ -87,6 +87,8 @@ class PhysicsSprite(sprite.Sprite):
                     self.rect.y += collided.top - self.collision_rect.bottom
                     self.velocity.y = 0
                     self.on_ground = True
+                    self.ground_rect = collided
+                    self.ground_rect_relative = self.pos - self.ground_rect.center
                     break
             if not self.ducking:
                 for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):

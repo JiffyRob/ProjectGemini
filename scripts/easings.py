@@ -10,9 +10,7 @@ def create_exp_easings(exp):
 
     def ease_in_out(time):
         return (
-            2 ** (exp - 1) * time**exp
-            if time < 0.5
-            else 1 - (-2 * time + 2) ** exp / 2
+            2 ** (exp - 1) * time**exp if time < 0.5 else 1 - (-2 * time + 2) ** exp / 2
         )
 
     return ease_in, ease_out, ease_in_out

@@ -123,6 +123,7 @@ class Player(mobile.PhysicsSprite):
         return super().update(dt) and self.health > 0
 
     def hurt(self, amount):
+        return
         self.health = max(0, self.health - amount)
 
     def heal(self, amount):

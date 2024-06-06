@@ -12,11 +12,13 @@ class Laser(sprite.Sprite):
         surface.fill((52, 197, 163))
         super().__init__(level, surface, rect, z + 1)
         self.velocity = direction
+        self.age = 0
 
     def update(self, dt):
         super().update(dt)
+        self.age += dt
         self.rect.center += self.velocity * dt
         if self.rect.colliderect(self.level.player.collision_rect):
             self.level.player.hurt(2)
             return False
-        return True
+        return self.age < 8  # should be offscreen by now
