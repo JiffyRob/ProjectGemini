@@ -88,9 +88,6 @@ class GunPlatform(sprite.Sprite):
     def update(self, dt):
         super().update(dt)
         self.shoot_timer.update(dt)
-        if abs(self.pos.y - self.level.player.pos.y) < 4 and self.shoot_timer.done():
-            self.shoot()
-            self.shoot_timer.reset()
         for trigger in self.triggers:
             triggered = False
             for sprite in self.level.groups[trigger]:
@@ -116,6 +113,9 @@ class GunPlatform(sprite.Sprite):
             self.angle += dt * self.rotation_speed
             self.angle %= 360
             self.rect.center = self.dest + circle_offset
+        if self.state == self.STATE_ARRIVED and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y) < 8 and self.shoot_timer.done():
+            self.shoot()
+            self.shoot_timer.reset()
         if self.state == self.STATE_SHOOTING and self.anim_dict[self.state].done():
             self.level.add_sprite(
                 projectile.Laser(

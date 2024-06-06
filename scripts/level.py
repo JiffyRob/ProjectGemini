@@ -278,7 +278,7 @@ class Level(game_state.GameState):
         )
         for background in self.backgrounds:
             offset = (
-                -pygame.Vector2(self.viewport_rect.topleft) + shake_offset
+                -pygame.Vector2(self.viewport_rect.topleft) + pygame.Vector2(0, self.map_rect.height - background.rect.height) + shake_offset
             ).elementwise() * background.mult
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width

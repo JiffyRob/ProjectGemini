@@ -1,12 +1,17 @@
 {
 	"identifier": "GeminiII",
 	"uniqueIdentifer": "98f38950-fec0-11ee-85ba-1b061a8e5769",
-	"x": 0,
-	"y": -464,
+	"x": 1288,
+	"y": -734,
 	"width": 448,
 	"height": 448,
 	"bgColor": "#34C5A3",
-	"neighbourLevels": [],
+	"neighbourLevels": [
+		{
+			"levelIid": "6ec05e10-fec0-11ee-85ba-e9ddb5f08779",
+			"dir": "n"
+		}
+	],
 	"customFields": {
 		"start": [
 			184,

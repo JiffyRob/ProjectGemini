@@ -1,12 +1,17 @@
 {
 	"identifier": "Home",
 	"uniqueIdentifer": "6ec05e10-fec0-11ee-85ba-e9ddb5f08779",
-	"x": 0,
-	"y": -576,
+	"x": 1288,
+	"y": -830,
 	"width": 112,
 	"height": 96,
 	"bgColor": "#696A79",
-	"neighbourLevels": [],
+	"neighbourLevels": [
+		{
+			"levelIid": "98f38950-fec0-11ee-85ba-1b061a8e5769",
+			"dir": "s"
+		}
+	],
 	"customFields": {
 		"start": [
 			72,

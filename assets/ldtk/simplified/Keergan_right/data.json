@@ -2,15 +2,15 @@
 	"identifier": "Keergan_right",
 	"uniqueIdentifer": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
 	"x": 304,
-	"y": 0,
-	"width": 768,
-	"height": 256,
+	"y": -112,
+	"width": 864,
+	"height": 368,
 	"bgColor": "#F8CD7C",
 	"neighbourLevels": [],
 	"customFields": {
 		"start": [
-			14,
-			227
+			8,
+			344
 		],
 		"entity_layer": 0,
 		"Background": "bg-mushroom.png",
@@ -42,7 +42,7 @@
 				"iid": "423a73c0-b0a0-11ee-83ba-937e1af7615d",
 				"layer": "Entities",
 				"x": 64,
-				"y": 16,
+				"y": 128,
 				"width": 16,
 				"height": 16,
 				"color": 4098376,
@@ -53,7 +53,7 @@
 				"iid": "42e4e490-b0a0-11ee-83ba-33b4b894555d",
 				"layer": "Entities",
 				"x": 80,
-				"y": 16,
+				"y": 128,
 				"width": 16,
 				"height": 16,
 				"color": 4098376,
@@ -64,7 +64,7 @@
 				"iid": "4359c670-b0a0-11ee-83ba-693a1aa54098",
 				"layer": "Entities",
 				"x": 112,
-				"y": 16,
+				"y": 128,
 				"width": 16,
 				"height": 16,
 				"color": 4098376,
@@ -75,7 +75,7 @@
 				"iid": "43d18e80-b0a0-11ee-83ba-cd6e96c2457b",
 				"layer": "Entities",
 				"x": 96,
-				"y": 16,
+				"y": 128,
 				"width": 16,
 				"height": 16,
 				"color": 4098376,
@@ -88,7 +88,7 @@
 				"iid": "c348fe80-b0a0-11ee-bbef-0369ef83fe9b",
 				"layer": "Entities",
 				"x": 288,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 2943221,
@@ -99,7 +99,7 @@
 				"iid": "c3c22620-b0a0-11ee-bbef-837a570ef6ff",
 				"layer": "Entities",
 				"x": 304,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 2943221,
@@ -110,7 +110,7 @@
 				"iid": "c4113080-b0a0-11ee-bbef-0ba327a99083",
 				"layer": "Entities",
 				"x": 320,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 2943221,
@@ -123,22 +123,39 @@
 				"iid": "178a2350-b0a0-11ee-bbef-6352285a8cd7",
 				"layer": "Entities",
 				"x": 416,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 7552569,
-				"customFields" : {}
+				"customFields": {
+					"moving": false
+				}
 			},
 			{
 				"id": "BoingerBeetle",
 				"iid": "182f8b10-b0a0-11ee-bbef-f7cfad36f3a3",
 				"layer": "Entities",
 				"x": 528,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 7552569,
-				"customFields" : {}
+				"customFields": {
+					"moving": false
+				}
+			},
+			{
+				"id": "BoingerBeetle",
+				"iid": "1fdb42e0-fec0-11ee-ae91-8f663c325cbb",
+				"layer": "Entities",
+				"x": 320,
+				"y": 112,
+				"width": 16,
+				"height": 16,
+				"color": 7552569,
+				"customFields": {
+					"moving": false
+				}
 			}
 		],
 		"RedShroom": [
@@ -147,7 +164,7 @@
 				"iid": "03b99270-d7b0-11ee-b607-bbef1387f835",
 				"layer": "Entities",
 				"x": 80,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 14957380,
@@ -158,7 +175,7 @@
 				"iid": "0d685cc0-d7b0-11ee-b607-01934be1ddd8",
 				"layer": "Entities",
 				"x": 256,
-				"y": 176,
+				"y": 288,
 				"width": 16,
 				"height": 16,
 				"color": 14957380,
@@ -169,7 +186,29 @@
 				"iid": "168a0240-d7b0-11ee-b607-c170db1d9ce1",
 				"layer": "Entities",
 				"x": 480,
-				"y": 208,
+				"y": 320,
+				"width": 16,
+				"height": 16,
+				"color": 14957380,
+				"customFields" : {}
+			},
+			{
+				"id": "RedShroom",
+				"iid": "fc3a2ae0-fec0-11ee-ae91-ff9e1b4eb239",
+				"layer": "Entities",
+				"x": 496,
+				"y": 176,
+				"width": 16,
+				"height": 16,
+				"color": 14957380,
+				"customFields" : {}
+			},
+			{
+				"id": "RedShroom",
+				"iid": "fecbd240-fec0-11ee-ae91-0161b8d8d369",
+				"layer": "Entities",
+				"x": 432,
+				"y": 112,
 				"width": 16,
 				"height": 16,
 				"color": 14957380,
@@ -182,7 +221,7 @@
 				"iid": "c796de50-d7b0-11ee-b607-79ee038f4682",
 				"layer": "Entities",
 				"x": 208,
-				"y": 224,
+				"y": 320,
 				"width": 16,
 				"height": 16,
 				"color": 15389866,
@@ -193,7 +232,7 @@
 				"iid": "c9d890f0-d7b0-11ee-b607-f31d9d868b3f",
 				"layer": "Entities",
 				"x": 352,
-				"y": 224,
+				"y": 304,
 				"width": 16,
 				"height": 16,
 				"color": 15389866,
@@ -204,7 +243,7 @@
 				"iid": "cdcd98e0-d7b0-11ee-b607-4d6ce6b1e0f8",
 				"layer": "Entities",
 				"x": 0,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 15389866,
@@ -215,7 +254,62 @@
 				"iid": "b9267560-d7b0-11ee-9eb6-e3662260d885",
 				"layer": "Entities",
 				"x": 304,
-				"y": 160,
+				"y": 272,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "f8dfb540-fec0-11ee-ae91-71ed863135ae",
+				"layer": "Entities",
+				"x": 528,
+				"y": 176,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "0091c530-fec0-11ee-ae91-cd0a0bd1d2da",
+				"layer": "Entities",
+				"x": 368,
+				"y": 176,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "3cf5d2a0-fec0-11ee-ae91-4b804061a783",
+				"layer": "Entities",
+				"x": 304,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "3d566930-fec0-11ee-ae91-499c0730889a",
+				"layer": "Entities",
+				"x": 288,
+				"y": 48,
+				"width": 16,
+				"height": 16,
+				"color": 15389866,
+				"customFields" : {}
+			},
+			{
+				"id": "BrownShroom",
+				"iid": "3dab8e10-fec0-11ee-ae91-93cc5f4e7b66",
+				"layer": "Entities",
+				"x": 272,
+				"y": 48,
 				"width": 16,
 				"height": 16,
 				"color": 15389866,
@@ -228,7 +322,7 @@
 				"iid": "b3e0bad0-fec0-11ee-8684-4f8f23c54744",
 				"layer": "Entities",
 				"x": 624,
-				"y": 224,
+				"y": 336,
 				"width": 16,
 				"height": 16,
 				"color": 1496242,
@@ -243,7 +337,7 @@
 				"iid": "4ac81140-fec0-11ee-ae91-931fac7d3b89",
 				"layer": "Entities",
 				"x": 656,
-				"y": 233,
+				"y": 345,
 				"width": 32,
 				"height": 8,
 				"color": 5925256,
@@ -252,8 +346,8 @@
 						"battery1"
 					],
 					"dest": {
-						"cx": 42,
-						"cy": 11
+						"cx": 45,
+						"cy": 12
 					},
 					"angle": 60,
 					"facing_left": true
@@ -264,7 +358,7 @@
 				"iid": "4c1db630-fec0-11ee-ae91-a5414157f005",
 				"layer": "Entities",
 				"x": 656,
-				"y": 226,
+				"y": 338,
 				"width": 32,
 				"height": 8,
 				"color": 5925256,
@@ -273,8 +367,8 @@
 						"battery1"
 					],
 					"dest": {
-						"cx": 42,
-						"cy": 11
+						"cx": 45,
+						"cy": 12
 					},
 					"angle": 0,
 					"facing_left": true
@@ -285,7 +379,7 @@
 				"iid": "686f9ec0-fec0-11ee-ae91-c38a23dfbfdd",
 				"layer": "Entities",
 				"x": 688,
-				"y": 226,
+				"y": 338,
 				"width": 32,
 				"height": 8,
 				"color": 5925256,
@@ -294,8 +388,8 @@
 						"battery1"
 					],
 					"dest": {
-						"cx": 42,
-						"cy": 11
+						"cx": 45,
+						"cy": 12
 					},
 					"angle": 120,
 					"facing_left": true
@@ -306,7 +400,7 @@
 				"iid": "c8ab8ba0-fec0-11ee-ae91-77b745cebea1",
 				"layer": "Entities",
 				"x": 688,
-				"y": 233,
+				"y": 345,
 				"width": 32,
 				"height": 8,
 				"color": 5925256,
@@ -315,8 +409,8 @@
 						"battery1"
 					],
 					"dest": {
-						"cx": 42,
-						"cy": 11
+						"cx": 45,
+						"cy": 12
 					},
 					"angle": 180,
 					"facing_left": true
@@ -327,7 +421,7 @@
 				"iid": "f68efb60-fec0-11ee-ae91-914d8646b08c",
 				"layer": "Entities",
 				"x": 720,
-				"y": 233,
+				"y": 345,
 				"width": 32,
 				"height": 8,
 				"color": 5925256,
@@ -336,8 +430,8 @@
 						"battery1"
 					],
 					"dest": {
-						"cx": 42,
-						"cy": 11
+						"cx": 45,
+						"cy": 12
 					},
 					"angle": 300,
 					"facing_left": true
@@ -348,7 +442,7 @@
 				"iid": "085c7a20-fec0-11ee-ae91-5f243cf85578",
 				"layer": "Entities",
 				"x": 720,
-				"y": 226,
+				"y": 338,
 				"width": 32,
 				"height": 8,
 				"color": 5925256,
@@ -357,8 +451,8 @@
 						"battery1"
 					],
 					"dest": {
-						"cx": 42,
-						"cy": 11
+						"cx": 45,
+						"cy": 12
 					},
 					"angle": 240,
 					"facing_left": true
