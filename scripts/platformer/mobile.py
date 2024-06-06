@@ -2,8 +2,8 @@ from itertools import cycle
 
 import pygame
 
-from scripts import sprite
-from scripts.animation import Animation, NoLoopAnimation, flip_surface
+from scripts import sprite, timer
+from scripts.animation import Animation, flip_surface
 
 GRAVITY = pygame.Vector2(0, 50)  # TODO: sideways gravity?????
 ACCEL_SPEED = 6
@@ -126,10 +126,12 @@ class BoingerBeetle(PhysicsSprite):
         self.hit_image = self.level.game.loader.get_spritesheet(
             "platformer-sprites.png"
         )[12]
+        self.moving = custom_fields["moving"]
         self.hit_wait = 0.2
         self.hit_timer = 0
         self.facing_left = True
         self.image = self.anim.image
+        self.hop_timer = timer.Timer(1000, self.hop, True)
 
     def on_xy_collision(self):
         self.facing_left = not self.facing_left
@@ -138,8 +140,14 @@ class BoingerBeetle(PhysicsSprite):
         self.collision_rect.center = self.rect.center
         self.collision_rect.top += 5
 
+    def hop(self):
+        if not self.moving:
+            self.velocity.y = -JUMP_SPEED * 0.1
+
     def update(self, dt):
-        self.velocity.x = WALK_SPEED * 0.3 * (-1 + self.facing_left * 2)
+        self.hop_timer.update()
+        if self.moving:
+            self.velocity.x = WALK_SPEED * 0.3 * (-1 + self.facing_left * 2)
         self.anim.flip_x = self.facing_left
         if not super().update(dt):
             return False

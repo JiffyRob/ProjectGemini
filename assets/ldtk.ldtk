@@ -2924,7 +2924,10 @@
 							"height": 16,
 							"defUid": 40,
 							"px": [416,336],
-							"fieldInstances": [{ "__identifier": "moving", "__type": "Bool", "__value": false, "__tile": null, "defUid": 128, "realEditorValues": [] }],
+							"fieldInstances": [{ "__identifier": "moving", "__type": "Bool", "__value": true, "__tile": null, "defUid": 128, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ true ]
+							}] }],
 							"__worldX": 720,
 							"__worldY": 224
 						},
@@ -2940,7 +2943,10 @@
 							"height": 16,
 							"defUid": 40,
 							"px": [528,336],
-							"fieldInstances": [{ "__identifier": "moving", "__type": "Bool", "__value": false, "__tile": null, "defUid": 128, "realEditorValues": [] }],
+							"fieldInstances": [{ "__identifier": "moving", "__type": "Bool", "__value": true, "__tile": null, "defUid": 128, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ true ]
+							}] }],
 							"__worldX": 832,
 							"__worldY": 224
 						},
@@ -3331,7 +3337,10 @@
 							"height": 16,
 							"defUid": 40,
 							"px": [320,112],
-							"fieldInstances": [{ "__identifier": "moving", "__type": "Bool", "__value": false, "__tile": null, "defUid": 128, "realEditorValues": [] }],
+							"fieldInstances": [{ "__identifier": "moving", "__type": "Bool", "__value": false, "__tile": null, "defUid": 128, "realEditorValues": [{
+								"id": "V_Bool",
+								"params": [ false ]
+							}] }],
 							"__worldX": 624,
 							"__worldY": 0
 						},

@@ -128,7 +128,7 @@
 				"height": 16,
 				"color": 7552569,
 				"customFields": {
-					"moving": false
+					"moving": true
 				}
 			},
 			{
@@ -141,7 +141,7 @@
 				"height": 16,
 				"color": 7552569,
 				"customFields": {
-					"moving": false
+					"moving": true
 				}
 			},
 			{
