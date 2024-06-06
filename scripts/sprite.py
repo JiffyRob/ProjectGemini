@@ -21,7 +21,7 @@ class Sprite:
 
     @property
     def pos(self):
-        return self.rect.center
+        return pygame.Vector2(self.rect.center)
 
     def update(self, dt):
         return True

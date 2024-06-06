@@ -25,6 +25,8 @@ class PhysicsSprite(sprite.Sprite):
         self.on_ground = False
         self.on_downer = False
         self.ducking = False
+        self.ground_rect_relative = pygame.Vector2()
+        self.ground_rect = None
 
     @property
     def collision_rect(self):
@@ -35,6 +37,11 @@ class PhysicsSprite(sprite.Sprite):
 
     def update(self, dt):
         # physics
+        # moving platforms
+        if self.ground_rect:
+            self.rect.center = self.ground_rect.center + self.ground_rect_relative
+        self.ground_rect = None
+        self.ground_rect_relative = None
         # lock velocity
         self.velocity.x = pygame.math.clamp(self.velocity.x, -MAX_X_SPEED, MAX_X_SPEED)
         self.velocity.y = pygame.math.clamp(self.velocity.y, -MAX_Y_SPEED, MAX_Y_SPEED)
@@ -45,7 +52,6 @@ class PhysicsSprite(sprite.Sprite):
         vel = self.velocity * dt + 0.5 * GRAVITY * self.weight * dt**2
         self.velocity += GRAVITY * self.weight * dt
         self.rect.x += vel.x
-        self.on_ground = False
         # bottom of the map
         if self.collision_rect.bottom > self.level.map_rect.bottom:
             self.dead = True
@@ -92,6 +98,8 @@ class PhysicsSprite(sprite.Sprite):
                         self.velocity.y = 0
                         self.on_ground = True
                         self.on_downer = True
+                        self.ground_rect = collided
+                        self.ground_rect_relative = self.pos - self.ground_rect.center
                         break
         self.ducking = False
         return True

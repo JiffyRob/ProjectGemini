@@ -232,7 +232,51 @@
 				"width": 16,
 				"height": 16,
 				"color": 1496242,
-				"customFields" : {}
+				"customFields": {
+					"trigger_id": "battery0"
+				}
+			}
+		],
+		"GunPlatform": [
+			{
+				"id": "GunPlatform",
+				"iid": "05ca5900-fec0-11ee-9518-0df02bf2d909",
+				"layer": "Entities",
+				"x": 655,
+				"y": 232,
+				"width": 32,
+				"height": 8,
+				"color": 5925256,
+				"customFields": {
+					"triggers": [
+						"battery0"
+					],
+					"dest": {
+						"cx": 41,
+						"cy": 10
+					},
+					"angle": 0
+				}
+			},
+			{
+				"id": "GunPlatform",
+				"iid": "16ffdd80-fec0-11ee-9518-8de5a8b57baa",
+				"layer": "Entities",
+				"x": 655,
+				"y": 222,
+				"width": 32,
+				"height": 8,
+				"color": 5925256,
+				"customFields": {
+					"triggers": [
+						"battery0"
+					],
+					"dest": {
+						"cx": 41,
+						"cy": 10
+					},
+					"angle": 180
+				}
 			}
 		]
 	}

@@ -45,6 +45,7 @@ class Level(game_state.GameState):
             "BrownShroom": platformer.immobile.BrownShroom,
             "Player": platformer.player.Player,
             "Battery": platformer.puzzle.Battery,
+            "GunPlatform": platformer.puzzle.GunPlatform,
         },
     )
 
