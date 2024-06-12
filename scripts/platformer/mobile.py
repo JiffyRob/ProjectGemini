@@ -36,6 +36,8 @@ class PhysicsSprite(sprite.Sprite):
         self.collision_rect = self.rect
 
     def update(self, dt):
+        if not super().update(dt):
+            return False
         # physics
         # moving platforms
         if self.ground_rect:

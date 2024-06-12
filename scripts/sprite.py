@@ -25,7 +25,7 @@ class Sprite:
         return pygame.Vector2(self.rect.center)
 
     def update(self, dt):
-        self.effects = [effect.update(dt) for effect in self.effects if not effect.done]
+        self.effects = [effect for effect in self.effects if effect.update(dt)]
         return True
 
 

@@ -256,7 +256,7 @@ class Level(game_state.GameState):
         for sprite in self.gui:
             sprite.update(dt)
         # update visual effects
-        self.effects = [effect.update(dt) for effect in self.effects if not effect.done]
+        self.effects = [effect for effect in self.effects if effect.update(dt)]
         # update script
         if self.script is not None:
             self.script.cycle()
@@ -278,7 +278,9 @@ class Level(game_state.GameState):
         )
         for background in self.backgrounds:
             offset = (
-                -pygame.Vector2(self.viewport_rect.topleft) + pygame.Vector2(0, self.map_rect.height - background.rect.height) + shake_offset
+                -pygame.Vector2(self.viewport_rect.topleft)
+                + pygame.Vector2(0, self.map_rect.height - background.rect.height)
+                + shake_offset
             ).elementwise() * background.mult
             if background.loop_x:
                 offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
@@ -301,7 +303,7 @@ class Level(game_state.GameState):
                     rect,
                 )
                 for effect in sprite.effects:
-                    effect.draw(self.game.window_surface, rect)
+                    effect.draw(sprite.image, self.game.window_surface, rect)
         # draw visual effects
         for effect in self.effects:
             effect.draw(self.game.window_surface)

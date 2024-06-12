@@ -1,5 +1,6 @@
 import pygame
 
+from scripts import timer, visual_fx
 from scripts.animation import Animation, NoLoopAnimation
 from scripts.platformer import mobile
 
@@ -30,6 +31,8 @@ class Player(mobile.PhysicsSprite):
         self.jump_cause = None
         self.image = self.anim_dict[self.state].image
         self.facing_left = False
+        self.pain_timer = timer.Timer(1000)
+        self.pain_timer.finish()
 
     @property
     def below_rect(self):
@@ -127,8 +130,15 @@ class Player(mobile.PhysicsSprite):
         self.image = self.anim_dict[self.state].image
         return super().update(dt) and self.health > 0
 
-    def hurt(self, amount):
-        self.health = max(0, self.health - amount)
+    def hurt(self, amount, deliverer=None, knockback=5):
+        if self.pain_timer.done():
+            self.effects.append(visual_fx.Blink(speed=0.1, count=6))
+            self.health = max(0, self.health - amount)
+            self.pain_timer.reset()
+            if deliverer is not None:
+                motion = (self.pos - deliverer.pos).scale_to_length(knockback)
+                self.rect.x += motion.x
+                self.rect.y += motion.y
 
     def heal(self, amount):
         self.health = min(self.health_capacity, self.health + amount)

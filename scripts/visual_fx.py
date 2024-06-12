@@ -41,12 +41,14 @@ class GrowingCircle:
         self.age += dt
         self.radius = self.age * self.speed
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
-        return self
+        return not self.done
 
-    def draw(self, surface, rect=None):
-        if rect is None:
+    def draw(self, surface, dest_surface=None, dest_rect=None):
+        if dest_rect is None:
             rect = pygame.Rect(0, 0, 0, 0)
-        surface.blit(
+        if dest_surface is None:
+            dest_surface = surface
+        dest_surface.blit(
             self.surface, (rect.topleft, rect.topleft), None, pygame.BLEND_RGB_MULT
         )
         self.done = self.radius >= self.max_radius
@@ -88,12 +90,45 @@ class ShrinkingCircle:
         self.radius = self.max_radius - self.age * self.speed
         self.surface.fill("black")
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
-        return self
+        return not self.done
 
-    def draw(self, surface, rect=None):
-        if rect is None:
-            rect = pygame.Rect(0, 0, 0, 0)
-        surface.blit(
-            self.surface, (rect.topleft, rect.topleft), None, pygame.BLEND_RGB_MULT
-        )
+    def draw(self, surface, dest_surface=None, dest_rect=None):
+        if dest_rect is None:
+            dest_rect = pygame.Rect(0, 0, 0, 0)
+        if dest_surface is None:
+            dest_surface = surface
+        dest_surface.blit(self.surface, dest_rect, None, pygame.BLEND_RGB_MULT)
         self.done = self.radius <= 0
+
+
+class Blink:
+    def __init__(self, color="white", speed=0.2, count=3):
+        self.color = pygame.Color(color)
+        self.speed = speed
+        self.age = 0
+        self.done = False
+        self.count = count
+
+    def update(self, dt):
+        self.age += dt
+        return not self.done
+
+    def draw(self, surface, dest_surface=None, dest_rect=None):
+        if dest_rect is None:
+            dest_rect = pygame.Rect(0, 0, 0, 0)
+        if dest_surface is None:
+            dest_surface = surface
+        index = self.age // self.speed
+        if index % 2:
+            print("blinky")
+            # TODO: pygame.transform.solid_overlay???
+            new_surface = pygame.Surface(surface.get_size()).convert(dest_surface)
+            new_surface.fill(surface.get_colorkey())
+            new_surface.set_colorkey(surface.get_colorkey())
+            pygame.transform.threshold(
+                new_surface, surface, surface.get_colorkey(), set_color=self.color
+            )
+            dest_surface.blit(new_surface, dest_rect)
+        if index >= self.count * 2:
+            self.done = True
+        return not self.done

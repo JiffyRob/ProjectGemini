@@ -113,7 +113,11 @@ class GunPlatform(sprite.Sprite):
             self.angle += dt * self.rotation_speed
             self.angle %= 360
             self.rect.center = self.dest + circle_offset
-        if self.state == self.STATE_ARRIVED and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y) < 8 and self.shoot_timer.done():
+        if (
+            self.state == self.STATE_ARRIVED
+            and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y) < 8
+            and self.shoot_timer.done()
+        ):
             self.shoot()
             self.shoot_timer.reset()
         if self.state == self.STATE_SHOOTING and self.anim_dict[self.state].done():
