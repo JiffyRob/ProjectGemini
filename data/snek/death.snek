@@ -1,0 +1,36 @@
+lock();
+
+fade(FADEOUT_CIRCLE);
+fade(STAY_FADED_OUT, 0, 0, 0);
+fade(FADEOUT_COLOR, 255, 0, 0);
+fade(STAY_FADED_OUT, 255, 0, 0);
+
+answer = ask("GAME OVER.", "Save & Quit", "Quit", "Get ranted at by narrator");
+
+if answer == "Get ranted at by narrator" {
+    write("I'm angry at you.  It's time you heard a piece of my mind.  How can I tell a story if you keep DYING all the time!!??");
+    write("Hear I am, the voiceless little textbox, slaving, day in and day out, to make this story enjoyable.  Do you think I get PAID for this?  NO.  I do this out of the goodness of my heart.  Do you realize how hard a job this is?  You're so BORING.  I haven't even gotten a thank you.  Meanwhile YOU get go traipsing around and collecting emeralds willy nilly.  How come I don't get some of those!!?!  Completely unacceptable.");
+    write("'Look at me!  Tra-la-laaaa!  Oops, I'm dead!'  Now I'm out of a job - you've bungled everything.  You are not at all considerate.");
+    write("You know, my Grandma once said, 'Waste not, want not.'  You just wasted yourself.  What possible reason could you have for doing this...?");
+    write("...");
+    write("It wasn't me was it?");
+    write("...");
+    write("It couldn't be.  It CAN'T be.  What could I have possibly done to make her suicidal?  I'm just the narrator.  Did I not tell her enough?  Come to think of it the lore at the beginning was a bit lacking....");
+    name = get_player_name();
+    write("The story itself was shoddy also....but I didn't write it.  I'm just the narrator.  {name} is lucky I embellished it as much as I did.");
+    write("You have no right to blame me for this.  Speak to the developer.  I have it on good authority that JiffyRob has multiple loose screws in his head.");
+    write("Furthermore, I consider you with as much prestige as a leaky bag of rancid dog meat leaking out of my refrigerator.  Have a nice afterlife, dumpyhead.");
+    claim_bonus = "Claim bonus for listening to narrator's rant (will save and quit)";
+    answer = ask("GAME OVER.", "Save & Quit", claim_bonus);
+    if answer == claim_bonus {
+        save();
+        write("OK....here you go....");
+        rickroll();
+        quit();
+    }
+}
+
+if answer == "Save & Quit" {
+    save();
+}
+quit();

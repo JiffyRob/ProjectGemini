@@ -157,8 +157,6 @@ class Game:
         self.load_input_binding("arrow")
         self.add_input_binding("jiffycontroller")
         self.sound_manager = sound.SoundManager(self.loader)
-        self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(level.Level.load(self, "GeminiII"))
         self.stack.appendleft(menu.MainMenu(self))
         dt = 0
         pygame.key.set_repeat(0, 0)
@@ -179,7 +177,13 @@ class Game:
         self.save.save()
 
     def quit(self):
+        while len(self.stack) > 1:
+            self.stack.clear()
+            self.stack.appendleft(menu.MainMenu(self))
+
+    def exit(self):
         self.running = False
+
 
 
 asyncio.run(Game().run())
