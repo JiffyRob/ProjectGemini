@@ -8,6 +8,8 @@ ACCEL_SPEED = 6
 DECCEL_SPEED = 6
 WALK_SPEED = 84
 JUMP_SPEED = 240
+WALLJUMP_X_SPEED = 120
+WALLJUMP_Y_SPEED = 200
 
 
 class Player(mobile.PhysicsSprite):
@@ -35,12 +37,14 @@ class Player(mobile.PhysicsSprite):
         self.pain_timer = timer.Timer(1000)
         self.pain_timer.finish()
         self.on_wall = False
+        self.from_wall = False
+        self.time_from_wall = 0
         self.time_on_wall = 0
         self.wall_direction = None
 
     @property
     def skidding(self):
-        return self.time_on_wall >= .1 and self.velocity.y >= 0
+        return self.time_on_wall >= .2 and self.velocity.y >= 0
 
     @property
     def below_rect(self):
@@ -81,6 +85,7 @@ class Player(mobile.PhysicsSprite):
         if direction == self.DIRECTION_RIGHT:
             self.on_wall = True
             self.wall_direction = self.DIRECTION_RIGHT
+        self.from_wall = False
 
     def on_fallout(self):
         self.health = 0
@@ -102,11 +107,11 @@ class Player(mobile.PhysicsSprite):
             ):
                 self.knife_pound()
             if self.state in {"idle", "walk", "jump", "skid"}:
-                if held_input["left"]:
+                if held_input["left"] and not self.from_wall:
                     self.walk_left()
-                if held_input["right"]:
+                if held_input["right"] and not self.from_wall:
                     self.walk_right()
-                if not held_input["left"] and not held_input["right"]:
+                if not held_input["left"] and not held_input["right"] and self.on_ground:
                     self.decelerate()
             else:
                 self.velocity.x = 0
@@ -155,6 +160,18 @@ class Player(mobile.PhysicsSprite):
         self.anim_dict[self.state].update(dt)
         self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
+        # push player into walls so they collide
+        if self.on_wall:
+            if self.wall_direction == self.DIRECTION_LEFT:
+                self.velocity.x -= ACCEL_SPEED / 3
+            if self.wall_direction == self.DIRECTION_RIGHT:
+                self.velocity.x += ACCEL_SPEED / 3
+        if self.from_wall:
+            self.time_from_wall += dt
+            if self.time_from_wall >= 0.5:
+                self.from_wall = False
+        if not self.from_wall:
+            self.time_from_wall = 0
         self.on_wall = False
         super().update(dt)
         if not self.on_wall:
@@ -206,6 +223,7 @@ class Player(mobile.PhysicsSprite):
     def jump(self, cause=JUMP_NORMAL):
         forced = cause in {self.JUMP_KNIFE, self.JUMP_PAIN, self.JUMP_BOOSTED}
         if forced or (self.on_ground and self.state in {"idle", "walk"}):
+            self.from_wall = False
             amp = {
                 self.JUMP_NORMAL: 1,
                 self.JUMP_PAIN: 1.1,
@@ -216,6 +234,14 @@ class Player(mobile.PhysicsSprite):
             self.on_ground = False
             self.on_downer = False
             self.jump_cause = cause
+        elif cause in {self.JUMP_NORMAL, self.JUMP_PAIN} and self.skidding:
+            if self.wall_direction == self.DIRECTION_RIGHT:
+                self.velocity.update(-WALLJUMP_X_SPEED, -WALLJUMP_Y_SPEED)
+            if self.wall_direction == self.DIRECTION_LEFT:
+                self.velocity.update(WALLJUMP_X_SPEED, -WALLJUMP_Y_SPEED)
+            self.on_wall = False
+            self.from_wall = True
+
 
     def duck(self):
         self.ducking = True
