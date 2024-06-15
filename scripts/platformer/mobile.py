@@ -15,6 +15,11 @@ JUMP_SPEED = 240
 
 
 class PhysicsSprite(sprite.Sprite):
+    DIRECTION_UP = 1
+    DIRECTION_DOWN = 2
+    DIRECTION_LEFT = 3
+    DIRECTION_RIGHT = 4
+
     def __init__(
         self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields
     ):
@@ -29,7 +34,10 @@ class PhysicsSprite(sprite.Sprite):
         self.ground_rect_relative = pygame.Vector2()
         self.ground_rect = None
 
-    def on_xy_collision(self):
+    def on_xy_collision(self, direction):
+        pass
+
+    def on_fallout(self):
         pass
 
     def update_rects(self):
@@ -57,15 +65,15 @@ class PhysicsSprite(sprite.Sprite):
         self.rect.x += vel.x
         self.update_rects()
         # bottom of the map
-        if self.collision_rect.bottom > self.level.map_rect.bottom:
-            self.dead = True
+        if self.collision_rect.top > self.level.map_rect.bottom:
+            self.on_fallout()
             return False
         if vel.x < 0:
             for collided in sorted(
                 self.level.collision_rects, key=lambda rect: -rect.x
             ):
                 if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision()
+                    self.on_xy_collision(self.DIRECTION_LEFT)
                     self.rect.x += collided.right - self.collision_rect.left
                     self.velocity.x = 0
                     self.update_rects()
@@ -73,7 +81,7 @@ class PhysicsSprite(sprite.Sprite):
         else:
             for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
                 if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision()
+                    self.on_xy_collision(self.DIRECTION_RIGHT)
                     self.rect.x += collided.left - self.collision_rect.right
                     self.velocity.x = 0
                     self.update_rects()
@@ -85,6 +93,7 @@ class PhysicsSprite(sprite.Sprite):
                 self.level.collision_rects, key=lambda rect: -rect.y
             ):
                 if self.collision_rect.colliderect(collided):
+                    self.on_xy_collision(self.DIRECTION_UP)
                     self.rect.y += collided.bottom - self.collision_rect.top
                     self.velocity.y = 0
                     self.update_rects()
@@ -92,6 +101,7 @@ class PhysicsSprite(sprite.Sprite):
         else:
             for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
                 if self.collision_rect.colliderect(collided):
+                    self.on_xy_collision(self.DIRECTION_DOWN)
                     self.rect.y += collided.top - self.collision_rect.bottom
                     self.velocity.y = 0
                     self.on_ground = True
@@ -105,6 +115,7 @@ class PhysicsSprite(sprite.Sprite):
                         old_rect.bottom <= collided.top
                         and self.collision_rect.colliderect(collided)
                     ):
+                        self.on_xy_collision(self.DIRECTION_DOWN)
                         self.rect.y += collided.top - self.collision_rect.bottom
                         self.velocity.y = 0
                         self.on_ground = True
@@ -135,8 +146,9 @@ class BoingerBeetle(PhysicsSprite):
         self.image = self.anim.image
         self.hop_timer = timer.Timer(1000, self.hop, True)
 
-    def on_xy_collision(self):
-        self.facing_left = not self.facing_left
+    def on_xy_collision(self, direction):
+        if direction in {self.DIRECTION_RIGHT, self.DIRECTION_LEFT}:
+            self.facing_left = not self.facing_left
 
     def update_rects(self):
         self.collision_rect.center = self.rect.center

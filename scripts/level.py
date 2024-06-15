@@ -250,7 +250,7 @@ class Level(game_state.GameState):
         )
         self.viewport_rect.clamp_ip(self.map_rect)
         # if player died, end game
-        if self.player not in self.sprites:
+        if self.player.health <= 0:
             self.run_cutscene("death")
         # update gui
         for sprite in self.gui:

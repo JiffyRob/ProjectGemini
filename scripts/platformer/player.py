@@ -1,7 +1,7 @@
 import pygame
 
 from scripts import timer, visual_fx, sprite
-from scripts.animation import Animation, NoLoopAnimation
+from scripts.animation import Animation, NoLoopAnimation, SingleAnimation
 from scripts.platformer import mobile
 
 ACCEL_SPEED = 6
@@ -25,6 +25,7 @@ class Player(mobile.PhysicsSprite):
             "jump": Animation((images[12],)),
             "pound": NoLoopAnimation((images[12:20]), 0.03),
             "pound-recover": NoLoopAnimation((images[20:28]), 0.1),
+            "skid": SingleAnimation(images[28]),
         }
         self.state = "jump"
         self.jump_forced = False
@@ -33,6 +34,13 @@ class Player(mobile.PhysicsSprite):
         self.facing_left = False
         self.pain_timer = timer.Timer(1000)
         self.pain_timer.finish()
+        self.on_wall = False
+        self.time_on_wall = 0
+        self.wall_direction = None
+
+    @property
+    def skidding(self):
+        return self.time_on_wall >= .1 and self.velocity.y >= 0
 
     @property
     def below_rect(self):
@@ -66,6 +74,17 @@ class Player(mobile.PhysicsSprite):
     def emeralds(self, value):
         self.level.game.save.emeralds = value
 
+    def on_xy_collision(self, direction):
+        if direction == self.DIRECTION_LEFT:
+            self.on_wall = True
+            self.wall_direction = self.DIRECTION_LEFT
+        if direction == self.DIRECTION_RIGHT:
+            self.on_wall = True
+            self.wall_direction = self.DIRECTION_RIGHT
+
+    def on_fallout(self):
+        self.health = 0
+
     def swap_state(self, new):
         if self.state != new:
             self.state = new
@@ -82,7 +101,7 @@ class Player(mobile.PhysicsSprite):
                 and self.jump_cause == self.JUMP_NORMAL
             ):
                 self.knife_pound()
-            if self.state in {"idle", "walk", "jump"}:
+            if self.state in {"idle", "walk", "jump", "skid"}:
                 if held_input["left"]:
                     self.walk_left()
                 if held_input["right"]:
@@ -118,7 +137,11 @@ class Player(mobile.PhysicsSprite):
                 self.swap_state("pound-recover")
                 self.level.shake(axes=self.level.AXIS_Y)
         elif not self.on_ground:
-            self.swap_state("jump")
+            if self.skidding:
+                self.swap_state("skid")
+                self.velocity.y *= .9
+            else:
+                self.swap_state("jump")
         elif self.velocity.x and self.state != "pound-recover":
             self.swap_state("walk")
         elif self.state != "pound-recover":
@@ -132,7 +155,14 @@ class Player(mobile.PhysicsSprite):
         self.anim_dict[self.state].update(dt)
         self.anim_dict[self.state].flip_x = self.facing_left
         self.image = self.anim_dict[self.state].image
-        return super().update(dt) and self.health > 0
+        self.on_wall = False
+        super().update(dt)
+        if not self.on_wall:
+            self.time_on_wall = 0
+            self.wall_direction = None
+        else:
+            self.time_on_wall += dt
+        return True
 
     def hurt(self, amount, deliverer=None, knockback=5):
         if self.pain_timer.done():
