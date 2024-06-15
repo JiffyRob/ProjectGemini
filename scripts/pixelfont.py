@@ -51,7 +51,7 @@ class PixelFont:
             row_height = max(row_height, chunk.size[1])
             row_width += chunk.size[0]
             if (width and (row_width > width)) or chunk.type == NEWLINE:
-                row_width = 0
+                row_width = chunk.size[0]
                 height += row_height + 1
             yield (max(row_width - chunk.size[0], 0), height), chunk
 

@@ -291,9 +291,10 @@ class Save(TextButton):
 
     def load(self):
         if self.level.delete_mode:
-            self.level.game.stack.appendleft(
-                DeleteConfirmationMenu(self.level.game, self.name)
-            )
+            if self.name:
+                self.level.game.stack.appendleft(
+                    DeleteConfirmationMenu(self.level.game, self.name)
+                )
             self.level.delete_mode_toggle()
             return
         if self.name:
@@ -356,11 +357,21 @@ class MainMenu(game_state.GameState):
         delete_button = Button(
             self,
             button_rect,
-            self.game.loader.font.render("Delete Mode"),
+            self.game.loader.font.render("Delete Data"),
             self.delete_mode_toggle,
         )
         button_dict[(0, i + 1)] = delete_button
         self.gui.append(delete_button)
+
+        button_rect.top = button_rect.bottom + 3
+        exit_button = Button(
+            self,
+            button_rect,
+            self.game.loader.font.render("Exit Game"),
+            self.game.exit,
+        )
+        self.gui.append(exit_button)
+        button_dict[(0, i + 2)] = exit_button
 
         self.knife = KnifeIndicator(self, button_dict=button_dict)
         self.gui.append(self.knife)
@@ -375,7 +386,7 @@ class MainMenu(game_state.GameState):
     def update(self, dt):
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
         if "quit" in self.game.input_queue.just_pressed:
-            self.game.quit()
+            self.game.exit()
         return super().update(dt)
 
     def draw(self):
@@ -470,9 +481,10 @@ class NameInputMenu(game_state.GameState):
     def confirm_name(self):
         self.game.save.load("start1")
         save_name = "".join(self.input.text).replace("_", "")
-        self.game.save.loaded_path = save_name
-        self.game.save.save()
-        self.game.load_save(save_name)
+        if save_name:
+            self.game.save.loaded_path = save_name
+            self.game.save.save()
+            self.game.load_save(save_name)
 
     def cancel(self):
         self.pop()

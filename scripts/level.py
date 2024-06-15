@@ -96,10 +96,11 @@ class Level(game_state.GameState):
         self.shake_axes = axes
 
     def run_cutscene(self, cutscene_id, extra_constants=None):
-        self.script = snekgemini.cutscene(
-            cutscene_id, level=self, extra_constants=extra_constants
-        )
-        self.script.cycle()
+        if self.script is None:
+            self.script = snekgemini.cutscene(
+                cutscene_id, level=self, extra_constants=extra_constants
+            )
+            self.script.cycle()
 
     def exit_level(self):
         self.run_cutscene("level_exit")
@@ -250,8 +251,7 @@ class Level(game_state.GameState):
         self.viewport_rect.clamp_ip(self.map_rect)
         # if player died, end game
         if self.player not in self.sprites:
-            print("player dead.  Exiting.")
-            return False
+            self.run_cutscene("death")
         # update gui
         for sprite in self.gui:
             sprite.update(dt)

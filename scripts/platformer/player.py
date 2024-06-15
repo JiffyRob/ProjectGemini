@@ -1,6 +1,6 @@
 import pygame
 
-from scripts import timer, visual_fx
+from scripts import timer, visual_fx, sprite
 from scripts.animation import Animation, NoLoopAnimation
 from scripts.platformer import mobile
 
@@ -37,6 +37,10 @@ class Player(mobile.PhysicsSprite):
     @property
     def below_rect(self):
         return pygame.FRect(self.rect.left, self.rect.bottom, self.rect.width, 3)
+
+    @property
+    def name(self):
+        return self.level.game.save.loaded_path
 
     @property
     def health(self):
@@ -185,3 +189,8 @@ class Player(mobile.PhysicsSprite):
 
     def duck(self):
         self.ducking = True
+
+
+class DeadPlayer(sprite.Sprite):
+    def __init__(self, level, rect, z=0, **custom_fields):
+        image = level.game.loader.get_spritesheet("me.png")[29]

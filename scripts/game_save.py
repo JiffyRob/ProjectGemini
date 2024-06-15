@@ -27,7 +27,10 @@ class GameSave:
     def save(self, path=None):
         if path is None:
             path = self.loaded_path
+        old_health = self.health
+        self.health = self.health_capacity
         self.game.loader.save_data(path, self.data)
+        self.health = old_health
 
     def delete(self, path=None):
         if path is None:

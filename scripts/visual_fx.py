@@ -101,6 +101,60 @@ class ShrinkingCircle:
         self.done = self.radius <= 0
 
 
+class FadeOut:
+    def __init__(self, color='black', duration=1):
+        self.age = 0
+        self.duration = duration
+        self.color = pygame.Color(color)
+        self.done = False
+        print('new')
+
+    def update(self, dt):
+        self.age += dt
+        self.done = self.age >= self.duration
+        return not self.done
+
+    def draw(self, surface, dest_surface=None, dest_rect=None):
+        if dest_surface is None:
+            dest_surface = surface
+        if dest_rect is None:
+            dest_rect = dest_surface.get_rect()
+        surface = pygame.Surface(dest_rect.size, pygame.SRCALPHA)
+        self.color.a = pygame.math.clamp(round(self.age * 255 / self.duration), 0, 255)
+        surface.fill(self.color)
+        dest_surface.blit(surface, dest_rect)
+        return not self.done
+
+
+class EternalSolid:
+    def __init__(self, color):
+        self.color = color
+        self.done = False
+
+    def update(self, dt):
+        return True
+
+    def draw(self, surface, dest_surface=None, dest_rect=None):
+        if dest_surface is None:
+            dest_surface = surface
+        if dest_rect is None:
+            dest_rect = dest_surface.get_rect()
+        pygame.draw.rect(dest_surface, self.color, dest_rect)
+
+
+class FadeIn(FadeOut):
+    def draw(self, surface, dest_surface=None, dest_rect=None):
+        if dest_surface is None:
+            dest_surface = surface
+        if dest_rect is None:
+            dest_rect = dest_surface.get_rect()
+        surface = pygame.Surface(dest_rect.size, pygame.SRCALPHA)
+        self.color.a = pygame.math.clamp((self.duration - self.age) * 255 / self.duration, 0, 255)
+        surface.fill(self.color)
+        dest_surface.blit(surface, dest_rect)
+        return not self.done
+
+
 class Blink:
     def __init__(self, color="white", speed=0.2, count=3):
         self.color = pygame.Color(color)
