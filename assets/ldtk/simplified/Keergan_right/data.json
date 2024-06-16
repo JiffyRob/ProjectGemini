@@ -458,6 +458,19 @@
 					"facing_left": true
 				}
 			}
+		],
+		"CrazyMushroom": [
+			{
+				"id": "CrazyMushroom",
+				"iid": "a1fba3d0-25d0-11ef-9e5a-b5dcbc1cefce",
+				"layer": "Entities",
+				"x": 48,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 16705377,
+				"customFields" : {}
+			}
 		]
 	}
 }

@@ -30,6 +30,24 @@ class Emerald(sprite.Sprite):
         return True
 
 
+class CrazyMushroom(sprite.Sprite):
+    groups = {"interactable", "static-collision"}
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        super().__init__(level, None, rect, z)
+        frames = self.level.game.loader.get_spritesheet("platformer-sprites.png")[35:38]
+        self.anim = Animation(frames, speed=0.2)
+
+    def update(self, dt):
+        if not super().update(dt):
+            return False
+        self.anim.update(dt)
+        self.image = self.anim.image()
+
+    def interact(self):
+        self.level.run_cutscene("psychedelic")
+
+
 class Prop(sprite.Sprite):
     FIRST = 13
     LAST = 15

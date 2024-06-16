@@ -50,7 +50,7 @@ class GunPlatform(sprite.Sprite):
     STATE_SHOOTING = 4
 
     def __init__(self, level, rect, z, **custom_fields):
-        super().__init__(level, None, rect, z)
+        super().__init__(level, None, rect, z - 1)
         self.collision_rect = self.rect
         on_frame, *shoot_frames, off_frame = level.game.loader.get_spritesheet(
             "platformer-sprites.png", (32, 8)

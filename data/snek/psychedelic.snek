@@ -1,0 +1,18 @@
+lock();
+# Funny dream sequence
+play_soundtrack("SunflowerGrove");
+fade(FADEOUT_COLOR, 243, 246, 71);
+fade(STAY_FADED_OUT, 243, 246, 71);
+write("What a strange dream!  If only I could remember what was in it....", 0);  # second argument is whether to block until finished
+wait(6000);
+# Ford picks you up
+fade(KILL_ALL);
+fade(FADEIN_COLOR, 243, 246, 71);
+play_soundtrack("Ford Perfect");
+spawn_ship("ford", -99, 8, 120, 52);
+write("Fancy meeting you here!  Need a lift?  Of course you do.  That's quite the ship you broke.")
+write("You certainly could have picked a worse spot to crash in.  I LOVE this planet-matches my car.  Hop in!");
+fade(FADEOUT_COLOR, 0, 0, 0);
+fade(STAY_FADED_OUT, 0, 0, 0);
+# Enter Ford's Home Base (runs its own cutscene)
+map_switch("Fordvania");

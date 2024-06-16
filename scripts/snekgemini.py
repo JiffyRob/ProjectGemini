@@ -8,10 +8,11 @@ class Write(snek.SnekCommand):
     WRITING = 1
     WRITTEN = 2
 
-    def __init__(self, text):
+    def __init__(self, text, blocking=True):
         super().__init__(required_context=("LEVEL",))
         self.state = self.UNWRITTEN
         self.text = text
+        self.blocking = blocking
 
     def finish_writing(self, _):
         self.state = self.WRITTEN
@@ -25,7 +26,10 @@ class Write(snek.SnekCommand):
         elif self.state == self.UNWRITTEN:
             self.context["LEVEL"].start_dialog(self.text, on_finish=self.finish_writing)
             self.state = self.WRITING
-            return snek.UNFINISHED
+            if self.blocking:
+                return snek.UNFINISHED
+            else:
+                return snek.NULL
         elif self.state == self.WRITING:
             return snek.UNFINISHED
         elif self.state == self.WRITTEN:
