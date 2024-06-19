@@ -5,8 +5,23 @@ import pygame
 from scripts import loader
 
 
-class GrowingCircle:
+class VisualEffect:
+    def __init__(self):
+        self.done= False
+
+    def update(self, dt):
+        pass
+
+    def draw(self, surface):
+        return None
+
+    def draw_over(self, dest_surface, dest_rect):
+        return None
+
+
+class CircleTransitionIn(VisualEffect):
     def __init__(self, size, position, speed=64):
+        super().__init__()
         self.size = pygame.Vector2(size)
         self.surface = loader.Loader.create_surface(size)
         self.surface.fill("black")
@@ -31,7 +46,6 @@ class GrowingCircle:
                 ]
             )
         )
-        self.done = False
 
     @property
     def position(self):
@@ -41,21 +55,21 @@ class GrowingCircle:
         self.age += dt
         self.radius = self.age * self.speed
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
+        self.done = self.radius >= self.max_radius
         return not self.done
 
-    def draw(self, surface, dest_surface=None, dest_rect=None):
-        if dest_rect is None:
-            rect = pygame.Rect(0, 0, 0, 0)
-        if dest_surface is None:
-            dest_surface = surface
-        dest_surface.blit(
-            self.surface, (rect.topleft, rect.topleft), None, pygame.BLEND_RGB_MULT
+    def draw(self, surface):
+        surface.blit(
+            self.surface, (0, 0), None, pygame.BLEND_RGB_MULT
         )
-        self.done = self.radius >= self.max_radius
+
+    def draw_over(self, dest_surface, dest_rect):
+        dest_surface.blit(self.surface, dest_rect, None, pygame.BLEND_RGB_MULT)
 
 
-class ShrinkingCircle:
+class CircleTransitionOut(VisualEffect):
     def __init__(self, size, position, speed=64):
+        super().__init__()
         self.size = pygame.Vector2(size)
         self.surface = loader.Loader.create_surface(self.size)
         self.surface.fill("white")
@@ -79,7 +93,6 @@ class ShrinkingCircle:
                 ]
             )
         )
-        self.done = False
 
     @property
     def position(self):
@@ -89,100 +102,89 @@ class ShrinkingCircle:
         self.age += dt
         self.radius = self.max_radius - self.age * self.speed
         self.surface.fill("black")
+        self.done = self.radius <= 0
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
         return not self.done
 
-    def draw(self, surface, dest_surface=None, dest_rect=None):
-        if dest_rect is None:
-            dest_rect = pygame.Rect(0, 0, 0, 0)
-        if dest_surface is None:
-            dest_surface = surface
-        dest_surface.blit(self.surface, dest_rect, None, pygame.BLEND_RGB_MULT)
-        self.done = self.radius <= 0
+    def draw(self, surface):
+        surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
 
 
-class FadeOut:
+class ColorTransitionOut(VisualEffect):
     def __init__(self, color='black', duration=1):
+        super().__init__()
         self.age = 0
         self.duration = duration
         self.color = pygame.Color(color)
-        self.done = False
-        print('new')
 
     def update(self, dt):
         self.age += dt
         self.done = self.age >= self.duration
-        return not self.done
-
-    def draw(self, surface, dest_surface=None, dest_rect=None):
-        if dest_surface is None:
-            dest_surface = surface
-        if dest_rect is None:
-            dest_rect = dest_surface.get_rect()
-        surface = pygame.Surface(dest_rect.size, pygame.SRCALPHA)
         self.color.a = pygame.math.clamp(round(self.age * 255 / self.duration), 0, 255)
+        return not self.done
+
+    def draw(self, surface):
+        color_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
+        color_surface.fill(self.color)
+        surface.blit(color_surface, (0, 0))
+
+    def draw_over(self, dest_surface, dest_rect):
+        surface = pygame.Surface(dest_rect.size, pygame.SRCALPHA)
         surface.fill(self.color)
-        dest_surface.blit(surface, dest_rect)
+        surface.blit(surface, dest_rect)
+
+
+class ColorTransitionIn(ColorTransitionOut):
+    def update(self, dt):
+        self.age += dt
+        self.done = self.age >= self.duration
+        self.color.a = pygame.math.clamp(255 - round(self.age * 255 / self.duration), 0, 255)
         return not self.done
 
 
-class EternalSolid:
-    def __init__(self, color):
+class Fill(VisualEffect):
+    def __init__(self, color, duration):
+        super().__init__()
         self.color = color
-        self.done = False
+        self.duration = duration
+        self.age = 0
 
     def update(self, dt):
-        return True
-
-    def draw(self, surface, dest_surface=None, dest_rect=None):
-        if dest_surface is None:
-            dest_surface = surface
-        if dest_rect is None:
-            dest_rect = dest_surface.get_rect()
-        pygame.draw.rect(dest_surface, self.color, dest_rect)
-
-
-class FadeIn(FadeOut):
-    def draw(self, surface, dest_surface=None, dest_rect=None):
-        if dest_surface is None:
-            dest_surface = surface
-        if dest_rect is None:
-            dest_rect = dest_surface.get_rect()
-        surface = pygame.Surface(dest_rect.size, pygame.SRCALPHA)
-        self.color.a = pygame.math.clamp((self.duration - self.age) * 255 / self.duration, 0, 255)
-        surface.fill(self.color)
-        dest_surface.blit(surface, dest_rect)
+        self.age += dt
+        self.done = (self.age >= self.duration) and self.duration
         return not self.done
 
+    def draw(self, surface):
+        surface.fill(self.color)
 
-class Blink:
+    def draw_over(self, dest_surface, dest_rect):
+        dest_surface.fill(self.color, dest_rect)
+
+
+class Blink(VisualEffect):
     def __init__(self, color="white", speed=0.2, count=3):
+        super().__init__()
         self.color = pygame.Color(color)
         self.speed = speed
         self.age = 0
-        self.done = False
         self.count = count
 
     def update(self, dt):
         self.age += dt
         return not self.done
 
-    def draw(self, surface, dest_surface=None, dest_rect=None):
-        if dest_rect is None:
-            dest_rect = pygame.Rect(0, 0, 0, 0)
-        if dest_surface is None:
-            dest_surface = surface
+    def draw(self, surface):
         index = self.age // self.speed
         if index % 2:
-            print("blinky")
-            # TODO: pygame.transform.solid_overlay???
-            new_surface = pygame.Surface(surface.get_size()).convert(dest_surface)
+            new_surface = pygame.Surface(surface.get_size())
             new_surface.fill(surface.get_colorkey())
             new_surface.set_colorkey(surface.get_colorkey())
             pygame.transform.threshold(
                 new_surface, surface, surface.get_colorkey(), set_color=self.color
             )
-            dest_surface.blit(new_surface, dest_rect)
+            surface.blit(new_surface, (0, 0))
         if index >= self.count * 2:
             self.done = True
-        return not self.done
+
+    def draw_over(self, dest_surface, dest_rect):
+        raise TypeError(f"{self.__class__} cannot be drawn over other surfaces due to no transparency info")

@@ -126,6 +126,15 @@ class Player(mobile.PhysicsSprite):
                 self.duck()
             if "quit" in self.level.game.input_queue.just_pressed:
                 self.level.run_cutscene("quit")
+            if "interact" in just_input:
+                if self.facing_left:
+                    interaction_rect = self.rect.move(-8, 0)
+                else:
+                    interaction_rect = self.rect.move(8, 0)
+                for sprite in self.level.groups["interactable"]:
+                    if interaction_rect.colliderect(sprite.collision_rect):
+                        sprite.interact()
+                        break
         if self.state == "pound":
             hit = self.on_ground
             if not hit and not self.ducking:

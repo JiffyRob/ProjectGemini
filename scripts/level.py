@@ -46,6 +46,8 @@ class Level(game_state.GameState):
             "Player": platformer.player.Player,
             "Battery": platformer.puzzle.Battery,
             "GunPlatform": platformer.puzzle.GunPlatform,
+            "CrazyMushroom": platformer.immobile.CrazyMushroom,
+            "Ship": platformer.mobile.Ship,
         },
     )
 
@@ -66,9 +68,12 @@ class Level(game_state.GameState):
         self.soundtrack = soundtrack
         if is_platformer:
             self.player = platformer.player.Player(self)
+            self.is_platformer = True
         else:
             self.player = topdown.mobile.Player(self)
+            self.is_platformer = False
         self.is_house = is_house
+        self.entity_layer = 0
         self.player.rect.center = player_pos
         self.sprites = {self.player}
         self.to_add = set()
@@ -118,6 +123,14 @@ class Level(game_state.GameState):
 
     def add_effect(self, effect):
         self.effects.append(effect)
+
+    def clear_effects(self):
+        self.effects.clear()
+
+    def spawn(self, sprite_name, rect, z=None, **custom_fields):
+        if z is None:
+            z = self.entity_layer
+        self.add_sprite(self.sprite_classes[self.is_platformer][sprite_name](self, rect, z, **custom_fields))
 
     def add_sprite(self, sprite):
         self.to_add.add(sprite)
@@ -189,6 +202,7 @@ class Level(game_state.GameState):
                 )
         # tile layers
         entity_layer = data["customFields"]["entity_layer"]
+        level.entity_layer = entity_layer
         for layer_ind, layer in enumerate(data["layers"]):
             level.add_sprite(
                 sprite.Sprite(
@@ -297,13 +311,11 @@ class Level(game_state.GameState):
                 (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
                 + shake_offset
             )
-            if sprite.image is not None:
+            if sprite.to_draw is not None:
                 self.game.window_surface.blit(
-                    sprite.image,
+                    sprite.to_draw,
                     rect,
                 )
-                for effect in sprite.effects:
-                    effect.draw(sprite.image, self.game.window_surface, rect)
         # draw visual effects
         for effect in self.effects:
             effect.draw(self.game.window_surface)

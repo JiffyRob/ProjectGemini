@@ -35,6 +35,7 @@ class CrazyMushroom(sprite.Sprite):
 
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, None, rect, z)
+        self.collision_rect = self.rect
         frames = self.level.game.loader.get_spritesheet("platformer-sprites.png")[35:38]
         self.anim = Animation(frames, speed=0.2)
 
@@ -42,7 +43,8 @@ class CrazyMushroom(sprite.Sprite):
         if not super().update(dt):
             return False
         self.anim.update(dt)
-        self.image = self.anim.image()
+        self.image = self.anim.image
+        return True
 
     def interact(self):
         self.level.run_cutscene("psychedelic")

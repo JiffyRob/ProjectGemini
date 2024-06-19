@@ -1,4 +1,4 @@
-from itertools import cycle
+from math import sin
 
 import pygame
 
@@ -134,7 +134,7 @@ class Ship(sprite.Sprite):
     }
 
     def __init__(self, level, rect=(0, 0, 48, 32), z=0, **custom_fields):
-        ship_image = level.game.loader.get_surface("platformer-sprite.png", self.SHIPS[custom_fields["ship"]])
+        ship_image = level.game.loader.get_surface("platformer-sprites.png", self.SHIPS[custom_fields["ship_type"]])
         super().__init__(level, ship_image, rect, z)
         self.start = pygame.Vector2(custom_fields["start"])
         self.dest = pygame.Vector2(custom_fields["dest"])
@@ -143,7 +143,11 @@ class Ship(sprite.Sprite):
 
     def update(self, dt):
         self.age += dt
-        self.rect.center = self.start.lerp(self.dest, easings.in_out_cubic(self.age / self.duration))
+        if self.age <= self.duration:
+            self.rect.center = self.start.lerp(self.dest, pygame.math.clamp(easings.in_out_cubic(self.age / self.duration), 0, 1))
+        else:
+            self.rect.center = self.dest + (0, 1.5 * sin(self.age * 3))
+        return super().update(dt)
 
 
 class BoingerBeetle(PhysicsSprite):
