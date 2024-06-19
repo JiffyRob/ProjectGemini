@@ -86,7 +86,6 @@ class GunPlatform(sprite.Sprite):
             self.anim_dict[self.state].restart()
 
     def update(self, dt):
-        super().update(dt)
         self.shoot_timer.update(dt)
         for trigger in self.triggers:
             triggered = False
@@ -132,4 +131,4 @@ class GunPlatform(sprite.Sprite):
             self.state = self.STATE_ARRIVED
         self.anim_dict[self.state].update(dt)
         self.image = self.anim_dict[self.state].image
-        return True
+        return super().update(dt)

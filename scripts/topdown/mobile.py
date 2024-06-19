@@ -47,7 +47,7 @@ class PhysicsSprite(sprite.Sprite):
             departure_directions.append("right")
         if departure_directions:
             self.on_map_departure(departure_directions)
-        return True
+        return super().update(dt)
 
 
 class Player(PhysicsSprite):
@@ -194,7 +194,7 @@ class Player(PhysicsSprite):
         self.desired_velocity.y += WALK_SPEED
 
 
-def search(start: tuple | pygame.Vector2, dist: int | float = 1):
+def search(start: tuple | pygame.Vector2):
     """yields positions in a grid of spacing 'dist', in order of rough proximity to 'start'"""
 
     def neighbors(position: tuple[int]):

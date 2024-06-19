@@ -44,8 +44,6 @@ class PhysicsSprite(sprite.Sprite):
         self.collision_rect = self.rect
 
     def update(self, dt):
-        if not super().update(dt):
-            return False
         # physics
         # moving platforms
         if self.ground_rect:
@@ -126,7 +124,7 @@ class PhysicsSprite(sprite.Sprite):
                         self.update_rects()
                         break
         self.ducking = False
-        return True
+        return super().update(dt)
 
 
 class Ship(sprite.Sprite):
@@ -186,8 +184,6 @@ class BoingerBeetle(PhysicsSprite):
         if self.moving:
             self.velocity.x = WALK_SPEED * 0.3 * (-1 + self.facing_left * 2)
         self.anim.flip_x = self.facing_left
-        if not super().update(dt):
-            return False
         if (
             self.collision_rect.colliderect(self.level.player.collision_rect)
             and self.level.player.velocity.y > 0
@@ -199,4 +195,4 @@ class BoingerBeetle(PhysicsSprite):
             self.hit_timer -= dt
         else:
             self.image = self.anim.image
-        return True
+        return super().update(dt)

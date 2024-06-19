@@ -37,8 +37,7 @@ class Interactable(sprite.Sprite):
             if self.interpreter.done():
                 self.running_script = False
                 self.interpreter = None
-        super().update(dt)
-        return True
+        return super().update(dt)
 
 
 class Ship(Interactable):
@@ -107,13 +106,12 @@ class House(Interactable):
         )
 
     def update(self, dt):
-        super().update(dt)
         if self.level.player.collision_rect.colliderect(self.teleport_rect):
             self.level.player.rect.top += (
                 self.teleport_rect.bottom - self.level.player.collision_rect.top
             )
             self.level.switch_level(self.dest_map)
-        return True
+        return super().update(dt)
 
 
 class Furniture(Interactable):

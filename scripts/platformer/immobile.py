@@ -18,8 +18,6 @@ class Emerald(sprite.Sprite):
         self.collision_rect = self.rect.inflate(-8, -4)
 
     def update(self, dt):
-        if not super().update(dt):
-            return False
         if self.collision_rect.colliderect(self.level.player.collision_rect):
             self.level.player.pay(5)
             return False
@@ -27,7 +25,7 @@ class Emerald(sprite.Sprite):
         self.image = self.anim.image
         self.rect.top = self.y + 1.5 * sin(self.age * 2)
         self.age += dt
-        return True
+        return super().update(dt)
 
 
 class CrazyMushroom(sprite.Sprite):
@@ -40,11 +38,9 @@ class CrazyMushroom(sprite.Sprite):
         self.anim = Animation(frames, speed=0.2)
 
     def update(self, dt):
-        if not super().update(dt):
-            return False
         self.anim.update(dt)
         self.image = self.anim.image
-        return True
+        return super().update(dt)
 
     def interact(self):
         self.level.run_cutscene("psychedelic")
@@ -66,10 +62,9 @@ class Prop(sprite.Sprite):
         # util_draw.debug_show(self.anim.image)
 
     def update(self, dt):
-        super().update(dt)
         self.anim.update(dt)
         self.image = self.anim.image
-        return True
+        return super().update(dt)
 
 
 class BrownShroom(Prop):
@@ -92,8 +87,6 @@ class BustedParts(sprite.Sprite):
         self.collision_rect.bottom = self.rect.bottom
 
     def update(self, dt):
-        if not super().update(dt):
-            return False
         self.anim.update(dt)
         if self.collision_rect.colliderect(self.level.player.collision_rect):
             self.image = self.hit_image
@@ -104,7 +97,7 @@ class BustedParts(sprite.Sprite):
             self.hit_time -= dt
         else:
             self.image = self.anim.image
-        return True
+        return super().update(dt)
 
 
 class CollisionSprite(sprite.Sprite):
@@ -114,9 +107,6 @@ class CollisionSprite(sprite.Sprite):
         if image is None:
             image = pygame.Surface(rect[2:]).convert_alpha()
         super().__init__(level, image=image, rect=rect, z=z)
-
-    def update(self, dt):
-        pass  # No physics on a static sprite
 
     @property
     def collision_rect(self):

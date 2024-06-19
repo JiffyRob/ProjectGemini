@@ -11,11 +11,10 @@ class Laser(sprite.Sprite):
         self.velocity = direction
 
     def update(self, dt):
-        super().update(dt)
         self.rect.center += self.velocity * dt
         if self.rect.colliderect(self.level.player.collision_rect):
             self.level.player.hurt(2)
             return False
         if self.rect.collidelist(self.level.collision_rects) != -1:
             return False
-        return self.rect.colliderect(self.level.map_rect)
+        return self.rect.colliderect(self.level.map_rect) and super().update(dt)
