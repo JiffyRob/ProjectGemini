@@ -65,7 +65,8 @@ class Game:
     def load_map(self, map_name):
         print("loading level:", map_name)
         self.stack.appendleft(level.Level.load(self, map_name))
-        self.save.planet = map_name
+        if "_" not in map_name:
+            self.save.planet = map_name
 
     def load_save(self, save_name):
         print("opening save:", save_name)

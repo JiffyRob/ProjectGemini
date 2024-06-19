@@ -16,6 +16,8 @@ class GameSave:
         return self.data[attr]
 
     def __setattr__(self, name, value):
+        if name == "planet":
+            raise Exception
         if name in {"data", "game"}:
             return super().__setattr__(name, value)
         self.data[name] = value

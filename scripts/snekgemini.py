@@ -170,7 +170,7 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
     if extra_constants is None:
         extra_constants = {}
     return snek.SNEKProgram(
-        level.game.loader.get_text(f"snek/{script_name}.snek"),
+        level.game.loader.get_script(f"{script_name}.snek"),
         {
             "RUNNER": runner,
             "LEVEL": level,
@@ -202,5 +202,7 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "fadeout_circle": FadeOutCircle,
             "fill": Fill,
             "clear_effects": snek.snek_command(level.clear_effects),
+            "run_cutscene": snek.snek_command(lambda *args: level.run_cutscene(*args, override=True)),
+            "attempt_map_cutscene": snek.snek_command(level.attempt_map_cutscene),
         },
     )

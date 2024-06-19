@@ -2,3 +2,4 @@ lock();
 fadein_circle();
 play_soundtrack(LEVEL_SOUNDTRACK);
 unlock();
+attempt_map_cutscene();

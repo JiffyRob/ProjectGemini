@@ -100,12 +100,22 @@ class Level(game_state.GameState):
         self.shake_delta += delta
         self.shake_axes = axes
 
-    def run_cutscene(self, cutscene_id, extra_constants=None):
-        if self.script is None:
+    def run_cutscene(self, cutscene_id, extra_constants=None, override=False):
+        if self.script is None or override:
             self.script = snekgemini.cutscene(
                 cutscene_id, level=self, extra_constants=extra_constants
             )
             self.script.cycle()
+
+    def attempt_map_cutscene(self, override=True):
+        if self.script is not None and not override:
+            return False
+        try:
+            self.run_cutscene(self.name , override=True)
+            return True
+        except FileNotFoundError:
+            print("No file found :/", self.name)
+            return False
 
     def exit_level(self):
         self.run_cutscene("level_exit")

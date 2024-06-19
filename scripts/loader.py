@@ -1,7 +1,6 @@
 import functools
 import gzip
 import json
-import os
 import pathlib
 
 import pygame
@@ -18,6 +17,7 @@ class Loader:
         self.save_path = self.data_path / "saves"
         self.sound_path = self.base_path / "sound"
         self.music_path = self.base_path / "music"
+        self.script_path = self.base_path / "data" / "snek"
         self.font = pixelfont.PixelFont(self.get_spritesheet("font.png", (7, 8)))
 
     def join(self, path):
@@ -40,6 +40,9 @@ class Loader:
 
     def join_save(self, path):
         return self.save_path / path
+
+    def join_script(self, path):
+        return self.script_path / path
 
     @functools.cache
     def get_text(self, path, for_map=False):
@@ -123,6 +126,12 @@ class Loader:
     def get_sound(self, path):
         path = self.join_sound(path).with_suffix(".wav")
         return pygame.mixer.Sound(path)
+
+    @functools.cache
+    def get_script(self, path):
+        path = self.join_script(path).with_suffix(".snek")
+        with path.open() as file:
+            return file.read()
 
     # not cached because save files change
     def get_save(self, path):
