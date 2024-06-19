@@ -3477,6 +3477,22 @@
 							"fieldInstances": [],
 							"__worldX": 352,
 							"__worldY": -256
+						},
+						{
+							"__identifier": "CrazyMushroom",
+							"__grid": [4,35],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#FEE761",
+							"iid": "4554aa00-25d0-11ef-9381-21640b0810c2",
+							"width": 16,
+							"height": 16,
+							"defUid": 130,
+							"px": [64,560],
+							"fieldInstances": [],
+							"__worldX": 368,
+							"__worldY": 224
 						}
 					]
 				},
@@ -5496,7 +5512,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
+									"params": ["Out shopping.  Will return soon.\n\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,

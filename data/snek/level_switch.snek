@@ -1,10 +1,10 @@
 # Don't ACTUALLY exit the last level.  That way after an exit you can appear right back on the doorway.
 lock();
-fade(FADEOUT_CIRCLE);
+fadeout_circle();
 unlock();
 map_switch(NEXT_LEVEL);
 # this will run once this level is reentered
 lock();
-fade(FADEIN_CIRCLE);
+fadein_circle();
 play_soundtrack(LEVEL_SOUNDTRACK);
 unlock();

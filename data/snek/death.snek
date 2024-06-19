@@ -1,9 +1,7 @@
 lock();
 
-fade(FADEOUT_CIRCLE);
-fade(STAY_FADED_OUT, 0, 0, 0);
-fade(FADEOUT_COLOR, 255, 0, 0);
-fade(STAY_FADED_OUT, 255, 0, 0);
+fadeout(255, 0, 0);
+fill(255, 0, 0);
 
 answer = ask("GAME OVER.", "Save & Quit", "Quit", "Get ranted at by narrator");
 

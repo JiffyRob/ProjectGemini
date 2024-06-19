@@ -7,5 +7,6 @@ leave = ask(
 print(leave);
 unlock();
 if leave == "yes" {
+    fadeout_circle();
     exit_level();  # always pop state LAST.  Once the level is exited this script will no longer be updated.
 }
