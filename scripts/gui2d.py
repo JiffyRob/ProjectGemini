@@ -91,7 +91,7 @@ class Dialog(sprite.GUISprite):
             self.state = self.STATE_GETTING_ANSWER
             self.update_text()
             if not self.answers:
-                self.kill_timer = timer.DTimer(1500, self.choose)
+                self.kill_timer = timer.DTimer(5000, self.choose)
                 self.state = self.STATE_COMPLETE
             self.add_letter_timer = timer.DTimer()
         else:

@@ -3479,22 +3479,6 @@
 							"__worldY": -256
 						},
 						{
-							"__identifier": "CrazyMushroom",
-							"__grid": [4,35],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#FEE761",
-							"iid": "4554aa00-25d0-11ef-9381-21640b0810c2",
-							"width": 16,
-							"height": 16,
-							"defUid": 130,
-							"px": [64,560],
-							"fieldInstances": [],
-							"__worldX": 368,
-							"__worldY": 224
-						},
-						{
 							"__identifier": "Emerald",
 							"__grid": [11,12],
 							"__pivot": [0,0],
@@ -4723,20 +4707,20 @@
 					"gridTiles": [],
 					"entityInstances": [
 						{
-							"__identifier": "Ship",
-							"__grid": [8,6],
+							"__identifier": "BrokenShip",
+							"__grid": [9,7],
 							"__pivot": [0,0],
 							"__tags": [],
-							"__tile": { "tilesetUid": 15, "x": 208, "y": 0, "w": 48, "h": 32 },
-							"__smartColor": "#E4A672",
-							"iid": "d8fecda0-d7b0-11ee-a609-ef083f7c164a",
+							"__tile": { "tilesetUid": 15, "x": 160, "y": 0, "w": 48, "h": 32 },
+							"__smartColor": "#3E2731",
+							"iid": "c41fd410-25d0-11ef-8787-a55a207e975c",
 							"width": 16,
 							"height": 16,
-							"defUid": 73,
-							"px": [128,96],
+							"defUid": 74,
+							"px": [144,112],
 							"fieldInstances": [],
-							"__worldX": 128,
-							"__worldY": 96
+							"__worldX": 144,
+							"__worldY": 112
 						}
 					]
 				},

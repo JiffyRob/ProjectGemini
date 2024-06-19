@@ -734,17 +734,6 @@
 				"height": 16,
 				"color": 16705377,
 				"customFields" : {}
-			},
-			{
-				"id": "CrazyMushroom",
-				"iid": "4554aa00-25d0-11ef-9381-21640b0810c2",
-				"layer": "Entities",
-				"x": 64,
-				"y": 560,
-				"width": 16,
-				"height": 16,
-				"color": 16705377,
-				"customFields" : {}
 			}
 		]
 	}
