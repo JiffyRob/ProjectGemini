@@ -64,6 +64,7 @@ class PhysicsSprite(sprite.Sprite):
         self.velocity += GRAVITY * self.weight * dt
         self.rect.x += vel.x
         self.update_rects()
+        self.on_ground = False
         # bottom of the map
         if self.collision_rect.top > self.level.map_rect.bottom:
             self.on_fallout()
