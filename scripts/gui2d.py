@@ -74,7 +74,6 @@ class Dialog(sprite.GUISprite):
         self.chosen_index = None
         self.on_kill = on_kill
         self.add_letter_timer = timer.DTimer(20, self.add_text, True)
-        self.kill_timer = timer.DTimer()
         self.image.set_colorkey(util_draw.COLORKEY)
         self.state = self.STATE_WRITING_PROMPT
         self.pad = 3
@@ -91,7 +90,6 @@ class Dialog(sprite.GUISprite):
             self.state = self.STATE_GETTING_ANSWER
             self.update_text()
             if not self.answers:
-                self.kill_timer = timer.DTimer(5000, self.choose)
                 self.state = self.STATE_COMPLETE
             self.add_letter_timer = timer.DTimer()
         else:
@@ -136,7 +134,6 @@ class Dialog(sprite.GUISprite):
 
     def update(self, time_delta: float):
         super().update(time_delta)
-        self.kill_timer.update(time_delta)
         self.add_letter_timer.update(time_delta)
         pressed = self.level.game.input_queue.just_pressed
         if self.state == self.STATE_GETTING_ANSWER:

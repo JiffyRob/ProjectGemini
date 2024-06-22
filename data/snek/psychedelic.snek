@@ -4,8 +4,8 @@ if answer == "Yes" {
     # Funny dream sequence
     play_soundtrack("SunflowerGrove");
     fadeout(243, 246, 71);
-    write("What a strange dream!  If only I could remember what was in it....", 0);
-    fill(243, 246, 71, 6);
+    fill(243, 246, 71, 0);
+    write("What a strange dream!  If only I could remember what was in it....");
 }
 # Ford picks you up
 clear_effects();
