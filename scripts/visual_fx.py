@@ -7,7 +7,7 @@ from scripts import loader
 
 class VisualEffect:
     def __init__(self):
-        self.done= False
+        self.done = False
 
     def update(self, dt):
         pass
@@ -59,9 +59,7 @@ class CircleTransitionIn(VisualEffect):
         return not self.done
 
     def draw(self, surface):
-        surface.blit(
-            self.surface, (0, 0), None, pygame.BLEND_RGB_MULT
-        )
+        surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
 
     def draw_over(self, dest_surface, dest_rect):
         dest_surface.blit(self.surface, dest_rect, None, pygame.BLEND_RGB_MULT)
@@ -111,7 +109,7 @@ class CircleTransitionOut(VisualEffect):
 
 
 class ColorTransitionOut(VisualEffect):
-    def __init__(self, color='black', duration=1):
+    def __init__(self, color="black", duration=1):
         super().__init__()
         self.age = 0
         self.duration = duration
@@ -138,7 +136,9 @@ class ColorTransitionIn(ColorTransitionOut):
     def update(self, dt):
         self.age += dt
         self.done = self.age >= self.duration
-        self.color.a = pygame.math.clamp(255 - round(self.age * 255 / self.duration), 0, 255)
+        self.color.a = pygame.math.clamp(
+            255 - round(self.age * 255 / self.duration), 0, 255
+        )
         return not self.done
 
 
@@ -187,4 +187,6 @@ class Blink(VisualEffect):
             self.done = True
 
     def draw_over(self, dest_surface, dest_rect):
-        raise TypeError(f"{self.__class__} cannot be drawn over other surfaces due to no transparency info")
+        raise TypeError(
+            f"{self.__class__} cannot be drawn over other surfaces due to no transparency info"
+        )

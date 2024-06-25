@@ -186,5 +186,4 @@ class Game:
         self.running = False
 
 
-
 asyncio.run(Game().run())

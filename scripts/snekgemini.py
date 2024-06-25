@@ -1,4 +1,5 @@
 import webbrowser
+
 import pygame
 
 from scripts import snek, util_draw, visual_fx
@@ -81,7 +82,9 @@ class FadeInCircle(snek.SnekCommand):
             if self.pos[1] is None:
                 self.pos[1] = player_pos[1]
             screen_pos = level.world_to_screen(self.pos)
-            self.fader = visual_fx.CircleTransitionIn(util_draw.RESOLUTION, screen_pos, speed=400)
+            self.fader = visual_fx.CircleTransitionIn(
+                util_draw.RESOLUTION, screen_pos, speed=400
+            )
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
@@ -105,7 +108,9 @@ class FadeOutCircle(snek.SnekCommand):
             if self.pos[1] is None:
                 self.pos[1] = player_pos[1]
             screen_pos = level.world_to_screen(self.pos)
-            self.fader = visual_fx.CircleTransitionOut(util_draw.RESOLUTION, screen_pos, speed=400)
+            self.fader = visual_fx.CircleTransitionOut(
+                util_draw.RESOLUTION, screen_pos, speed=400
+            )
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
@@ -161,7 +166,13 @@ class Fill(snek.SnekCommand):
 
 
 def spawn_ship(level, ship_type, start_x, start_y, dest_x, dest_y):
-    level.spawn("Ship", pygame.Rect(start_x - 24, start_y - 16, 48, 32), start=(start_x, start_y), dest=(dest_x, dest_y), ship_type=ship_type)
+    level.spawn(
+        "Ship",
+        pygame.Rect(start_x - 24, start_y - 16, 48, 32),
+        start=(start_x, start_y),
+        dest=(dest_x, dest_y),
+        ship_type=ship_type,
+    )
 
 
 def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
@@ -195,14 +206,18 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "play_soundtrack": snek.snek_command(level.game.play_soundtrack),
             "save": snek.snek_command(level.game.save_to_disk),
             "quit": snek.snek_command(level.game.quit),
-            "rickroll": snek.snek_command(lambda: webbrowser.open("https://youtu.be/E4WlUXrJgy4")),
+            "rickroll": snek.snek_command(
+                lambda: webbrowser.open("https://youtu.be/E4WlUXrJgy4")
+            ),
             "fadein": FadeIn,
             "fadeout": FadeOut,
             "fadein_circle": FadeInCircle,
             "fadeout_circle": FadeOutCircle,
             "fill": Fill,
             "clear_effects": snek.snek_command(level.clear_effects),
-            "run_cutscene": snek.snek_command(lambda *args: level.run_cutscene(*args, override=True)),
+            "run_cutscene": snek.snek_command(
+                lambda *args: level.run_cutscene(*args, override=True)
+            ),
             "attempt_map_cutscene": snek.snek_command(level.attempt_map_cutscene),
         },
     )

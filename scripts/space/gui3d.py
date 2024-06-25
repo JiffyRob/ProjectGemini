@@ -1,7 +1,9 @@
+import numpy
 import pygame
 
 from scripts import sprite
 from scripts.animation import Animation
+from scripts.space import math3d
 
 
 class Ship(sprite.GUISprite):
@@ -97,3 +99,24 @@ class Ship(sprite.GUISprite):
         blit_surface = pygame.transform.rotate(self.surface, rotation)
         surface.blit(blit_surface, blit_surface.get_rect(center=self.rect.center))
         self.direction = 0
+
+
+class Compass(sprite.GUISprite):
+    def __init__(self, level, origin):
+        super().__init__(level)
+        self.origin = origin
+        self.positions = (
+            numpy.array(((0, 1, 0), (1, 0, 0), (0, 0, 1)), dtype=numpy.float64) * 10
+        )
+        self.colors = ("red", "green", "blue")
+        self.letters = [level.game.loader.font.render(i) for i in ("N", "E", "Q")]
+
+    def draw(self, surface):
+        positions_copy = self.positions.copy()
+        math3d.rotate_points(positions_copy, -self.level.camera.rotation)
+        for offset, color, letter in sorted(
+            zip(positions_copy, self.colors, self.letters), key=lambda x: -x[0][2]
+        ):
+            endpoint = self.origin + offset[:2]
+            pygame.draw.line(surface, color, self.origin, endpoint)
+            surface.blit(letter, self.origin + offset[:2] * 1.5 - (3, 4))

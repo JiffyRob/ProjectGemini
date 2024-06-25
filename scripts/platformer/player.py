@@ -1,6 +1,6 @@
 import pygame
 
-from scripts import timer, visual_fx, sprite
+from scripts import sprite, timer, visual_fx
 from scripts.animation import Animation, NoLoopAnimation, SingleAnimation
 from scripts.platformer import mobile
 
@@ -44,7 +44,7 @@ class Player(mobile.PhysicsSprite):
 
     @property
     def skidding(self):
-        return self.time_on_wall >= .2 and self.velocity.y >= 0
+        return self.time_on_wall >= 0.2 and self.velocity.y >= 0
 
     @property
     def below_rect(self):
@@ -111,7 +111,11 @@ class Player(mobile.PhysicsSprite):
                     self.walk_left()
                 if held_input["right"] and not self.from_wall:
                     self.walk_right()
-                if not held_input["left"] and not held_input["right"] and self.on_ground:
+                if (
+                    not held_input["left"]
+                    and not held_input["right"]
+                    and self.on_ground
+                ):
                     self.decelerate()
             else:
                 self.velocity.x = 0
@@ -153,7 +157,7 @@ class Player(mobile.PhysicsSprite):
         elif not self.on_ground:
             if self.skidding:
                 self.swap_state("skid")
-                self.velocity.y *= .9
+                self.velocity.y *= 0.9
             else:
                 self.swap_state("jump")
         elif self.velocity.x and self.state != "pound-recover":
@@ -250,7 +254,6 @@ class Player(mobile.PhysicsSprite):
                 self.velocity.update(WALLJUMP_X_SPEED, -WALLJUMP_Y_SPEED)
             self.on_wall = False
             self.from_wall = True
-
 
     def duck(self):
         self.ducking = True

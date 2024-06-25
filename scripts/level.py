@@ -111,7 +111,7 @@ class Level(game_state.GameState):
         if self.script is not None and not override:
             return False
         try:
-            self.run_cutscene(self.name , override=True)
+            self.run_cutscene(self.name, override=True)
             return True
         except FileNotFoundError:
             print("No file found :/", self.name)
@@ -140,7 +140,11 @@ class Level(game_state.GameState):
     def spawn(self, sprite_name, rect, z=None, **custom_fields):
         if z is None:
             z = self.entity_layer
-        self.add_sprite(self.sprite_classes[self.is_platformer][sprite_name](self, rect, z, **custom_fields))
+        self.add_sprite(
+            self.sprite_classes[self.is_platformer][sprite_name](
+                self, rect, z, **custom_fields
+            )
+        )
 
     def add_sprite(self, sprite):
         self.to_add.add(sprite)

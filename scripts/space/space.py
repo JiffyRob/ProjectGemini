@@ -23,7 +23,10 @@ class Space(game_state.GameState):
         ship_rect = pygame.Rect(0, 0, 48, 32)
         ship_rect.center = self.game.screen_rect.center
         self.ship = gui3d.Ship(self, ship_rect)
-        self.gui = [self.ship]
+        self.compass = gui3d.Compass(
+            self, pygame.Vector2(16, -16) + self.game.screen_rect.bottomleft
+        )
+        self.gui = [self.ship, self.compass]
         self.sprites = []
         self.ship_overlay = self.game.loader.get_surface_scaled_to(
             "ship-inside.png", util_draw.RESOLUTION
