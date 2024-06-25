@@ -118,5 +118,5 @@ class Compass(sprite.GUISprite):
             zip(positions_copy, self.colors, self.letters), key=lambda x: -x[0][2]
         ):
             endpoint = self.origin + offset[:2]
-            pygame.draw.line(surface, color, self.origin, endpoint)
+            pygame.draw.line(surface, color, self.origin, endpoint, width=2)
             surface.blit(letter, self.origin + offset[:2] * 1.5 - (3, 4))

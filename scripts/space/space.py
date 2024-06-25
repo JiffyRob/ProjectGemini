@@ -11,6 +11,7 @@ class Space(game_state.GameState):
         super().__init__(game, color="black")
         # self.game.renderer.logical_size = (1920, 1080)
         # in world space y is vertical, and x and z are horizontal
+        # in game terms, y is Quarth-Mist, x is East-West, and z is North-South
         # on screen with no rotation x is left-right, y is up-down, and z is depth
         self.camera = math3d.Camera(
             pygame.Vector3(),
