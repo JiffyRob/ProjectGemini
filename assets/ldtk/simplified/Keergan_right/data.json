@@ -13,17 +13,7 @@
 			344
 		],
 		"entity_layer": 0,
-		"Background": "bg-mushroom.png",
-		"BackgroundXMult": [
-			0.3,
-			0.6
-		],
-		"LoopX": true,
-		"LoopY": true,
-		"BackgroundYMult": [
-			0.5,
-			0.5
-		],
+		"Background": "mushroom",
 		"platformer": true,
 		"Biome": "Mushroom_Plat",
 		"Soundtrack": "FungalBoogie",

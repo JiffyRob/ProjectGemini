@@ -18,11 +18,7 @@
 			136
 		],
 		"entity_layer": 8,
-		"Background": null,
-		"BackgroundXMult": [],
-		"LoopX": false,
-		"LoopY": false,
-		"BackgroundYMult": [],
+		"Background": "saline",
 		"platformer": false,
 		"Biome": "Purple_Flats_Topdown",
 		"Soundtrack": "Gemini-II",

@@ -1,10 +1,11 @@
 import pathlib
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 from random import uniform
 
 import pygame
 
 from scripts import (
+    animation,
     game_state,
     gui2d,
     platformer,
@@ -14,13 +15,108 @@ from scripts import (
     util_draw,
 )
 
-Parallax = namedtuple(
-    "Parallax",
-    ("image", "rect", "mult", "loop_x", "loop_y"),
-    defaults=(pygame.FRect((0, 0), util_draw.RESOLUTION), (1, 1), True, True),
-)
-
 LERP_SPEED = 1
+
+
+class Parallax:
+    def __init__(
+        self,
+        level,
+        anim=None,
+        rect=((0, 0), util_draw.RESOLUTION),
+        item_size=(64, 64),
+        scroll_speed=(1, 1),
+        anchor_bottom=False,
+        loop_x=True,
+        loop_y=True,
+    ):
+        self.level = level
+        self.anim = anim
+        self.image = anim.image
+        self.rect = pygame.FRect(rect)
+        self.scroll_speed = pygame.Vector2(scroll_speed)
+        self.item_size = pygame.Vector2(item_size)
+        self.anchor_bottom = anchor_bottom
+        self.loop_x = loop_x
+        self.loop_y = loop_y
+
+    def update(self, dt):
+        self.anim.update(dt)
+        self.image = self.anim.image
+
+    @classmethod
+    def load(cls, level, name):
+        # load background data
+        data = level.game.loader.get_json("backgrounds.json")
+        defaults = data.get("default", None)
+        background_data = data.get(name, None)
+        if (
+            background_data is None
+            or defaults is None
+            or background_data.get("source", None) is None
+        ):
+            print("WARNING: Unable to load background data")
+            return
+        background_data = {**defaults, **background_data}
+        # load background source
+        source_surface = level.game.loader.get_surface(background_data["source"])
+        # create layers
+        for layer in background_data["layers"]:
+            layer = {**defaults["layers"][0], **layer}
+            mode = layer["mode"]
+            anchor_bottom = False
+            # size setting - some backgrounds loop indefinitely.  Draw slightly larger than the screen.
+            if mode == "tile":
+                size = pygame.Vector2(layer["frames"][0][2:]) + util_draw.RESOLUTION
+                layer["loop_x"] = layer["loop_y"] = True
+                layer["anchor_bottom"] = False
+                frames = [
+                    util_draw.repeat_surface(source_surface.subsurface(i), size)
+                    for i in layer["frames"]
+                ]
+                item_size = pygame.Vector2(layer["frames"][0][2:])
+            elif mode == "backdrop":
+                size = pygame.Vector2(256, 256)
+                if layer["loop_x"]:
+                    size[0] += util_draw.RESOLUTION[0]
+                if layer["loop_y"]:
+                    size[1] += util_draw.RESOLUTION[1]
+                elif layer["anchor_bottom"]:
+                    anchor_bottom = True
+                frames = [
+                    util_draw.repeat_surface(
+                        pygame.transform.scale(
+                            source_surface.subsurface(i), (256, 256)
+                        ),
+                        size,
+                    )
+                    for i in layer["frames"]
+                ]
+                item_size = (256, 256)
+            else:
+                print("WARNING: layer has incorrect mode set.  Skipping.")
+                continue
+            # create and return Parallax layer with loaded information
+            yield cls(
+                level=level,
+                anim=animation.Animation(frames, layer["anim_speed"]),
+                rect=pygame.FRect((0, 0), size),
+                item_size=item_size,
+                scroll_speed=[layer["scroll_x"], layer["scroll_y"]],
+                anchor_bottom=anchor_bottom,
+                loop_x=layer["loop_x"],
+                loop_y=layer["loop_y"],
+            )
+
+    def draw(self, surface, offset):
+        if (not self.loop_y) and self.anchor_bottom:
+            offset.y += self.level.map_rect.height - self.item_size.y
+        offset = offset.elementwise() * self.scroll_speed
+        if self.loop_x:
+            offset.x = offset.x % self.item_size.x - self.item_size.x
+        if self.loop_y:
+            offset.y = offset.y % self.item_size.y - self.item_size.y
+        surface.blit(self.image, self.rect.move(offset))
 
 
 class Level(game_state.GameState):
@@ -198,22 +294,9 @@ class Level(game_state.GameState):
         )
         # background creation
         level.bgcolor = data["bgColor"]
-        background_source = data["customFields"]["Background"]
-        if background_source is not None:
-            images = game.loader.get_spritesheet(background_source, (64, 64))
-            multipliers = zip(
-                data["customFields"]["BackgroundXMult"],
-                data["customFields"]["BackgroundYMult"],
-            )
-            for image, multiplier in zip(images, multipliers):
-                level.backgrounds.append(
-                    Parallax(
-                        pygame.transform.scale(image, (256, 256)),
-                        mult=multiplier,
-                        loop_x=data["customFields"]["LoopX"],
-                        loop_y=data["customFields"]["LoopY"],
-                    )
-                )
+        level.backgrounds.extend(
+            Parallax.load(level, data["customFields"]["Background"])
+        )
         # tile layers
         entity_layer = data["customFields"]["entity_layer"]
         level.entity_layer = entity_layer
@@ -280,6 +363,9 @@ class Level(game_state.GameState):
         # if player died, end game
         if self.player.health <= 0:
             self.run_cutscene("death")
+        # update backgrounds
+        for background in self.backgrounds:
+            background.update(dt)
         # update gui
         for sprite in self.gui:
             sprite.update(dt)
@@ -304,19 +390,9 @@ class Level(game_state.GameState):
             uniform(-self.shake_magnitude, self.shake_magnitude)
             * bool(self.shake_axes & self.AXIS_Y),
         )
+        offset = -pygame.Vector2(self.viewport_rect.topleft)
         for background in self.backgrounds:
-            offset = (
-                -pygame.Vector2(self.viewport_rect.topleft)
-                + pygame.Vector2(0, self.map_rect.height - background.rect.height)
-                + shake_offset
-            ).elementwise() * background.mult
-            if background.loop_x:
-                offset.x = (offset.x % util_draw.RESOLUTION[0]) - background.rect.width
-                while offset.x < util_draw.RESOLUTION[0]:
-                    self.game.window_surface.blit(
-                        background.image, background.rect.move(offset)
-                    )
-                    offset.x += background.rect.width
+            background.draw(self.game.window_surface, offset.copy())
         # draw map + sprites
         for sprite in sorted(
             self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery
