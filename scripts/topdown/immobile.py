@@ -114,6 +114,50 @@ class House(Interactable):
         return super().update(dt)
 
 
+class Smith(Interactable):
+    groups = {"static-collision", "interactable"}
+
+    def __init__(self, level, rect=(0, 0, 64, 48), z=0, **custom_fields):
+        # three rects to represent the house without the doorway
+        roof_rect = pygame.FRect(rect[0], rect[1] + 26, 64, 22)
+        self.extra_collision_rects = (
+            pygame.FRect(roof_rect.left, roof_rect.bottom, 32, 16),
+            roof_rect,
+        )
+        # use right side of door as collision rect as that's what interaction uses
+        # this way you interact with the rect that has the sign on it
+        self.collision_rect = pygame.FRect(
+            roof_rect.left + 48,
+            roof_rect.bottom,
+            16,
+            16,
+        )
+        # the doorway
+        self.teleport_rect = pygame.FRect(
+            roof_rect.left + 32,
+            roof_rect.bottom,
+            16,
+            10,
+        )
+        self.dest_map = custom_fields["map"]
+        super().__init__(
+            level,
+            image=level.game.loader.get_surface("tileset.png", rect=(0, 96, 64, 64)),
+            rect=rect,
+            z=z,
+            script="furniture",
+            extra_constants={"TEXT": custom_fields["Sign"]},
+        )
+
+    def update(self, dt):
+        if self.level.player.collision_rect.colliderect(self.teleport_rect):
+            self.level.player.rect.top += (
+                self.teleport_rect.bottom - self.level.player.collision_rect.top
+            )
+            self.level.switch_level(self.dest_map)
+        return super().update(dt)
+
+
 class Furniture(Interactable):
     groups = {"static-collision", "interactable"}
 
@@ -148,3 +192,11 @@ class Furniture(Interactable):
         self.collision_rect = self.rect.copy()
         self.collision_rect.height *= 0.7
         self.collision_rect.centery = self.rect.centery
+
+
+class Bush(sprite.Sprite):
+    groups = {"static-collision"}
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        super().__init__(level, level.game.loader.get_surface("tileset.png", rect=(160, 64, 16, 16)), rect, z)
+        self.collision_rect = self.rect.copy()

@@ -131,6 +131,8 @@ class Level(game_state.GameState):
             "BrokenShip": topdown.immobile.BrokenShip,
             "House": topdown.immobile.House,
             "Furniture": topdown.immobile.Furniture,
+            "Bush": topdown.immobile.Bush,
+            "Smith": topdown.immobile.Smith,
         },
         # platformer
         {
@@ -152,6 +154,7 @@ class Level(game_state.GameState):
         game,
         name=None,
         player_pos=(0, 0),
+        player_facing=None,
         map_size=(256, 256),
         is_platformer=False,
         is_house=False,
@@ -171,6 +174,8 @@ class Level(game_state.GameState):
         self.is_house = is_house
         self.entity_layer = 0
         self.player.rect.center = player_pos
+        if player_facing is not None:
+            self.player.last_facing = player_facing
         self.sprites = {self.player}
         self.to_add = set()
         self.collision_rects = []
@@ -216,8 +221,8 @@ class Level(game_state.GameState):
     def exit_level(self):
         self.run_cutscene("level_exit")
 
-    def switch_level(self, dest):
-        self.run_cutscene("level_switch", extra_constants={"NEXT_LEVEL": dest})
+    def switch_level(self, dest, direction=None, position=None):
+        self.run_cutscene("level_switch", extra_constants={"NEXT_LEVEL": dest, "DIRECTION": direction, "POSITION": position})
 
     def lock(self):
         for sprite in self.sprites:
@@ -273,7 +278,7 @@ class Level(game_state.GameState):
         self.on_dialog_finish = lambda answer: None
 
     @classmethod
-    def load(cls, game, name):
+    def load(cls, game, name, direction=None, position=None):
         # basic metadata
         folder = pathlib.Path("ldtk/simplified", name)
         data = game.loader.get_json(folder / "data.json", for_map=True)
@@ -283,10 +288,20 @@ class Level(game_state.GameState):
         soundtrack = data["customFields"]["Soundtrack"]
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
+        player_position = data["customFields"]["start"]
+        if direction == "down":
+            player_position = (position[0], 8)
+        if direction == "up":
+            player_position = (position[0], size[1] - 8)
+        if direction == "right":
+            player_position = (8, position[1])
+        if direction == "left":
+            player_position = (size[0] - 8, position[1])
         level = cls(
             game,
             name=name,
-            player_pos=data["customFields"]["start"],
+            player_pos=player_position,
+            player_facing=direction,
             map_size=size,
             is_platformer=is_platformer,
             soundtrack=soundtrack,

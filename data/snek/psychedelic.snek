@@ -19,4 +19,4 @@ write("Fancy meeting you here!  Need a lift?  Of course you do.  That's quite th
 write("You certainly could have picked a worse spot to crash in.  I LOVE this planet-matches my car.  Hop in!");
 fadeout();
 # Enter Ford's Home Base (runs its own cutscene)
-map_switch("Fordvania");
+map_switch("Pyrodyne");

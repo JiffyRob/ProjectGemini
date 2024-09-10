@@ -1,0 +1,272 @@
+{
+	"identifier": "Pyrodyne",
+	"uniqueIdentifer": "bd98dad0-25d0-11ef-b430-771fcb09d85d",
+	"x": 1264,
+	"y": 544,
+	"width": 432,
+	"height": 432,
+	"bgColor": "#696A79",
+	"neighbourLevels": [
+		{
+			"levelIid": "b6ce7fe0-25d0-11ef-b430-73c6047ed6d2",
+			"dir": "e"
+		},
+		{
+			"levelIid": "16e35fc0-4ce0-11ef-bc27-c52a8e208f67",
+			"dir": "n"
+		}
+	],
+	"customFields": {
+		"start": [
+			128,
+			128
+		],
+		"entity_layer": 8,
+		"Background": "lava",
+		"platformer": false,
+		"Biome": "Gold_Topdown",
+		"Soundtrack": null,
+		"house": false
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities": {
+		"Bush": [
+			{
+				"id": "Bush",
+				"iid": "fdd15df0-25d0-11ef-b430-2d3db420e8b9",
+				"layer": "Entities",
+				"x": 120,
+				"y": 312,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "ff150180-25d0-11ef-b430-2165ca8f3339",
+				"layer": "Entities",
+				"x": 129,
+				"y": 337,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "ffe45f70-25d0-11ef-b430-71fdd7a7ede5",
+				"layer": "Entities",
+				"x": 142,
+				"y": 313,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "00c2b180-25d0-11ef-b430-a587a7732903",
+				"layer": "Entities",
+				"x": 153,
+				"y": 337,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0273e3f0-25d0-11ef-b430-e77c785e79be",
+				"layer": "Entities",
+				"x": 164,
+				"y": 313,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "03b082a0-25d0-11ef-b430-ed2bda64a485",
+				"layer": "Entities",
+				"x": 178,
+				"y": 337,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "04da0e80-25d0-11ef-b430-59d1a2efe582",
+				"layer": "Entities",
+				"x": 189,
+				"y": 314,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0594d300-25d0-11ef-b430-434e4a257206",
+				"layer": "Entities",
+				"x": 202,
+				"y": 336,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "07403910-25d0-11ef-b430-4bf3f130e041",
+				"layer": "Entities",
+				"x": 215,
+				"y": 314,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "08b5c210-25d0-11ef-b430-71b5e2f4ce50",
+				"layer": "Entities",
+				"x": 228,
+				"y": 335,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "09965e10-25d0-11ef-b430-e5a559f83c60",
+				"layer": "Entities",
+				"x": 239,
+				"y": 313,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0ad5bbe0-25d0-11ef-b430-17c515192e73",
+				"layer": "Entities",
+				"x": 252,
+				"y": 335,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0c173c90-25d0-11ef-b430-1f74c125afa4",
+				"layer": "Entities",
+				"x": 265,
+				"y": 314,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0d364120-25d0-11ef-b430-afddd78ed09f",
+				"layer": "Entities",
+				"x": 278,
+				"y": 334,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0e4fee80-25d0-11ef-b430-79b021c50cd4",
+				"layer": "Entities",
+				"x": 292,
+				"y": 314,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "0f7ef8a0-25d0-11ef-b430-85e0e9fc932e",
+				"layer": "Entities",
+				"x": 306,
+				"y": 336,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Bush",
+				"iid": "10941220-25d0-11ef-b430-35419a36ef6d",
+				"layer": "Entities",
+				"x": 318,
+				"y": 316,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			}
+		],
+		"Smith": [
+			{
+				"id": "Smith",
+				"iid": "89337280-25d0-11ef-b430-276d148b509c",
+				"layer": "Entities",
+				"x": 64,
+				"y": 74,
+				"width": 16,
+				"height": 16,
+				"color": 1199753,
+				"customFields": {
+					"map": "smith",
+					"Sign": "Pyrodyne Smith Co"
+				}
+			},
+			{
+				"id": "Smith",
+				"iid": "8a5cd750-25d0-11ef-b430-3f38823e2cbe",
+				"layer": "Entities",
+				"x": 144,
+				"y": 74,
+				"width": 16,
+				"height": 16,
+				"color": 1199753,
+				"customFields": {
+					"map": "smith",
+					"Sign": "Pyrodyne Smith Co"
+				}
+			},
+			{
+				"id": "Smith",
+				"iid": "8bac61c0-25d0-11ef-b430-b7d535d664cc",
+				"layer": "Entities",
+				"x": 224,
+				"y": 74,
+				"width": 16,
+				"height": 16,
+				"color": 1199753,
+				"customFields": {
+					"map": "smith",
+					"Sign": "Pyrodyne Smith Co"
+				}
+			}
+		]
+	}
+}

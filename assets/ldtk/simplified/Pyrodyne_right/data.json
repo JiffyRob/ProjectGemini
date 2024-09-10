@@ -1,0 +1,34 @@
+{
+	"identifier": "Pyrodyne_right",
+	"uniqueIdentifer": "b6ce7fe0-25d0-11ef-b430-73c6047ed6d2",
+	"x": 1696,
+	"y": 544,
+	"width": 256,
+	"height": 256,
+	"bgColor": "#696A79",
+	"neighbourLevels": [
+		{
+			"levelIid": "bd98dad0-25d0-11ef-b430-771fcb09d85d",
+			"dir": "w"
+		}
+	],
+	"customFields": {
+		"start": [
+			8,
+			126
+		],
+		"entity_layer": 8,
+		"Background": "lava",
+		"platformer": false,
+		"Biome": "Gold_Topdown",
+		"Soundtrack": null,
+		"house": false
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities" : {}
+}

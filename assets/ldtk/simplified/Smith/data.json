@@ -1,0 +1,34 @@
+{
+	"identifier": "Smith",
+	"uniqueIdentifer": "16e35fc0-4ce0-11ef-bc27-c52a8e208f67",
+	"x": 1392,
+	"y": 448,
+	"width": 112,
+	"height": 96,
+	"bgColor": "#696A79",
+	"neighbourLevels": [
+		{
+			"levelIid": "bd98dad0-25d0-11ef-b430-771fcb09d85d",
+			"dir": "s"
+		}
+	],
+	"customFields": {
+		"start": [
+			72,
+			82
+		],
+		"entity_layer": 8,
+		"Background": null,
+		"platformer": false,
+		"Biome": "N_A",
+		"Soundtrack": null,
+		"house": false
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities" : {}
+}

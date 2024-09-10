@@ -51,6 +51,13 @@ class PhysicsSprite(sprite.Sprite):
 
 
 class Player(PhysicsSprite):
+    reverses = {
+        "up": "down",
+        "right": "left",
+        "down": "up",
+        "left": "right",
+    }
+
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, rect=rect, image=None, z=z)
         images = level.game.loader.get_spritesheet("me.png")
@@ -113,7 +120,19 @@ class Player(PhysicsSprite):
 
     def on_map_departure(self, directions):
         if not self.level.is_house:
-            self.level.switch_level(f"{self.level.name}_{directions[0]}")
+            long_name = f"{self.level.name}_{directions[0]}"
+            x = long_name.count("right") - long_name.count("left")
+            y = long_name.count("down") - long_name.count("up")
+            short_name = self.level.name.split("_")[0]
+            if x < 0:
+                short_name += "_left" * abs(x)
+            if x > 0:
+                short_name += "_right" * x
+            if y < 0:
+                short_name += "_up" * abs(y)
+            if y > 0:
+                short_name += "_down" * y
+            self.level.switch_level(short_name, direction=directions[0], position=self.pos)
         else:
             self.level.run_cutscene("level_exit")
 

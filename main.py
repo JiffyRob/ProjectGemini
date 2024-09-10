@@ -62,9 +62,9 @@ class Game:
     def pop_state(self):
         self.stack.popleft()
 
-    def load_map(self, map_name):
+    def load_map(self, map_name, direction=None, position=None):
         print("loading level:", map_name)
-        self.stack.appendleft(level.Level.load(self, map_name))
+        self.stack.appendleft(level.Level.load(self, map_name, direction, position))
         if "_" not in map_name:
             self.save.planet = map_name
 
@@ -92,7 +92,10 @@ class Game:
         self.dt_mult = mult
 
     def play_soundtrack(self, track_name):
-        self.sound_manager.switch_track(f"music/{track_name}.wav")
+        if track_name is None:
+            self.sound_manager.stop_track()
+        else:
+            self.sound_manager.switch_track(f"music/{track_name}.wav")
 
     def update(self, dt):
         kill_state = False
