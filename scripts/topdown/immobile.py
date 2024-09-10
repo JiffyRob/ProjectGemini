@@ -119,7 +119,7 @@ class Smith(Interactable):
 
     def __init__(self, level, rect=(0, 0, 64, 48), z=0, **custom_fields):
         # three rects to represent the house without the doorway
-        roof_rect = pygame.FRect(rect[0], rect[1] + 26, 64, 22)
+        roof_rect = pygame.FRect(rect[0], rect[1] + 15, 64, 22)
         self.extra_collision_rects = (
             pygame.FRect(roof_rect.left, roof_rect.bottom, 32, 16),
             roof_rect,

@@ -339,21 +339,27 @@ class Level(game_state.GameState):
                     )
                 )
         # collision data creation
-        for row, line in enumerate(
-            game.loader.get_csv(folder / "Collision.csv", for_map=True)
-        ):
-            for col, value in enumerate(line):
-                value = int(value)
-                if value == 0 and not is_platformer:
-                    rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                    level.collision_rects.append(rect)
-                if value == 1 and is_platformer:
-                    rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                    level.collision_rects.append(rect)
-                if value == 2 and is_platformer:
-                    rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                    level.down_rects.append(rect)
-        level.player.z = entity_layer
+        # TODO: refactor this disgusting mess of fors and ifs
+        for collision_index, filename in enumerate(("Collision.csv", "Collision_B.csv")):
+            for row, line in enumerate(
+                game.loader.get_csv(folder / filename, for_map=True)
+            ):
+                for col, value in enumerate(line):
+                    value = int(value)
+                    if collision_index:
+                        if value == 1:
+                            rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                            level.collision_rects.append(rect)
+                    elif value == 0 and not is_platformer:
+                        rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                        level.collision_rects.append(rect)
+                    elif value == 1 and is_platformer:
+                        rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                        level.collision_rects.append(rect)
+                    elif value == 2 and is_platformer:
+                        rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                        level.down_rects.append(rect)
+            level.player.z = entity_layer
         return level
 
     def world_to_screen(self, pos):
