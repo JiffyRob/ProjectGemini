@@ -318,6 +318,8 @@ class MainMenu(game_state.GameState):
         super().__init__(game, "black")
         self.delete_mode = False
 
+        backdrop = pygame.transform.scale(game.loader.get_surface("background.png"), game.screen_rect.size)
+
         background_rect = game.screen_rect.inflate(-16, -16)
         title1 = game.loader.get_image("gui.png", "PROJECT")
         title1_rect = pygame.Rect(20, background_rect.top + 10, *title1.get_size())
@@ -334,6 +336,7 @@ class MainMenu(game_state.GameState):
         save_names = self.game.loader.get_save_names(5)
 
         self.gui = [
+            Image(self, backdrop, game.screen_rect),
             Background(self, background_rect, -1),
             Image(
                 self,
@@ -354,6 +357,8 @@ class MainMenu(game_state.GameState):
             button_rect.top = button_rect.bottom + 3
 
         button_rect.height = 16
+        button_rect.width -= 25
+        button_rect.x += 25
         delete_button = Button(
             self,
             button_rect,
@@ -408,6 +413,7 @@ class NameInputMenu(game_state.GameState):
         super().__init__(game, "black")
         background_rect = game.screen_rect.inflate(-16, -16)
         self.gui = [
+            Image(self, pygame.transform.scale(game.loader.get_surface("background.png"), game.screen_rect.size), game.screen_rect),
             Background(self, background_rect, -1),
         ]
 
@@ -491,16 +497,16 @@ class NameInputMenu(game_state.GameState):
 
 
 class DeleteConfirmationMenu(game_state.GameState):
-    def __init__(self, level, save_name):
+    def __init__(self, game, save_name):
         self.save_name = save_name
-        super().__init__(level, (0, 0, 0, 0))
+        super().__init__(game, (0, 0, 0, 0))
         background_rect = pygame.Rect(0, 0, 256, 48)
         background_rect.center = self.game.screen_rect.center
         button1_rect = pygame.Rect(
-            background_rect.left, background_rect.top + 8, background_rect.width, 16
+            background_rect.left + 32, background_rect.top + 8, background_rect.width - 64, 16
         )
         button2_rect = pygame.Rect(
-            background_rect.left, background_rect.top + 24, background_rect.width, 16
+            background_rect.left + 32, background_rect.top + 24, background_rect.width - 64, 16
         )
         button_dict = {
             (0, 0): Button(
@@ -517,6 +523,8 @@ class DeleteConfirmationMenu(game_state.GameState):
             ),
         }
         self.gui = [
+            Image(self, pygame.transform.scale(game.loader.get_surface("background.png"), game.screen_rect.size),
+                  game.screen_rect),
             Background(self, background_rect, -1),
             *button_dict.values(),
             KnifeIndicator(self, button_dict),
