@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 476545,
-	"nextUid": 194,
+	"nextUid": 195,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -2934,6 +2934,41 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "Drone",
+			"uid": 194,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#0099DB",
+			"renderMode": "Cross",
+			"showName": true,
+			"tilesetId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -5599,6 +5634,86 @@
 							"fieldInstances": [],
 							"__worldX": 1560,
 							"__worldY": -606
+						},
+						{
+							"__identifier": "Drone",
+							"__grid": [17,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#0099DB",
+							"iid": "9a998110-73f0-11ef-9c8a-b7dca6982623",
+							"width": 16,
+							"height": 16,
+							"defUid": 194,
+							"px": [272,80],
+							"fieldInstances": [],
+							"__worldX": 1560,
+							"__worldY": -654
+						},
+						{
+							"__identifier": "Drone",
+							"__grid": [13,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#0099DB",
+							"iid": "9b54bac0-73f0-11ef-9c8a-fb2d486dd482",
+							"width": 16,
+							"height": 16,
+							"defUid": 194,
+							"px": [208,208],
+							"fieldInstances": [],
+							"__worldX": 1496,
+							"__worldY": -526
+						},
+						{
+							"__identifier": "Drone",
+							"__grid": [3,13],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#0099DB",
+							"iid": "9bfd2fc0-73f0-11ef-9c8a-9ba2deb48b70",
+							"width": 16,
+							"height": 16,
+							"defUid": 194,
+							"px": [48,208],
+							"fieldInstances": [],
+							"__worldX": 1336,
+							"__worldY": -526
+						},
+						{
+							"__identifier": "Drone",
+							"__grid": [22,21],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#0099DB",
+							"iid": "9cb7f440-73f0-11ef-9c8a-53aa72fd8a50",
+							"width": 16,
+							"height": 16,
+							"defUid": 194,
+							"px": [352,336],
+							"fieldInstances": [],
+							"__worldX": 1640,
+							"__worldY": -398
+						},
+						{
+							"__identifier": "Drone",
+							"__grid": [10,19],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#0099DB",
+							"iid": "9d3fc1e0-73f0-11ef-9c8a-f3311343af9e",
+							"width": 16,
+							"height": 16,
+							"defUid": 194,
+							"px": [160,304],
+							"fieldInstances": [],
+							"__worldX": 1448,
+							"__worldY": -430
 						}
 					]
 				},
@@ -6497,7 +6612,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\n\n --Father"]
+									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,

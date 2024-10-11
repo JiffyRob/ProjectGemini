@@ -1,9 +1,11 @@
 from queue import Queue
+from math import sin
+import random
 
 import pygame
 
-from scripts import sprite, util_draw
-from scripts.animation import Animation
+from scripts import sprite, projectile, timer
+from scripts.animation import Animation, SingleAnimation
 
 WALK_SPEED = 64
 REVERSE = {"up": "down", "down": "up", "left": "right", "right": "left"}
@@ -211,6 +213,88 @@ class Player(PhysicsSprite):
 
     def walk_down(self):
         self.desired_velocity.y += WALK_SPEED
+
+
+class Drone(sprite.Sprite):
+    SPEED = 32
+    FALL_SPEED = 256
+
+    def __init__(self, level, rect=(0, 0, 10, 10), z=0, **custom_fields):
+        frames = level.game.loader.get_spritesheet("drone.png", (10, 10))
+        self.images = {
+            "descent": SingleAnimation(frames[0]),
+            "idle": SingleAnimation(frames[0]),
+            "shoot": SingleAnimation(frames[1]),
+        }
+        self.state = "descent"
+        self.true_pos = pygame.Vector2(pygame.Rect(rect).center)
+        self.dest = pygame.Vector2(pygame.FRect(rect).center)
+        self.age = 0
+        self.shoot_cooldown = timer.Timer(1200)
+        self.pos_cycle = timer.Timer(random.randint(0, 5000))
+        self.shoot_start = pygame.Vector2(7, 4)
+        self.facing_left = False
+        self.distance = 16
+        self.offset = 16
+        self.new_pos()
+        super().__init__(level, self.images[self.state], rect, z)
+        self.true_pos.y = self.dest.y - self.level.map_rect.height
+
+    def new_pos(self):
+        self.distance = random.randint(16, 96)
+        if random.randint(0, 1):
+            self.distance *= -1
+        self.offset = random.randint(-16, 16)
+        self.pos_cycle = timer.Timer(2500)
+
+    def update(self, dt):
+        if not self.locked:
+            if self.state == "descent":
+                motion = self.dest - self.true_pos
+                motion.clamp_magnitude_ip(self.FALL_SPEED * dt)
+                self.true_pos += motion
+                print(self.true_pos)
+                if self.true_pos.distance_squared_to(self.dest) < 4:
+                    print("idle")
+                    self.state = "idle"
+            else:
+                self.age += dt
+                desired_position = pygame.Vector2(self.level.player.pos.x + self.distance, self.level.player.pos.y + self.offset)
+                dist = (desired_position - self.true_pos).length_squared()
+                if dist > 16:
+                    motion = desired_position - self.true_pos
+                    motion.scale_to_length(self.SPEED * dt)
+                    self.true_pos += motion
+                    if dist < 64:
+                        self.state = "shoot"
+                    else:
+                        self.state = "idle"
+                elif self.shoot_cooldown.done():
+                    direction = pygame.Vector2(100, 0)
+                    if self.facing_left:
+                        direction.x *= -1
+                    self.level.add_sprite(
+                        projectile.Laser(
+                            self.level,
+                            pygame.Rect(self.rect.topleft + self.shoot_start, (4, 1)),
+                            self.z,
+                            direction,
+                        )
+                    )
+                    self.new_pos()
+                    self.shoot_cooldown.reset()
+                    self.state = "idle"
+                if self.pos_cycle.done():
+                    self.new_pos()
+        self.shoot_cooldown.update()
+        self.pos_cycle.update()
+        self.facing_left = self.true_pos.x > self.level.player.pos.x
+        self.rect.center = self.true_pos
+        self.rect.y += 3 * sin(self.age * 5)
+        self.images[self.state].flip_x = self.facing_left
+        self.images[self.state].update(dt)
+        self.image = self.images[self.state].image
+        return super().update(dt)
 
 
 def search(start: tuple | pygame.Vector2):

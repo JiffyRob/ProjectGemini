@@ -176,7 +176,6 @@ class InputQueue:
             events = pygame.event.get()
 
         for raw_event in events:
-            print(raw_event)
             if raw_event.type == pygame.JOYDEVICEADDED:
                 self.joysticks[raw_event.device_index] = pygame.Joystick(
                     raw_event.device_index

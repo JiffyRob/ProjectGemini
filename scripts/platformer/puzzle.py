@@ -2,9 +2,8 @@ import math
 
 import pygame
 
-from scripts import easings, sprite, timer
+from scripts import easings, sprite, timer, projectile
 from scripts.animation import NoLoopAnimation, SingleAnimation
-from scripts.platformer import projectile
 
 
 class Battery(sprite.Sprite):

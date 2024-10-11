@@ -133,6 +133,7 @@ class Level(game_state.GameState):
             "Furniture": topdown.immobile.Furniture,
             "Bush": topdown.immobile.Bush,
             "Smith": topdown.immobile.Smith,
+            "Drone": topdown.mobile.Drone,
         },
         # platformer
         {
