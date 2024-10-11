@@ -6497,7 +6497,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
+									"params": ["Out shopping.  Will return soon.\n\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,
@@ -7024,9 +7024,9 @@
 							"defUid": 161,
 							"px": [64,74],
 							"fieldInstances": [
-								{ "__identifier": "map", "__type": "String", "__value": "smith", "__tile": null, "defUid": 164, "realEditorValues": [{
+								{ "__identifier": "map", "__type": "String", "__value": "Smith", "__tile": null, "defUid": 164, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["smith"]
+									"params": ["Smith"]
 								}] },
 								{ "__identifier": "Sign", "__type": "String", "__value": "Pyrodyne Smith Co", "__tile": null, "defUid": 166, "realEditorValues": [{
 									"id": "V_String",
@@ -7049,9 +7049,9 @@
 							"defUid": 161,
 							"px": [144,74],
 							"fieldInstances": [
-								{ "__identifier": "map", "__type": "String", "__value": "smith", "__tile": null, "defUid": 164, "realEditorValues": [{
+								{ "__identifier": "map", "__type": "String", "__value": "Smith", "__tile": null, "defUid": 164, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["smith"]
+									"params": ["Smith"]
 								}] },
 								{ "__identifier": "Sign", "__type": "String", "__value": "Pyrodyne Smith Co", "__tile": null, "defUid": 166, "realEditorValues": [{
 									"id": "V_String",
@@ -7074,9 +7074,9 @@
 							"defUid": 161,
 							"px": [224,74],
 							"fieldInstances": [
-								{ "__identifier": "map", "__type": "String", "__value": "smith", "__tile": null, "defUid": 164, "realEditorValues": [{
+								{ "__identifier": "map", "__type": "String", "__value": "Smith", "__tile": null, "defUid": 164, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["smith"]
+									"params": ["Smith"]
 								}] },
 								{ "__identifier": "Sign", "__type": "String", "__value": "Pyrodyne Smith Co", "__tile": null, "defUid": 166, "realEditorValues": [{
 									"id": "V_String",
