@@ -80,6 +80,7 @@ class Dialog(sprite.GUISprite):
         self.font = pixelfont.PixelFont(
             self.level.game.loader.get_spritesheet("font.png", (7, 8))
         )
+        self.motion_cooldown = timer.Timer(100)
         self.rebuild()
 
     def update_text(self):
@@ -134,15 +135,18 @@ class Dialog(sprite.GUISprite):
 
     def update(self, time_delta: float):
         super().update(time_delta)
+        self.motion_cooldown.update()
         self.add_letter_timer.update(time_delta)
         pressed = self.level.game.input_queue.just_pressed
         if self.state == self.STATE_GETTING_ANSWER:
-            if "up" in pressed:
+            if "up" in pressed and self.motion_cooldown.done():
                 self.answer_index = max(self.answer_index - 1, 0)
                 self.update_text()
-            if "down" in pressed:
+                self.motion_cooldown.reset()
+            if "down" in pressed and self.motion_cooldown.done():
                 self.answer_index = min(self.answer_index + 1, len(self.answers) - 1)
                 self.update_text()
+                self.motion_cooldown.reset()
             if "interact" in pressed:
                 self.choose()
         if (

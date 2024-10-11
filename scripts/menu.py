@@ -3,7 +3,7 @@ from math import ceil, sin
 
 import pygame
 
-from scripts import animation, game_state, loader, sprite, util_draw
+from scripts import animation, game_state, loader, sprite, timer
 
 
 def nine_slice(images, size):
@@ -150,6 +150,7 @@ class KnifeIndicator(sprite.GUISprite):
         self.last_x = start_pos[0]
         self.last_y = start_pos[1]
         self.button.select()
+        self.motion_cooldown = timer.Timer(100)
         super().__init__(
             level,
             None,
@@ -188,6 +189,8 @@ class KnifeIndicator(sprite.GUISprite):
         return None
 
     def move(self, direction):
+        if not self.motion_cooldown.done():
+            return
         new_coord = self.search(direction)
         if new_coord is None:
             return None
@@ -200,6 +203,7 @@ class KnifeIndicator(sprite.GUISprite):
         self.rect.midright = self.button.rect.midleft
         self.button_dict[self.last_coord].deselect()
         self.button.select()
+        self.motion_cooldown.reset()
 
     def update(self, dt):
         pressed = self.level.game.input_queue.just_pressed
@@ -217,6 +221,7 @@ class KnifeIndicator(sprite.GUISprite):
         self.rect.midright = self.button.rect.midleft
         self.anim.update(dt)
         self.red_anim.update(dt)
+        self.motion_cooldown.update()
         return True
 
     def draw(self, surface):

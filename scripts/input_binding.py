@@ -1,8 +1,10 @@
-from queue import Queue
-
 import pygame
+import pygame._sdl2.controller as controller
+
+controller.init()
 
 HAT_AXIS_MOTION = pygame.event.custom_type()
+CONTROLLER_AXIS_SIZE = 32768
 
 
 def axis_direction(num, deadzone):
@@ -23,6 +25,7 @@ def event_magnitude(event):
 def event_to_strings(
     event, joystick_deadzone=0.3, controller_unique=False, split_hats=False
 ):
+    event = pygame.Event(event.type, event.dict)
     if event.type == HAT_AXIS_MOTION:
         identifiers = ["HatAxisMotion"]
     else:
@@ -36,7 +39,11 @@ def event_to_strings(
     if event.type in {pygame.KEYDOWN, pygame.KEYUP}:
         identifiers.append(pygame.key.name(event.key))
 
-    if "JOY" in identifiers[0] and controller_unique:
+    # controllers axes are at a different range.  Adjust to match joysticks.
+    if event.type == pygame.CONTROLLERAXISMOTION:
+        event.value /= CONTROLLER_AXIS_SIZE
+
+    if ("Joy" in identifiers[0] or "Controller" in identifiers[0]) and controller_unique:
         identifiers.insert(0, pygame.joystick.Joystick(event.instance_id).get_guid())
 
     if event.type in {pygame.JOYHATMOTION}:
@@ -62,10 +69,10 @@ def event_to_strings(
         identifiers.append(event.axis)
         identifiers.append(event.value)
 
-    if event.type in {pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN}:
+    if event.type in {pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN, pygame.CONTROLLERBUTTONUP, pygame.CONTROLLERBUTTONDOWN}:
         identifiers.append(event.button)
 
-    if event.type == pygame.JOYAXISMOTION:
+    if event.type in {pygame.JOYAXISMOTION, pygame.CONTROLLERAXISMOTION}:
         # Just posting on/off
         # Possibly have a way of getting event "magnitude"
         identifiers.append(event.axis)
@@ -78,8 +85,9 @@ def releaser_string(event_string):
     event_string = event_string.replace("KeyDown", "KeyUp")
     event_string = event_string.replace("MouseButtonDown", "MouseButtonUp")
     event_string = event_string.replace("JoyButtonDown", "JoyButtonUp")
+    event_string = event_string.replace("ControllerButtonDown", "ControllerButtonUp")
 
-    if "JoyAxisMotion" in event_string:
+    if "JoyAxisMotion" in event_string or "ControllerAxisMotion" in event_string:
         event_string = event_string.replace("forward", "center")
         event_string = event_string.replace("back", "center")
     if "HatAxisMotion" in event_string:
@@ -94,13 +102,24 @@ def init_joysticks():
     for i in range(pygame.joystick.get_count()):
         joy = pygame.joystick.Joystick(i)
         joy.init()
-        yield joy
+        yield i, joy
+
+
+def init_controllers():
+    controller.init()
+    for i in range(controller.get_count()):
+        if controller.is_controller(i):
+            gamepad = controller.Controller(i)
+            gamepad.init()
+            yield i, gamepad
 
 
 def interactive_id_printer():
     pygame.init()
+    controller.init()
     pygame.font.init()
-    joys = list(init_joysticks())
+    joys = dict(init_joysticks())
+    controllers = dict(init_controllers())
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 40)
     surface = font.render(
@@ -109,10 +128,26 @@ def interactive_id_printer():
     screen = pygame.display.set_mode(surface.get_size())
     screen.blit(surface, (0, 0))
     running = True
+
     while running:
         for event in pygame.event.get():
             for string in event_to_strings(event, split_hats=True):
                 print(string)
+            if event.type == pygame.JOYDEVICEADDED:
+                joy = pygame.joystick.Joystick(event.device_index)
+                joy.init()
+                joys[event.device_index] = joy
+            if event.type == pygame.JOYDEVICEREMOVED:
+                joys[event.instance_id].quit()
+                del joys[event.instance_id]
+            if event.type == pygame.CONTROLLERDEVICEADDED:
+                gamepad = controller.Controller(event.device_index)
+                gamepad.init()
+                controllers[event.device_index] = gamepad
+            if event.type == pygame.CONTROLLERDEVICEREMOVED:
+                controllers[event.device_index].quit()
+                del controllers[event.device_index]
+
             if event.type == pygame.QUIT:
                 running = False
         clock.tick(60)
@@ -126,7 +161,8 @@ class InputQueue:
     SPLIT_HATS = True
 
     def __init__(self):
-        self.joysticks = {}
+        self.joysticks = dict(init_joysticks())
+        self.controllers = dict(init_controllers())
         self.press_bindings = {}
         self.release_bindings = {}
         self.held = {}
@@ -140,12 +176,17 @@ class InputQueue:
             events = pygame.event.get()
 
         for raw_event in events:
+            print(raw_event)
             if raw_event.type == pygame.JOYDEVICEADDED:
                 self.joysticks[raw_event.device_index] = pygame.Joystick(
                     raw_event.device_index
                 )
             if raw_event.type == pygame.JOYDEVICEREMOVED:
-                self.joysticks[raw_event.device_index].quit()
+                self.joysticks[raw_event.instance_id].quit()
+            if raw_event.type == pygame.CONTROLLERDEVICEADDED:
+                self.controllers[raw_event.device_index] = controller.Controller(raw_event.device_index)
+            if raw_event.type == pygame.CONTROLLERDEVICEREMOVED:
+                self.controllers[raw_event.instance_id].quit()
             for action_id in event_to_strings(
                 raw_event,
                 joystick_deadzone=self.JOYSTICK_DEADZONE,
@@ -185,3 +226,7 @@ class InputQueue:
                 else:
                     print(user_action, "Not releasable")
                     self.no_hold.add(user_action)
+
+
+if __name__ == "__main__":
+    interactive_id_printer()
