@@ -159,7 +159,7 @@ class Game:
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.loader = loader.Loader()
         self.load_input_binding("arrow")
-        self.add_input_binding("jiffycontroller")
+        self.add_input_binding("controller")
         self.sound_manager = sound.SoundManager(self.loader)
         self.stack.appendleft(menu.MainMenu(self))
         dt = 0

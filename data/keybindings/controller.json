@@ -1,0 +1,16 @@
+{
+  "up": ["ControllerButtonDown_11", "ControllerAxisMotion_1_back"],
+  "down": ["ControllerButtonDown_12", "ControllerAxisMotion_1_forward"],
+  "left": ["ControllerButtonDown_13", "ControllerAxisMotion_0_back"],
+  "right": ["ControllerButtonDown_14", "ControllerAxisMotion_0_forward"],
+  "jump": ["ControllerButtonDown_0", null],
+  "duck": ["ControllerButtonDown_12", "ControllerAxisMotion_1_forward"],
+  "interact": ["ControllerButtonDown_1", null],
+  "interact_platformer": ["ControllerButtonDown_1", null],
+  "time-phase": ["KeyDown_left ctrl", "KeyDown_right ctrl"],
+  "items": ["ControllerButtonDown_3", null],
+  "quit": ["ControllerButtonDown_6", null],
+  "pause": ["ControllerButtonDown_2", null],
+  "turbo_ship": ["ControllerButtonDown_0", null],
+  "enter": ["ControllerButtonDown_1", null]
+}
