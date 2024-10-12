@@ -21,11 +21,13 @@ class ScrollingBackground(sprite.Sprite):
         self.sea_land_transition = tileset.subsurface((96, 176, 16, 16))
         self.sea_tile = level.game.loader.get_spritesheet("liquid.png")[0]
         self.state = self.STATE_GROUND
-        self.swap_cooldown = timer.Timer(1000)
+        self.swap_cooldown = timer.Timer(10000)
         self.x_offset = 0
         self.images = deque()
         self.rect = pygame.FRect(rect)
-        self.rock_chance = 100
+        self.land_rock_chance = 100
+        self.sea_rock_chance = 50
+        self.stump_chance = 100
         self.locked = False
         super().__init__(level, self.get_next_image(), rect, z)
 
@@ -53,8 +55,14 @@ class ScrollingBackground(sprite.Sprite):
         if not self.locked:
             self.x_offset -= BOARD_SPEED * dt
             self.swap_cooldown.update()
-            if not random.randint(0, self.rock_chance):
-                self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+            if self.state == self.STATE_GROUND and .05 < self.swap_cooldown.percent_complete() < .95:
+                if not random.randint(0, self.land_rock_chance):
+                    self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+                if not random.randint(0, self.stump_chance):
+                    self.level.spawn("Stump", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+            elif self.state == self.STATE_WATER and .05 < self.swap_cooldown.percent_complete() < .95:
+                if not random.randint(0, self.sea_rock_chance):
+                    self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
 
     def draw(self, surface, offset):
         if self.x_offset < 0:
@@ -125,7 +133,7 @@ class Player(sprite.Sprite):
     def hurt(self, amount):
         if self.pain_timer.done():
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
-            self.health = max(0, self.health - amount)
+            # self.health = max(0, self.health - amount)
             self.pain_timer.reset()
 
     def update(self, dt):
@@ -265,6 +273,20 @@ class Rock(sprite.Sprite):
         return super().update(dt)
 
 
-
 class Stump(sprite.Sprite):
-    ...
+    groups = {"static-collision"}
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        image = level.game.loader.get_surface("tileset.png").subsurface(16, 256, 32, 32)
+        super().__init__(level, image, rect, z)
+
+    @property
+    def collision_rect(self):
+        return self.rect
+
+    def update(self, dt):
+        if not self.locked:
+            self.rect.left -= BOARD_SPEED * dt
+            if self.rect.right < 0:
+                return False
+        return super().update(dt)

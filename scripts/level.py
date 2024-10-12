@@ -168,6 +168,7 @@ class Level(game_state.GameState):
             "Drone": hoverboarding.Drone,
             "DeadPlayer": hoverboarding.DeadPlayer,
             "Rock": hoverboarding.Rock,
+            "Stump": hoverboarding.Stump,
         },
     }
 
