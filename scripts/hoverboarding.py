@@ -18,13 +18,13 @@ class ScrollingBackground(sprite.Sprite):
         self.land_tile = tileset.subsurface((112, 176, 16, 16))
         self.land_sea_transition = tileset.subsurface((128, 176, 16, 16))
         self.sea_land_transition = tileset.subsurface((96, 176, 16, 16))
-        self.sea_tile = level.game.loader.get_spritesheet("liquid.png")[0]
-        self.state = self.STATE_GROUND
+        self.sea_tile = level.game.loader.get_spritesheet("liquid.png")[4]
+        self.state = self.STATE_WATER
         self.swap_cooldown = timer.Timer(10000)
         self.speedup_time = 5000
         self.speedup_timer = timer.Timer(5000)
-        self.slowdown_timer = timer.Timer(10000)
-        self.stop_timer = timer.Timer(15000)
+        self.slowdown_timer = timer.Timer(70000)
+        self.stop_timer = timer.Timer(75000)
         self.x_offset = 0
         self.images = deque()
         self.rect = pygame.FRect(rect)
@@ -44,7 +44,7 @@ class ScrollingBackground(sprite.Sprite):
 
     def get_next_image(self):
         if self.state == self.STATE_SLOWDOWN:
-            return util_draw.repeat_surface(self.land_tile, (16, self.rect.height))
+            return util_draw.repeat_surface(self.sea_tile, (16, self.rect.height))
         if self.swap_cooldown.done():
             self.swap_cooldown.reset()
             if self.state == self.STATE_GROUND:
@@ -74,9 +74,9 @@ class ScrollingBackground(sprite.Sprite):
                 if not random.randint(0, self.sea_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
             if not self.speedup_timer.done():
-                self.level.speed = 256 * easings.in_out_quad(self.age / self.speedup_time * 1000)
+                self.level.speed = 200 * easings.in_out_quad(self.age / self.speedup_time * 1000)
             if self.slowdown_timer.done():
-                self.level.speed = 256 * (1 - easings.in_out_quad((self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time))
+                self.level.speed = 200 * (1 - easings.in_out_quad((self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time))
                 self.state = self.STATE_SLOWDOWN
                 self.level.message("drones", "leave")
             if self.stop_timer.done():
@@ -106,8 +106,8 @@ class ScrollingBackground(sprite.Sprite):
 class Player(sprite.Sprite):
     groups = "interactable"
 
-    BANK_SPEED = 64
-    ACCEL_SPEED = 32
+    BANK_SPEED = 82
+    ACCEL_SPEED = 48
 
     MIN_Y = 32
     MAX_Y = util_draw.RESOLUTION[1] - 32
@@ -158,11 +158,12 @@ class Player(sprite.Sprite):
 
     @property
     def collision_rect(self):
-        return pygame.Rect(self.rect.left + 5, self.rect.top + 13, 19, 13)
+        return pygame.Rect(self.rect.left + 8, self.rect.top + 14, 12, 11)
 
     def hurt(self, amount):
         if self.pain_timer.done():
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
+            self.health = max(0, self.health - amount)
             self.pain_timer.reset()
 
     def exit(self):
@@ -213,7 +214,7 @@ class Player(sprite.Sprite):
                     self.rect.x = max(self.MIN_Y, self.rect.x - self.ACCEL_SPEED * dt)
                     self.state = "lookback"
                 if self.collision_rect.collidelist(self.level.collision_rects) != -1:
-                    self.hurt(10)
+                    self.hurt(3)
         anim = self.anim_dict[f"{self.state}-{self.facing}"]
         anim.update(dt)
         self.image = anim.image
@@ -271,8 +272,8 @@ class Drone(sprite.Sprite):
         self.dest = pygame.Vector2(-32, self.pos.y + self.offset)
 
     def new_pos(self):
-        self.distance = random.randint(-112, -48)
-        self.offset = random.randint(-48, 48)
+        self.distance = random.randint(-84, -48)
+        self.offset = random.randint(-64, 64)
         self.pos_cycle = timer.Timer(2500)
 
     def update(self, dt):
@@ -293,11 +294,11 @@ class Drone(sprite.Sprite):
                 self.age += dt
                 desired_position = pygame.Vector2(self.level.player.pos.x + self.distance, self.level.player.pos.y + self.offset)
                 dist = (desired_position - self.true_pos).length_squared()
-                if dist > 16:
+                if dist > 64:
                     motion = desired_position - self.true_pos
                     motion.scale_to_length(self.SPEED * dt)
                     self.true_pos += motion
-                    if dist < 64:
+                    if dist < 128:
                         self.state = "shoot"
                     else:
                         self.state = "idle"
