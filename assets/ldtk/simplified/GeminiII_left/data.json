@@ -1,12 +1,17 @@
 {
-	"identifier": "GeminiII_right",
+	"identifier": "GeminiII_left",
 	"uniqueIdentifer": "24068cb0-73f0-11ef-9c8a-cdf1c04b184c",
 	"x": 1744,
 	"y": -736,
 	"width": 256,
 	"height": 224,
 	"bgColor": "#696A79",
-	"neighbourLevels": [],
+	"neighbourLevels": [
+		{
+			"levelIid": "45c1b7c0-73f0-11ef-9c8a-a39cbd9c2249",
+			"dir": "e"
+		}
+	],
 	"customFields": {
 		"start": [
 			64,
@@ -30,8 +35,8 @@
 				"id": "Drone",
 				"iid": "adc9e360-73f0-11ef-9c8a-5fd36c7aa014",
 				"layer": "Entities",
-				"x": 64,
-				"y": 32,
+				"x": 0,
+				"y": 80,
 				"width": 16,
 				"height": 16,
 				"color": 39387,
@@ -42,7 +47,7 @@
 				"iid": "ae3cf080-73f0-11ef-9c8a-97f34b1f6f49",
 				"layer": "Entities",
 				"x": 0,
-				"y": 112,
+				"y": 144,
 				"width": 16,
 				"height": 16,
 				"color": 39387,
@@ -52,8 +57,8 @@
 				"id": "Drone",
 				"iid": "ae9ac7f0-73f0-11ef-9c8a-4b28a57b9da6",
 				"layer": "Entities",
-				"x": 48,
-				"y": 176,
+				"x": 0,
+				"y": 192,
 				"width": 16,
 				"height": 16,
 				"color": 39387,
@@ -61,10 +66,10 @@
 			},
 			{
 				"id": "Drone",
-				"iid": "af106d20-73f0-11ef-9c8a-33b00238555c",
+				"iid": "4c1940c0-73f0-11ef-9c8a-a74d9fe2a8de",
 				"layer": "Entities",
-				"x": 64,
-				"y": 80,
+				"x": 0,
+				"y": 32,
 				"width": 16,
 				"height": 16,
 				"color": 39387,

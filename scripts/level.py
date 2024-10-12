@@ -169,6 +169,7 @@ class Level(game_state.GameState):
             "DeadPlayer": hoverboarding.DeadPlayer,
             "Rock": hoverboarding.Rock,
             "Stump": hoverboarding.Stump,
+            "Player": topdown.mobile.Player,
         },
     }
 
@@ -192,7 +193,6 @@ class Level(game_state.GameState):
         elif map_type in {self.MAP_HOUSE, self.MAP_TOPDOWN}:
             self.player = topdown.mobile.Player(self)
         elif map_type == self.MAP_HOVERBOARD:
-            print("OOOOOOOH!  Race time!")
             self.player = hoverboarding.Player(self)
         else:
             print('AAAAHAHH')
@@ -222,6 +222,7 @@ class Level(game_state.GameState):
         self.shake_magnitude = 0
         self.shake_delta = 0
         self.shake_axes = 0
+        self.speed = 0  # used for hoverboard levels
 
     def shake(self, magnitude=5, delta=8, axes=AXIS_X | AXIS_Y):
         self.shake_magnitude += magnitude
@@ -265,6 +266,10 @@ class Level(game_state.GameState):
         for background in self.backgrounds:
             background.unlock()
 
+    def message(self, group, message):
+        for sprite in self.groups[group]:
+            sprite.message(message)
+
     def add_effect(self, effect):
         self.effects.append(effect)
 
@@ -274,11 +279,11 @@ class Level(game_state.GameState):
     def spawn(self, sprite_name, rect, z=None, **custom_fields):
         if z is None:
             z = self.entity_layer
-        self.add_sprite(
-            self.sprite_classes[self.map_type][sprite_name](
-                self, rect, z, **custom_fields
-            )
+        new_sprite = self.sprite_classes[self.map_type][sprite_name](
+            self, rect, z, **custom_fields
         )
+        self.add_sprite(new_sprite)
+        return new_sprite
 
     def add_sprite(self, sprite):
         self.to_add.add(sprite)

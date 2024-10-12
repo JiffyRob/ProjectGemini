@@ -297,6 +297,17 @@ class Drone(sprite.Sprite):
         return super().update(dt)
 
 
+class DeadPlayer(sprite.Sprite):
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        self.anim = NoLoopAnimation(level.game.loader.get_spritesheet("me.png")[30:35], 0.1)
+        super().__init__(level, self.anim.image, rect, z)
+
+    def update(self, dt):
+        self.anim.update(dt)
+        self.image = self.anim.image
+        return super().update(dt)
+
+
 def search(start: tuple | pygame.Vector2):
     """yields positions in a grid of spacing 'dist', in order of rough proximity to 'start'"""
 
@@ -320,14 +331,3 @@ def search(start: tuple | pygame.Vector2):
                 frontier.put(next)
                 reached.add(next)
         yield current
-
-
-class DeadPlayer(sprite.Sprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
-        self.anim = NoLoopAnimation(level.game.loader.get_spritesheet("me.png")[30:35], 0.1)
-        super().__init__(level, self.anim.image, rect, z)
-
-    def update(self, dt):
-        self.anim.update(dt)
-        self.image = self.anim.image
-        return super().update(dt)

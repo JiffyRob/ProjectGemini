@@ -1,0 +1,50 @@
+{
+	"identifier": "GeminiII_left_left",
+	"uniqueIdentifer": "98f38950-fec0-11ee-85ba-1b061a8e5769",
+	"x": 1288,
+	"y": -734,
+	"width": 448,
+	"height": 448,
+	"bgColor": "#34C5A3",
+	"neighbourLevels": [
+		{
+			"levelIid": "6ec05e10-fec0-11ee-85ba-e9ddb5f08779",
+			"dir": "n"
+		}
+	],
+	"customFields": {
+		"start": [
+			184,
+			136
+		],
+		"entity_layer": 8,
+		"Background": "saline",
+		"Biome": "Purple_Flats_Topdown",
+		"Soundtrack": "Gemini-II",
+		"Maptype": "TopDown"
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities": {
+		"House": [
+			{
+				"id": "House",
+				"iid": "504f8d20-fec0-11ee-85ba-eb3da28e3686",
+				"layer": "Entities",
+				"x": 144,
+				"y": 80,
+				"width": 16,
+				"height": 16,
+				"color": 12087120,
+				"customFields": {
+					"map": "Home",
+					"Sign": "My House"
+				}
+			}
+		]
+	}
+}

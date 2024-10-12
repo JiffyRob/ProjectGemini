@@ -19,6 +19,9 @@ class Sprite:
         self.hidden = False
         self.hidden_image = None
 
+    def message(self, message):
+        print(self, "received", message)
+
     def hide(self):
         self.hidden = True
         self.hidden_image = self.image
