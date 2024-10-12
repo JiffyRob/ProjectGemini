@@ -19,10 +19,9 @@
 		],
 		"entity_layer": 8,
 		"Background": null,
-		"platformer": false,
 		"Biome": "N_A",
 		"Soundtrack": null,
-		"house": false
+		"Maptype": "House"
 	},
 	"layers": [
 		"Collision.png",

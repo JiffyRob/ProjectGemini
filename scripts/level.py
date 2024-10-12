@@ -124,9 +124,13 @@ class Level(game_state.GameState):
     AXIS_X = 1
     AXIS_Y = 2
 
-    sprite_classes = (
-        # topdown
-        {
+    MAP_TOPDOWN = "TopDown"
+    MAP_PLATFORMER = "Platformer"
+    MAP_HOUSE = "House"
+    MAP_HOVERBOARD = "Hoverboard"
+
+    sprite_classes = {
+        MAP_TOPDOWN: {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
             "Ship": topdown.immobile.Ship,
             "BrokenShip": topdown.immobile.BrokenShip,
@@ -137,8 +141,11 @@ class Level(game_state.GameState):
             "Drone": topdown.mobile.Drone,
             "DeadPlayer": topdown.mobile.DeadPlayer,
         },
-        # platformer
-        {
+        MAP_HOUSE: {
+            "Emerald": platformer.immobile.Emerald,  # same for both perspectives
+            "Furniture": topdown.immobile.Furniture,
+        },
+        MAP_PLATFORMER: {
             "Emerald": platformer.immobile.Emerald,
             "BustedParts": platformer.immobile.BustedParts,
             "BoingerBeetle": platformer.mobile.BoingerBeetle,
@@ -151,7 +158,10 @@ class Level(game_state.GameState):
             "Ship": platformer.mobile.Ship,
             "DeadPlayer": platformer.player.DeadPlayer,
         },
-    )
+        MAP_HOVERBOARD: {
+
+        },
+    }
 
     def __init__(
         self,
@@ -160,8 +170,7 @@ class Level(game_state.GameState):
         player_pos=(0, 0),
         player_facing=None,
         map_size=(256, 256),
-        is_platformer=False,
-        is_house=False,
+        map_type=MAP_TOPDOWN,
         soundtrack=None,
     ):
         super().__init__(game)
@@ -169,13 +178,16 @@ class Level(game_state.GameState):
         self.backgrounds = []
         self.groups = defaultdict(set)
         self.soundtrack = soundtrack
-        if is_platformer:
+        if map_type == self.MAP_PLATFORMER:
             self.player = platformer.player.Player(self)
-            self.is_platformer = True
-        else:
+        elif map_type in {self.MAP_HOUSE, self.MAP_TOPDOWN}:
             self.player = topdown.mobile.Player(self)
-            self.is_platformer = False
-        self.is_house = is_house
+        elif map_type == self.MAP_HOVERBOARD:
+            print("OOOOOOOH!  Race time!")
+        else:
+            print('AAAAHAHH')
+            raise
+        self.map_type = map_type
         self.entity_layer = 0
         self.player.rect.center = player_pos
         if player_facing is not None:
@@ -246,7 +258,7 @@ class Level(game_state.GameState):
         if z is None:
             z = self.entity_layer
         self.add_sprite(
-            self.sprite_classes[self.is_platformer][sprite_name](
+            self.sprite_classes[self.map_type][sprite_name](
                 self, rect, z, **custom_fields
             )
         )
@@ -287,13 +299,12 @@ class Level(game_state.GameState):
         folder = pathlib.Path("ldtk/simplified", name)
         data = game.loader.get_json(folder / "data.json", for_map=True)
         size = data["width"], data["height"]
-        is_platformer = data["customFields"]["platformer"]
-        is_house = data["customFields"]["house"]
+        map_type = data["customFields"]["Maptype"]
         soundtrack = data["customFields"]["Soundtrack"]
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
         player_position = data["customFields"]["start"]
-        if is_platformer:
+        if map_type == cls.MAP_PLATFORMER:
             if direction == "left":
                 player_position = (size[0] - 8, player_position[1])
             if direction == "right":
@@ -314,9 +325,8 @@ class Level(game_state.GameState):
             player_pos=player_position,
             player_facing=direction,
             map_size=size,
-            is_platformer=is_platformer,
+            map_type=map_type,
             soundtrack=soundtrack,
-            is_house=is_house,
         )
         # background creation
         level.bgcolor = data["bgColor"]
@@ -337,7 +347,7 @@ class Level(game_state.GameState):
             )
         # sprites
         for key, value in data["entities"].items():
-            sprite_cls = cls.sprite_classes[is_platformer][key]
+            sprite_cls = cls.sprite_classes[map_type][key]
             if sprite_cls is None:
                 continue
             for entity in value:
@@ -361,13 +371,13 @@ class Level(game_state.GameState):
                         if value == 1:
                             rect = pygame.FRect(col * 16, row * 16, 16, 16)
                             level.collision_rects.append(rect)
-                    elif value == 0 and not is_platformer:
+                    elif value == 0 and map_type in {cls.MAP_HOUSE, cls.MAP_TOPDOWN}:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.collision_rects.append(rect)
-                    elif value == 1 and is_platformer:
+                    elif value == 1 and map_type == cls.MAP_PLATFORMER:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.collision_rects.append(rect)
-                    elif value == 2 and is_platformer:
+                    elif value == 2 and map_type == cls.MAP_PLATFORMER:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.down_rects.append(rect)
             level.player.z = entity_layer

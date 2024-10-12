@@ -14,10 +14,9 @@
 		],
 		"entity_layer": 8,
 		"Background": "mushroom",
-		"platformer": true,
 		"Biome": "Mushroom_Plat",
 		"Soundtrack": "FungalBoogie",
-		"house": false
+		"Maptype": "Platformer"
 	},
 	"layers": [
 		"Collision.png",

@@ -23,10 +23,9 @@
 		],
 		"entity_layer": 8,
 		"Background": "lava",
-		"platformer": false,
 		"Biome": "Gold_Topdown",
 		"Soundtrack": null,
-		"house": false
+		"Maptype": "TopDown"
 	},
 	"layers": [
 		"Collision.png",

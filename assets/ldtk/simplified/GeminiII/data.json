@@ -19,10 +19,9 @@
 		],
 		"entity_layer": 8,
 		"Background": "saline",
-		"platformer": false,
 		"Biome": "Purple_Flats_Topdown",
 		"Soundtrack": "Gemini-II",
-		"house": false
+		"Maptype": "TopDown"
 	},
 	"layers": [
 		"Collision.png",

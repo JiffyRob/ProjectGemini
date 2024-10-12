@@ -11,7 +11,7 @@
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 476545,
-	"nextUid": 195,
+	"nextUid": 196,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "Free",
@@ -3014,7 +3014,12 @@
 		}
 	], "enums": [
 		{ "identifier": "Direction", "uid": 13, "values": [], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
-		{ "identifier": "Maptype", "uid": 32, "values": [{ "id": "Platformer_M", "tileRect": null, "color": 12470831 }], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
+		{ "identifier": "Maptype", "uid": 32, "values": [
+			{ "id": "TopDown", "tileRect": null, "color": 12470831 },
+			{ "id": "Platformer", "tileRect": null, "color": 14120515 },
+			{ "id": "House", "tileRect": null, "color": 15389866 },
+			{ "id": "Hoverboard", "tileRect": null, "color": 14984818 }
+		], "iconTilesetUid": null, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "Biome", "uid": 49, "values": [
 			{ "id": "Mushroom_Plat", "tileRect": { "tilesetUid": 15, "x": 32, "y": 0, "w": 16, "h": 16 }, "color": 12470831 },
 			{ "id": "Purple_Flats_Topdown", "tileRect": { "tilesetUid": 15, "x": 112, "y": 176, "w": 16, "h": 16 }, "color": 6830188 },
@@ -3144,43 +3149,6 @@
 			"tilesetUid": null
 		},
 		{
-			"identifier": "platformer",
-			"doc": null,
-			"__type": "Bool",
-			"uid": 45,
-			"type": "F_Bool",
-			"isArray": false,
-			"canBeNull": false,
-			"arrayMinLength": null,
-			"arrayMaxLength": null,
-			"editorDisplayMode": "Hidden",
-			"editorDisplayScale": 1,
-			"editorDisplayPos": "Above",
-			"editorLinkStyle": "StraightArrow",
-			"editorDisplayColor": null,
-			"editorAlwaysShow": false,
-			"editorShowInWorld": true,
-			"editorCutLongValues": true,
-			"editorTextSuffix": null,
-			"editorTextPrefix": null,
-			"useForSmartColor": false,
-			"exportToToc": false,
-			"searchable": false,
-			"min": null,
-			"max": null,
-			"regex": null,
-			"acceptFileTypes": null,
-			"defaultOverride": null,
-			"textLanguageMode": null,
-			"symmetricalRef": false,
-			"autoChainRef": true,
-			"allowOutOfLevelRef": true,
-			"allowedRefs": "OnlySame",
-			"allowedRefsEntityUid": null,
-			"allowedRefTags": [],
-			"tilesetUid": null
-		},
-		{
 			"identifier": "Biome",
 			"doc": null,
 			"__type": "LocalEnum.Biome",
@@ -3255,11 +3223,11 @@
 			"tilesetUid": null
 		},
 		{
-			"identifier": "house",
+			"identifier": "Maptype",
 			"doc": null,
-			"__type": "Bool",
-			"uid": 96,
-			"type": "F_Bool",
+			"__type": "LocalEnum.Maptype",
+			"uid": 195,
+			"type": "F_Enum(32)",
 			"isArray": false,
 			"canBeNull": false,
 			"arrayMinLength": null,
@@ -3319,10 +3287,6 @@
 					"id": "V_String",
 					"params": ["mushroom"]
 				}] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": true, "__tile": null, "defUid": 45, "realEditorValues": [{
-					"id": "V_Bool",
-					"params": [ true ]
-				}] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Mushroom_Plat", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Mushroom_Plat"]
@@ -3331,7 +3295,10 @@
 					"id": "V_String",
 					"params": ["FungalBoogie"]
 				}] },
-				{ "__identifier": "house", "__type": "Bool", "__value": false, "__tile": null, "defUid": 96, "realEditorValues": [] }
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "Platformer", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["Platformer"]
+				}] }
 			],
 			"layerInstances": [
 				{
@@ -5241,7 +5208,6 @@
 				{ "__identifier": "start", "__type": "Array<Int>", "__value": [152,119], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [152] }, { "id": "V_Int", "params": [119] } ] },
 				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [{ "id": "V_Int", "params": [8] }] },
 				{ "__identifier": "Background", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": false, "__tile": null, "defUid": 45, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Mushroom_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Mushroom_Topdown"]
@@ -5250,7 +5216,10 @@
 					"id": "V_String",
 					"params": ["FungalBoogie"]
 				}] },
-				{ "__identifier": "house", "__type": "Bool", "__value": false, "__tile": null, "defUid": 96, "realEditorValues": [] }
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["TopDown"]
+				}] }
 			],
 			"layerInstances": [
 				{
@@ -5558,7 +5527,6 @@
 					"id": "V_String",
 					"params": ["saline"]
 				}] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": false, "__tile": null, "defUid": 45, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Purple_Flats_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Purple_Flats_Topdown"]
@@ -5567,7 +5535,10 @@
 					"id": "V_String",
 					"params": ["Gemini-II"]
 				}] },
-				{ "__identifier": "house", "__type": "Bool", "__value": false, "__tile": null, "defUid": 96, "realEditorValues": [] }
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["TopDown"]
+				}] }
 			],
 			"layerInstances": [
 				{
@@ -6433,7 +6404,6 @@
 				{ "__identifier": "start", "__type": "Array<Int>", "__value": [72,82], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [72] }, { "id": "V_Int", "params": [82] } ] },
 				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [{ "id": "V_Int", "params": [8] }] },
 				{ "__identifier": "Background", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": false, "__tile": null, "defUid": 45, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "N_A", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["N_A"]
@@ -6442,9 +6412,9 @@
 					"id": "V_String",
 					"params": ["BlueVictoria"]
 				}] },
-				{ "__identifier": "house", "__type": "Bool", "__value": true, "__tile": null, "defUid": 96, "realEditorValues": [{
-					"id": "V_Bool",
-					"params": [ true ]
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "House", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["House"]
 				}] }
 			],
 			"layerInstances": [
@@ -6738,16 +6708,15 @@
 					"id": "V_String",
 					"params": ["lava"]
 				}] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": false, "__tile": null, "defUid": 45, "realEditorValues": [{
-					"id": "V_Bool",
-					"params": [ false ]
-				}] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Gold_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Gold_Topdown"]
 				}] },
 				{ "__identifier": "Soundtrack", "__type": "String", "__value": null, "__tile": null, "defUid": 76, "realEditorValues": [] },
-				{ "__identifier": "house", "__type": "Bool", "__value": false, "__tile": null, "defUid": 96, "realEditorValues": [] }
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["TopDown"]
+				}] }
 			],
 			"layerInstances": [
 				{
@@ -7831,13 +7800,15 @@
 					"id": "V_String",
 					"params": ["lava"]
 				}] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": false, "__tile": null, "defUid": 45, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Gold_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Gold_Topdown"]
 				}] },
 				{ "__identifier": "Soundtrack", "__type": "String", "__value": null, "__tile": null, "defUid": 76, "realEditorValues": [] },
-				{ "__identifier": "house", "__type": "Bool", "__value": false, "__tile": null, "defUid": 96, "realEditorValues": [] }
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["TopDown"]
+				}] }
 			],
 			"layerInstances": [
 				{
@@ -8172,13 +8143,15 @@
 				{ "__identifier": "start", "__type": "Array<Int>", "__value": [72,82], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [72] }, { "id": "V_Int", "params": [82] } ] },
 				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [] },
 				{ "__identifier": "Background", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
-				{ "__identifier": "platformer", "__type": "Bool", "__value": false, "__tile": null, "defUid": 45, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "N_A", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["N_A"]
 				}] },
 				{ "__identifier": "Soundtrack", "__type": "String", "__value": null, "__tile": null, "defUid": 76, "realEditorValues": [] },
-				{ "__identifier": "house", "__type": "Bool", "__value": false, "__tile": null, "defUid": 96, "realEditorValues": [] }
+				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "House", "__tile": null, "defUid": 195, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["House"]
+				}] }
 			],
 			"layerInstances": [
 				{

@@ -121,7 +121,7 @@ class Player(PhysicsSprite):
         return rect
 
     def on_map_departure(self, directions):
-        if not self.level.is_house:
+        if self.level.map_type != self.level.MAP_HOUSE:
             long_name = f"{self.level.name}_{directions[0]}"
             x = long_name.count("right") - long_name.count("left")
             y = long_name.count("down") - long_name.count("up")
