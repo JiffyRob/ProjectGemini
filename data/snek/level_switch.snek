@@ -2,7 +2,7 @@
 lock();
 fadeout_circle();
 unlock();
-map_switch(NEXT_LEVEL, DIRECTION, POSITION);
+map_switch(NEXT_LEVEL, DIRECTION, POSITION, ENTRANCE);
 # this will run once this level is reentered
 lock();
 fadein_circle();

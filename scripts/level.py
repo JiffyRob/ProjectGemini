@@ -146,6 +146,7 @@ class Level(game_state.GameState):
             "Smith": topdown.immobile.Smith,
             "Drone": topdown.mobile.Drone,
             "DeadPlayer": topdown.mobile.DeadPlayer,
+            "Hoverboard": topdown.immobile.Hoverboard,
         },
         MAP_HOUSE: {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
@@ -182,24 +183,26 @@ class Level(game_state.GameState):
         map_size=(256, 256),
         map_type=MAP_TOPDOWN,
         soundtrack=None,
+        entrance=None
     ):
         super().__init__(game)
         self.name = name
         self.backgrounds = []
         self.groups = defaultdict(set)
         self.soundtrack = soundtrack
+        rect = pygame.FRect(0, 0, 16, 16)
+        rect.center = player_pos
         if map_type == self.MAP_PLATFORMER:
-            self.player = platformer.player.Player(self)
+            self.player = platformer.player.Player(self, rect)
         elif map_type in {self.MAP_HOUSE, self.MAP_TOPDOWN}:
-            self.player = topdown.mobile.Player(self)
+            self.player = topdown.mobile.Player(self, rect, entrance=entrance)
         elif map_type == self.MAP_HOVERBOARD:
-            self.player = hoverboarding.Player(self)
+            self.player = hoverboarding.Player(self, rect)
         else:
             print('AAAAHAHH')
             raise
         self.map_type = map_type
         self.entity_layer = 0
-        self.player.rect.center = player_pos
         if player_facing is not None:
             self.player.last_facing = player_facing
         self.sprites = {self.player}
@@ -229,10 +232,10 @@ class Level(game_state.GameState):
         self.shake_delta += delta
         self.shake_axes = axes
 
-    def run_cutscene(self, cutscene_id, extra_constants=None, override=False):
+    def run_cutscene(self, cutscene_id, extra_constants=None, override=False, extra_api=None):
         if self.script is None or override:
             self.script = snekgemini.cutscene(
-                cutscene_id, level=self, extra_constants=extra_constants
+                cutscene_id, level=self, extra_constants=extra_constants, extra_api=extra_api,
             )
             self.script.cycle()
 
@@ -249,8 +252,8 @@ class Level(game_state.GameState):
     def exit_level(self):
         self.run_cutscene("level_exit")
 
-    def switch_level(self, dest, direction=None, position=None):
-        self.run_cutscene("level_switch", extra_constants={"NEXT_LEVEL": dest, "DIRECTION": direction, "POSITION": position})
+    def switch_level(self, dest, direction=None, position=None, entrance="normal"):
+        self.run_cutscene("level_switch", extra_constants={"NEXT_LEVEL": dest, "DIRECTION": direction, "POSITION": position, "ENTRANCE": entrance})
 
     def lock(self):
         self.locked = True
@@ -316,7 +319,7 @@ class Level(game_state.GameState):
         self.on_dialog_finish = lambda answer: None
 
     @classmethod
-    def load(cls, game, name, direction=None, position=None):
+    def load(cls, game, name, direction=None, position=None, entrance="normal"):
         # basic metadata
         folder = pathlib.Path("ldtk/simplified", name)
         data = game.loader.get_json(folder / "data.json", for_map=True)
@@ -334,7 +337,7 @@ class Level(game_state.GameState):
                 player_position = (8, player_position[1])
         elif map_type == cls.MAP_HOVERBOARD:
             pass
-        else:
+        elif entrance == "normal":
             if direction == "down":
                 player_position = (position[0], 8)
             if direction == "up":
@@ -351,6 +354,7 @@ class Level(game_state.GameState):
             map_size=size,
             map_type=map_type,
             soundtrack=soundtrack,
+            entrance=entrance,
         )
         # background creation
         level.bgcolor = data["bgColor"]

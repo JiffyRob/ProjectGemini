@@ -82,7 +82,7 @@ class ScrollingBackground(sprite.Sprite):
             if self.stop_timer.done():
                 self.level.speed = 0
                 if not self.finished:
-                    self.level.player.dismount()
+                    self.level.player.exit()
                     self.finished = True
 
     def draw(self, surface, offset):
@@ -117,14 +117,17 @@ class Player(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 32, 32), z=0):
         frames = level.game.loader.get_spritesheet("hoverboard.png", (32, 32))
         self.anim_dict = {
+            "entering-right": Animation(frames[4:8], 0.1),
             "empty-right": Animation(frames[:4], 0.1),
             "idle-right": Animation(frames[4:8], 0.1),
             "lookback-right": Animation(frames[8:12], 0.1),
+            "exiting-right": Animation(frames[4:8], 0.1),
         }
-        self.state = "idle"
+        self.state = "entering"
         self.facing = "right"
         self.pain_timer = timer.Timer(1000)
         super().__init__(level, self.anim_dict[f"{self.state}-{self.facing}"].image, rect, z)
+        self.rect.right = 0
 
     def interact(self):
         pass
@@ -162,6 +165,9 @@ class Player(sprite.Sprite):
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
             self.pain_timer.reset()
 
+    def exit(self):
+        self.state = "exiting"
+
     def dismount(self):
         self.state = "empty"
         rect = pygame.Rect(0, 0, 16, 16)
@@ -171,7 +177,27 @@ class Player(sprite.Sprite):
 
     def update(self, dt):
         if not self.locked:
-            if self.state != "empty":
+            if self.state == "entering":
+                self.rect.left += 64 * dt
+                if self.rect.left > 32:
+                    self.state = "idle"
+            elif self.state == "exiting":
+                self.rect.left += 64 * dt
+                if self.rect.left > self.level.map_rect.right:
+                    long_name = f"{self.level.name}_right"
+                    x = long_name.count("right") - long_name.count("left")
+                    y = long_name.count("down") - long_name.count("up")
+                    short_name = self.level.name.split("_")[0]
+                    if x < 0:
+                        short_name += "_left" * abs(x)
+                    if x > 0:
+                        short_name += "_right" * x
+                    if y < 0:
+                        short_name += "_up" * abs(y)
+                    if y > 0:
+                        short_name += "_down" * y
+                    self.level.switch_level(short_name, direction="right", position=self.pos, entrance="board")
+            elif self.state != "empty":
                 held_input = self.level.game.input_queue.held
                 just_input = self.level.game.input_queue.just_pressed
                 self.state = "idle"

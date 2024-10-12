@@ -1,13 +1,7 @@
 class GameSave:
     def __init__(self, game):
         self.game = game
-        self.data = {
-            "health": 6,
-            "health_capacity": 6,
-            "planet": "GeminiII",
-            "bush_interactions": 0,
-            "emeralds": 10,
-        }
+        self.data = {}
         self.loaded_path = None
 
     def __getattr__(self, attr):
@@ -19,6 +13,12 @@ class GameSave:
         if name in {"data", "game"}:
             return super().__setattr__(name, value)
         self.data[name] = value
+
+    def get_state(self, key):
+        return self.data[key]
+
+    def set_state(self, key, value):
+        self.data[key] = value
 
     def load(self, path):
         self.data = self.game.loader.get_save(path)

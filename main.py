@@ -62,9 +62,12 @@ class Game:
     def pop_state(self):
         self.stack.popleft()
 
-    def load_map(self, map_name, direction=None, position=None):
+    def load_map(self, map_name, direction=None, position=None, entrance=None):
         print("loading level:", map_name)
-        self.stack.appendleft(level.Level.load(self, map_name, direction, position))
+        new_map = level.Level.load(self, map_name, direction, position, entrance)
+        if isinstance(self.stack[0], level.Level) and new_map.map_type != new_map.MAP_HOUSE:
+            self.pop_state()
+        self.stack.appendleft(new_map)
         if "_" not in map_name:
             self.save.planet = map_name
 

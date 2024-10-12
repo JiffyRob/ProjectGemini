@@ -1,5 +1,5 @@
+attempt_map_cutscene();
 fadein_circle();
 lock();
 play_soundtrack(LEVEL_SOUNDTRACK);
 unlock();
-attempt_map_cutscene();

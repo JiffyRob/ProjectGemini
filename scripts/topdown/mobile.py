@@ -8,6 +8,9 @@ from scripts import sprite, projectile, timer
 from scripts.animation import Animation, SingleAnimation, NoLoopAnimation
 
 WALK_SPEED = 64
+BOARD_SPEED = 96
+FALL_SPEED = 128
+
 REVERSE = {"up": "down", "down": "up", "left": "right", "right": "left"}
 
 
@@ -61,9 +64,13 @@ class Player(PhysicsSprite):
     }
 
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        self.dest = pygame.Vector2(pygame.Rect(rect).center)
         super().__init__(level, rect=rect, image=None, z=z)
         images = level.game.loader.get_spritesheet("me.png")
+        board_images = level.game.loader.get_spritesheet("hoverboard.png", (32, 32))
         self.anim_dict = {
+            "entrance-board": Animation(board_images[4:8], 0.1),
+            "entrance-fall": SingleAnimation(images[1]),
             "walk-up": Animation(images[4:8]),
             "idle-up": Animation((images[5],)),
             "walk-right": Animation(images[8:12]),
@@ -73,10 +80,17 @@ class Player(PhysicsSprite):
             "walk-left": Animation(images[8:12], flip_x=True),
             "idle-left": Animation((images[9],), flip_x=True),
         }
-        self.state = "idle"
+        entrance = custom_fields.get("entrance", "normal")
+        if entrance == "board":
+            self.state = "entrance-board"
+            self.rect.right = 0
+        elif entrance == "fall":
+            self.state = "entrance-fall"
+            self.rect.bottom = 0
+        else:
+            self.state = "idle"
         self.last_facing = "right"
         self.image = self.anim_dict["idle-right"].image
-
         self.emeralds = 10
 
     @property
@@ -163,6 +177,21 @@ class Player(PhysicsSprite):
                 sprite.interact()
 
     def update(self, dt):
+        if "entrance" in self.state:
+            if self.state == "entrance-board":
+                self.rect.center += (self.dest - self.pos).clamp_magnitude(BOARD_SPEED) * dt
+                if self.pos.distance_squared_to(self.dest) <= 1:
+                    self.level.spawn("Hoverboard", (self.rect.topleft, (32, 32)))
+                    self.level.game.save.hoverboarded = True
+                    self.rect.center = pygame.Rect(self.rect.topleft, (32, 32)).center
+                    self.state = "idle-right"
+            if self.state == "entrance-fall":
+                self.rect.center += (self.dest - self.pos).clamp_magnitude(FALL_SPEED) * dt
+                if self.pos.distance_squared_to(self.dest) <= 1:
+                    self.state = "idle"
+            self.anim_dict[self.state].update(dt)
+            self.image = self.anim_dict[self.state].image
+            return sprite.Sprite.update(self, dt)
         self.desired_velocity *= 0
         if not self.locked:
             pressed = self.level.game.input_queue.just_pressed

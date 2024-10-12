@@ -45,6 +45,19 @@
 					"Sign": "My House"
 				}
 			}
+		],
+		"Hoverboard": [
+			{
+				"id": "Hoverboard",
+				"iid": "83a30040-73f0-11ef-9c8a-e10654901d17",
+				"layer": "Entities",
+				"x": 368,
+				"y": 256,
+				"width": 32,
+				"height": 32,
+				"color": 4916999,
+				"customFields" : {}
+			}
 		]
 	}
 }

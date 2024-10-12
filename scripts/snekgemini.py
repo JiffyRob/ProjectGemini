@@ -180,11 +180,13 @@ def spawn(level, sprite_name, x, y, width, height, z=0, **custom_fields):
     level.spawn(sprite_name, (x, y, width, height), z, **custom_fields)
 
 
-def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
+def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None, extra_api=None):
     if runner is not snek.NULL:
         level = runner.level
     if extra_constants is None:
         extra_constants = {}
+    if extra_api is None:
+        extra_api = {}
     return snek.SNEKProgram(
         level.game.loader.get_script(f"{script_name}.snek"),
         {
@@ -209,6 +211,8 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "get_player_z": snek.snek_command(lambda: level.player.z),
             "get_player_pos": snek.snek_command(lambda: level.player.pos),
             "get_player_name": snek.snek_command(lambda: level.player.name),
+            "get_save_state": snek.snek_command(level.game.save.get_state),
+            "set_save_state": snek.snek_command(level.game.save.set_state),
             "hide_player": snek.snek_command(level.player.hide),
             "show_player": snek.snek_command(level.player.show),
             "map_switch": snek.snek_command(level.game.load_map),
@@ -230,5 +234,6 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
                 lambda *args: level.run_cutscene(*args, override=True)
             ),
             "attempt_map_cutscene": snek.snek_command(level.attempt_map_cutscene),
+            **extra_api,
         },
     )

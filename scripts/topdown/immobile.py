@@ -1,7 +1,7 @@
 import pygame
 
-from scripts import snekgemini, sprite
-
+from scripts import snekgemini, sprite, snek
+from scripts.animation import Animation
 
 class Interactable(sprite.Sprite):
     groups = {"interactable"}
@@ -200,3 +200,48 @@ class Bush(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
         super().__init__(level, level.game.loader.get_surface("tileset.png", rect=(160, 64, 16, 16)), rect, z)
         self.collision_rect = self.rect.copy()
+
+
+class Hoverboard(sprite.Sprite):
+    groups = {"interactable"}
+
+    def __init__(self, level, rect=(0, 0, 32, 32), z=0, **custom_fields):
+        self.anim = Animation(level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[:4])
+        self.exit_anim = Animation(level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[4:8])
+        self.exiting = False
+        super().__init__(level, self.anim.image, rect, z - 1)
+
+    @property
+    def collision_rect(self):
+        return self.rect.inflate(-16, -8)
+
+    def ride_off_into_sunset(self):
+        self.level.player.lock()
+        self.level.player.hide()
+        self.anim = self.exit_anim
+        self.exiting = True
+
+    def interact(self):
+        self.level.run_cutscene("hoverboard", extra_api={"ride_off_into_sunset": snek.snek_command(self.ride_off_into_sunset)})
+
+    def update(self, dt):
+        self.anim.update(dt)
+        self.image = self.anim.image
+        if self.exiting:
+            self.rect.x += 64 * dt
+            if self.rect.left > self.level.map_rect.right:
+                self.level.player.rect.center = self.pos
+                long_name = f"{self.level.name}_right"
+                x = long_name.count("right") - long_name.count("left")
+                y = long_name.count("down") - long_name.count("up")
+                short_name = self.level.name.split("_")[0]
+                if x < 0:
+                    short_name += "_left" * abs(x)
+                if x > 0:
+                    short_name += "_right" * x
+                if y < 0:
+                    short_name += "_up" * abs(y)
+                if y > 0:
+                    short_name += "_down" * y
+                self.level.switch_level(short_name, direction="right", position=self.pos)
+        return super().update(dt)
