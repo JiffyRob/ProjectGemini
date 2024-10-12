@@ -3313,7 +3313,7 @@
 			"__bgPos": null,
 			"externalRelPath": null,
 			"fieldInstances": [
-				{ "__identifier": "start", "__type": "Array<Int>", "__value": [8,344], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [8] }, { "id": "V_Int", "params": [344] } ] },
+				{ "__identifier": "start", "__type": "Array<Int>", "__value": [8,568], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [8] }, { "id": "V_Int", "params": [568] } ] },
 				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [null] },
 				{ "__identifier": "Background", "__type": "String", "__value": "mushroom", "__tile": null, "defUid": 26, "realEditorValues": [{
 					"id": "V_String",

@@ -290,14 +290,21 @@ class Level(game_state.GameState):
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
         player_position = data["customFields"]["start"]
-        if direction == "down":
-            player_position = (position[0], 8)
-        if direction == "up":
-            player_position = (position[0], size[1] - 8)
-        if direction == "right":
-            player_position = (8, position[1])
-        if direction == "left":
-            player_position = (size[0] - 8, position[1])
+        if is_platformer:
+            if direction == "left":
+                player_position = (size[0] - 8, player_position[1])
+            if direction == "right":
+                print("right", player_position, position)
+                player_position = (8, player_position[1])
+        else:
+            if direction == "down":
+                player_position = (position[0], 8)
+            if direction == "up":
+                player_position = (position[0], size[1] - 8)
+            if direction == "right":
+                player_position = (8, position[1])
+            if direction == "left":
+                player_position = (size[0] - 8, position[1])
         level = cls(
             game,
             name=name,
