@@ -190,3 +190,14 @@ class Blink(VisualEffect):
         raise TypeError(
             f"{self.__class__} cannot be drawn over other surfaces due to no transparency info"
         )
+
+
+class Hide(VisualEffect):
+    def __init__(self):
+        super().__init__()
+
+    def draw(self, surface):
+        surface.fill(surface.get_colorkey())
+
+    def draw_over(self, dest_surface, dest_rect):
+        pass

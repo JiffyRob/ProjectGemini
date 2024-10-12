@@ -13,6 +13,7 @@ from scripts import (
     sprite,
     topdown,
     util_draw,
+    visual_fx,
 )
 
 LERP_SPEED = 1
@@ -134,6 +135,7 @@ class Level(game_state.GameState):
             "Bush": topdown.immobile.Bush,
             "Smith": topdown.immobile.Smith,
             "Drone": topdown.mobile.Drone,
+            "DeadPlayer": topdown.mobile.DeadPlayer,
         },
         # platformer
         {
@@ -147,6 +149,7 @@ class Level(game_state.GameState):
             "GunPlatform": platformer.puzzle.GunPlatform,
             "CrazyMushroom": platformer.immobile.CrazyMushroom,
             "Ship": platformer.mobile.Ship,
+            "DeadPlayer": platformer.player.DeadPlayer,
         },
     )
 

@@ -8,8 +8,8 @@ ACCEL_SPEED = 6
 DECCEL_SPEED = 6
 WALK_SPEED = 84
 JUMP_SPEED = 240
-WALLJUMP_X_SPEED = 120
-WALLJUMP_Y_SPEED = 200
+WALLJUMP_X_SPEED = 64
+WALLJUMP_Y_SPEED = 400
 
 
 class Player(mobile.PhysicsSprite):
@@ -44,7 +44,7 @@ class Player(mobile.PhysicsSprite):
 
     @property
     def skidding(self):
-        return self.time_on_wall >= 0.2 and self.velocity.y >= 0
+        return self.time_on_wall >= 0.2 and not self.on_ground
 
     @property
     def below_rect(self):
@@ -123,7 +123,7 @@ class Player(mobile.PhysicsSprite):
                 self.velocity.x, -WALK_SPEED, WALK_SPEED
             )
             if held_input["jump"]:
-                self.jump()
+                self.jump(just=("jump" in just_input))
             elif self.jump_cause == self.JUMP_NORMAL:
                 self.velocity.y = max(self.velocity.y, self.velocity.y * 0.7)
             if held_input["duck"]:
@@ -186,7 +186,9 @@ class Player(mobile.PhysicsSprite):
         if not self.from_wall:
             self.time_from_wall = 0
         self.on_wall = False
-        super().update(dt)
+        super().update(dt, physics=self.health > 0)
+        if self.on_ground:
+            self.on_wall = False
         if not self.on_wall:
             self.time_on_wall = 0
             self.wall_direction = None
@@ -233,7 +235,7 @@ class Player(mobile.PhysicsSprite):
                 * min(DECCEL_SPEED, abs(self.velocity.x))
             )
 
-    def jump(self, cause=JUMP_NORMAL):
+    def jump(self, cause=JUMP_NORMAL, just=False):
         forced = cause in {self.JUMP_KNIFE, self.JUMP_PAIN, self.JUMP_BOOSTED}
         if forced or (self.on_ground and self.state in {"idle", "walk"}):
             self.from_wall = False
@@ -247,7 +249,7 @@ class Player(mobile.PhysicsSprite):
             self.on_ground = False
             self.on_downer = False
             self.jump_cause = cause
-        elif cause in {self.JUMP_NORMAL, self.JUMP_PAIN} and self.skidding:
+        elif cause in {self.JUMP_NORMAL, self.JUMP_PAIN} and self.skidding and just:
             if self.wall_direction == self.DIRECTION_RIGHT:
                 self.velocity.update(-WALLJUMP_X_SPEED, -WALLJUMP_Y_SPEED)
             if self.wall_direction == self.DIRECTION_LEFT:
@@ -262,3 +264,12 @@ class Player(mobile.PhysicsSprite):
 class DeadPlayer(sprite.Sprite):
     def __init__(self, level, rect, z=0, **custom_fields):
         image = level.game.loader.get_spritesheet("me.png")[29]
+        super().__init__(level, image, rect, z)
+        self.rect.center = self.level.player.pos
+        self.velocity = pygame.Vector2(0, -300)
+
+    def update(self, dt):
+        vel = self.velocity * dt + 0.5 * mobile.GRAVITY * 10 * dt ** 2
+        self.velocity += mobile.GRAVITY * 10 * dt
+        self.rect.move_ip(*vel)
+        return super().update(dt)

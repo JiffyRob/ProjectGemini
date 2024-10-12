@@ -1,7 +1,9 @@
-lock();
+# lock();
+hide_player();
 
-fadeout(255, 0, 0);
-fill(255, 0, 0);
+spawn("DeadPlayer", get_player_x() - 8, get_player_y() - 8, 16, 16, get_player_z());
+# fadeout_circle(get_player_x(), get_player_y(), 1, 100);
+# fill(0, 0, 0);
 
 answer = ask("GAME OVER.", "Save & Quit", "Quit", "Get ranted at by narrator");
 

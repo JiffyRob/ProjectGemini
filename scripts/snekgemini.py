@@ -93,11 +93,12 @@ class FadeInCircle(snek.SnekCommand):
 
 # TODO: Possibly reduce repetition...?
 class FadeOutCircle(snek.SnekCommand):
-    def __init__(self, x=None, y=None, blocking=True):
+    def __init__(self, x=None, y=None, blocking=True, speed=400):
         super().__init__(("get_player_pos()", "LEVEL"))
         self.pos = [x, y]
         self.blocking = blocking
         self.fader = None
+        self.speed = speed
 
     def get_value(self):
         if self.fader is None:
@@ -109,7 +110,7 @@ class FadeOutCircle(snek.SnekCommand):
                 self.pos[1] = player_pos[1]
             screen_pos = level.world_to_screen(self.pos)
             self.fader = visual_fx.CircleTransitionOut(
-                util_draw.RESOLUTION, screen_pos, speed=400
+                util_draw.RESOLUTION, screen_pos, speed=self.speed
             )
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
@@ -175,6 +176,10 @@ def spawn_ship(level, ship_type, start_x, start_y, dest_x, dest_y):
     )
 
 
+def spawn(level, sprite_name, x, y, width, height, z=0, **custom_fields):
+    level.spawn(sprite_name, (x, y, width, height), z, **custom_fields)
+
+
 def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
     if runner is not snek.NULL:
         level = runner.level
@@ -199,9 +204,15 @@ def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None):
             "ask": Ask,
             "exit_level": snek.snek_command(level.exit_level),
             "pop_state": snek.snek_command(level.game.pop_state),
+            "get_player_x": snek.snek_command(lambda: level.player.pos.x),
+            "get_player_y": snek.snek_command(lambda: level.player.pos.y),
+            "get_player_z": snek.snek_command(lambda: level.player.z),
             "get_player_pos": snek.snek_command(lambda: level.player.pos),
             "get_player_name": snek.snek_command(lambda: level.player.name),
+            "hide_player": snek.snek_command(level.player.hide),
+            "show_player": snek.snek_command(level.player.show),
             "map_switch": snek.snek_command(level.game.load_map),
+            "spawn": snek.snek_command(lambda *args: spawn(level, *args)),
             "spawn_ship": snek.snek_command(lambda *args: spawn_ship(level, *args)),
             "play_soundtrack": snek.snek_command(level.game.play_soundtrack),
             "save": snek.snek_command(level.game.save_to_disk),

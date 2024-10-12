@@ -43,87 +43,88 @@ class PhysicsSprite(sprite.Sprite):
     def update_rects(self):
         self.collision_rect = self.rect
 
-    def update(self, dt):
+    def update(self, dt, physics=True):
         # physics
         # moving platforms
-        if self.ground_rect:
-            self.rect.center = self.ground_rect.center + self.ground_rect_relative
+        if physics:
+            if self.ground_rect:
+                self.rect.center = self.ground_rect.center + self.ground_rect_relative
+                self.update_rects()
+            self.ground_rect = None
+            self.ground_rect_relative = None
+            # lock velocity
+            self.velocity.x = pygame.math.clamp(self.velocity.x, -MAX_X_SPEED, MAX_X_SPEED)
+            self.velocity.y = pygame.math.clamp(self.velocity.y, -MAX_Y_SPEED, MAX_Y_SPEED)
+            # locked sprites do not move
+            if self.locked:
+                self.velocity.x *= 0
+            old_rect = self.collision_rect.copy()
+            vel = self.velocity * dt + 0.5 * GRAVITY * self.weight * dt**2
+            self.velocity += GRAVITY * self.weight * dt
+            self.rect.x += vel.x
             self.update_rects()
-        self.ground_rect = None
-        self.ground_rect_relative = None
-        # lock velocity
-        self.velocity.x = pygame.math.clamp(self.velocity.x, -MAX_X_SPEED, MAX_X_SPEED)
-        self.velocity.y = pygame.math.clamp(self.velocity.y, -MAX_Y_SPEED, MAX_Y_SPEED)
-        # locked sprites do not move
-        if self.locked:
-            self.velocity.x *= 0
-        old_rect = self.collision_rect.copy()
-        vel = self.velocity * dt + 0.5 * GRAVITY * self.weight * dt**2
-        self.velocity += GRAVITY * self.weight * dt
-        self.rect.x += vel.x
-        self.update_rects()
-        self.on_ground = False
-        # bottom of the map
-        if self.collision_rect.top > self.level.map_rect.bottom:
-            self.on_fallout()
-            return False
-        if vel.x < 0:
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: -rect.x
-            ):
-                if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision(self.DIRECTION_LEFT)
-                    self.rect.x += collided.right - self.collision_rect.left
-                    self.velocity.x = 0
-                    self.update_rects()
-                    break
-        else:
-            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
-                if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision(self.DIRECTION_RIGHT)
-                    self.rect.x += collided.left - self.collision_rect.right
-                    self.velocity.x = 0
-                    self.update_rects()
-                    break
-        self.rect.y += vel.y
-        self.update_rects()
-        if vel.y < 0:
-            for collided in sorted(
-                self.level.collision_rects, key=lambda rect: -rect.y
-            ):
-                if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision(self.DIRECTION_UP)
-                    self.rect.y += collided.bottom - self.collision_rect.top
-                    self.velocity.y = 0
-                    self.update_rects()
-                    break
-        else:
-            for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
-                if self.collision_rect.colliderect(collided):
-                    self.on_xy_collision(self.DIRECTION_DOWN)
-                    self.rect.y += collided.top - self.collision_rect.bottom
-                    self.velocity.y = 0
-                    self.on_ground = True
-                    self.ground_rect = collided
-                    self.ground_rect_relative = self.pos - self.ground_rect.center
-                    self.update_rects()
-                    break
-            if not self.ducking:
-                for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):
-                    if (
-                        old_rect.bottom <= collided.top
-                        and self.collision_rect.colliderect(collided)
-                    ):
+            self.on_ground = False
+            # bottom of the map
+            if self.collision_rect.top > self.level.map_rect.bottom:
+                self.on_fallout()
+                return False
+            if vel.x < 0:
+                for collided in sorted(
+                    self.level.collision_rects, key=lambda rect: -rect.x
+                ):
+                    if self.collision_rect.colliderect(collided):
+                        self.on_xy_collision(self.DIRECTION_LEFT)
+                        self.rect.x += collided.right - self.collision_rect.left
+                        self.velocity.x = 0
+                        self.update_rects()
+                        break
+            else:
+                for collided in sorted(self.level.collision_rects, key=lambda rect: rect.x):
+                    if self.collision_rect.colliderect(collided):
+                        self.on_xy_collision(self.DIRECTION_RIGHT)
+                        self.rect.x += collided.left - self.collision_rect.right
+                        self.velocity.x = 0
+                        self.update_rects()
+                        break
+            self.rect.y += vel.y
+            self.update_rects()
+            if vel.y < 0:
+                for collided in sorted(
+                    self.level.collision_rects, key=lambda rect: -rect.y
+                ):
+                    if self.collision_rect.colliderect(collided):
+                        self.on_xy_collision(self.DIRECTION_UP)
+                        self.rect.y += collided.bottom - self.collision_rect.top
+                        self.velocity.y = 0
+                        self.update_rects()
+                        break
+            else:
+                if not self.ducking:
+                    for collided in sorted(self.level.down_rects, key=lambda rect: rect.y):
+                        if (
+                            old_rect.bottom <= collided.top
+                            and self.collision_rect.colliderect(collided)
+                        ):
+                            self.on_xy_collision(self.DIRECTION_DOWN)
+                            self.rect.y += collided.top - self.collision_rect.bottom
+                            self.velocity.y = 0
+                            self.on_ground = True
+                            self.on_downer = True
+                            self.ground_rect = collided
+                            self.ground_rect_relative = self.pos - self.ground_rect.center
+                            self.update_rects()
+                            break
+                for collided in sorted(self.level.collision_rects, key=lambda rect: rect.y):
+                    if self.collision_rect.colliderect(collided):
                         self.on_xy_collision(self.DIRECTION_DOWN)
                         self.rect.y += collided.top - self.collision_rect.bottom
                         self.velocity.y = 0
                         self.on_ground = True
-                        self.on_downer = True
                         self.ground_rect = collided
                         self.ground_rect_relative = self.pos - self.ground_rect.center
                         self.update_rects()
                         break
-        self.ducking = False
+            self.ducking = False
         return super().update(dt)
 
 

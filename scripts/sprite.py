@@ -1,5 +1,7 @@
 import pygame
 
+from scripts import visual_fx
+
 
 class Sprite:
     groups = set()
@@ -14,6 +16,16 @@ class Sprite:
         self.dead = False
         self.locked = False
         self.effects = []
+        self.hidden = False
+        self.hidden_image = None
+
+    def hide(self):
+        self.hidden = True
+        self.hidden_image = self.image
+
+    def show(self):
+        self.hidden = False
+        self.image = self.hidden_image
 
     def lock(self):
         self.locked = True
@@ -26,6 +38,8 @@ class Sprite:
         return pygame.Vector2(self.rect.center)
 
     def update(self, dt):
+        if self.hidden:
+            self.image = None
         self.effects = [effect for effect in self.effects if effect.update(dt)]
         if self.image is not None:
             self.to_draw = self.image.copy()

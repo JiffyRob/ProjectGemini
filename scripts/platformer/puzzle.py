@@ -85,49 +85,50 @@ class GunPlatform(sprite.Sprite):
             self.anim_dict[self.state].restart()
 
     def update(self, dt):
-        self.shoot_timer.update(dt)
-        for trigger in self.triggers:
-            triggered = False
-            for sprite in self.level.groups[trigger]:
-                if sprite.triggered():
-                    triggered = True
-                else:
-                    triggered = False
-                    break
-            if triggered and self.state == self.STATE_OFF:
-                self.state = self.STATE_MOVING
-        circle_offset = (
-            math.cos(self.angle * math.pi / 180) * self.radius,
-            math.sin(self.angle * math.pi / 180) * self.radius,
-        )
-        if self.state == self.STATE_MOVING:
-            self.dest_dt += dt
-            self.rect.center = self.start.lerp(
-                self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1))
+        if not self.locked:
+            self.shoot_timer.update(dt)
+            for trigger in self.triggers:
+                triggered = False
+                for sprite in self.level.groups[trigger]:
+                    if sprite.triggered():
+                        triggered = True
+                    else:
+                        triggered = False
+                        break
+                if triggered and self.state == self.STATE_OFF:
+                    self.state = self.STATE_MOVING
+            circle_offset = (
+                math.cos(self.angle * math.pi / 180) * self.radius,
+                math.sin(self.angle * math.pi / 180) * self.radius,
             )
-            if self.dest_dt > 1:
-                self.state = self.STATE_ARRIVED
-        if self.state in {self.STATE_ARRIVED, self.STATE_SHOOTING}:
-            self.angle += dt * self.rotation_speed
-            self.angle %= 360
-            self.rect.center = self.dest + circle_offset
-        if (
-            self.state == self.STATE_ARRIVED
-            and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y) < 8
-            and self.shoot_timer.done()
-        ):
-            self.shoot()
-            self.shoot_timer.reset()
-        if self.state == self.STATE_SHOOTING and self.anim_dict[self.state].done():
-            self.level.add_sprite(
-                projectile.Laser(
-                    self.level,
-                    pygame.Rect(self.rect.topleft + self.shoot_start, (4, 1)),
-                    self.z,
-                    self.shoot_direction,
+            if self.state == self.STATE_MOVING:
+                self.dest_dt += dt
+                self.rect.center = self.start.lerp(
+                    self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1))
                 )
-            )
-            self.state = self.STATE_ARRIVED
-        self.anim_dict[self.state].update(dt)
-        self.image = self.anim_dict[self.state].image
+                if self.dest_dt > 1:
+                    self.state = self.STATE_ARRIVED
+            if self.state in {self.STATE_ARRIVED, self.STATE_SHOOTING}:
+                self.angle += dt * self.rotation_speed
+                self.angle %= 360
+                self.rect.center = self.dest + circle_offset
+            if (
+                self.state == self.STATE_ARRIVED
+                and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y) < 8
+                and self.shoot_timer.done()
+            ):
+                self.shoot()
+                self.shoot_timer.reset()
+            if self.state == self.STATE_SHOOTING and self.anim_dict[self.state].done():
+                self.level.add_sprite(
+                    projectile.Laser(
+                        self.level,
+                        pygame.Rect(self.rect.topleft + self.shoot_start, (4, 1)),
+                        self.z,
+                        self.shoot_direction,
+                    )
+                )
+                self.state = self.STATE_ARRIVED
+            self.anim_dict[self.state].update(dt)
+            self.image = self.anim_dict[self.state].image
         return super().update(dt)
