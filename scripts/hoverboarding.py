@@ -21,12 +21,19 @@ class ScrollingBackground(sprite.Sprite):
         self.sea_land_transition = tileset.subsurface((96, 176, 16, 16))
         self.sea_tile = level.game.loader.get_spritesheet("liquid.png")[0]
         self.state = self.STATE_GROUND
-        self.swap_cooldown = timer.Timer(5000)
+        self.swap_cooldown = timer.Timer(1000)
         self.x_offset = 0
         self.images = deque()
         self.rect = pygame.FRect(rect)
         self.rock_chance = 100
+        self.locked = False
         super().__init__(level, self.get_next_image(), rect, z)
+
+    def lock(self):
+        self.locked = True
+
+    def unlock(self):
+        self.locked = False
 
     def get_next_image(self):
         if self.swap_cooldown.done():
@@ -43,10 +50,11 @@ class ScrollingBackground(sprite.Sprite):
             return util_draw.repeat_surface(self.sea_tile, (16, self.rect.height))
 
     def update(self, dt):
-        self.x_offset -= BOARD_SPEED * dt
-        self.swap_cooldown.update()
-        if not random.randint(0, self.rock_chance):
-            self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+        if not self.locked:
+            self.x_offset -= BOARD_SPEED * dt
+            self.swap_cooldown.update()
+            if not random.randint(0, self.rock_chance):
+                self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
 
     def draw(self, surface, offset):
         if self.x_offset < 0:
@@ -250,9 +258,10 @@ class Rock(sprite.Sprite):
         return self.rect
 
     def update(self, dt):
-        self.rect.left -= BOARD_SPEED * dt
-        if self.rect.right < 0:
-            return False
+        if not self.locked:
+            self.rect.left -= BOARD_SPEED * dt
+            if self.rect.right < 0:
+                return False
         return super().update(dt)
 
 

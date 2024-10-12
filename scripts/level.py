@@ -41,6 +41,12 @@ class Parallax:
         self.loop_x = loop_x
         self.loop_y = loop_y
 
+    def lock(self):
+        pass
+
+    def unlock(self):
+        pass
+
     def update(self, dt):
         self.anim.update(dt)
         self.image = self.anim.image
@@ -210,6 +216,7 @@ class Level(game_state.GameState):
         self.effects = []
         self.script = None
         self.run_cutscene("level_begin")
+        self.locked = False
 
         self.shake_magnitude = 0
         self.shake_delta = 0
@@ -244,12 +251,18 @@ class Level(game_state.GameState):
         self.run_cutscene("level_switch", extra_constants={"NEXT_LEVEL": dest, "DIRECTION": direction, "POSITION": position})
 
     def lock(self):
+        self.locked = True
         for sprite in self.sprites:
             sprite.lock()
+        for background in self.backgrounds:
+            background.lock()
 
     def unlock(self):
+        self.locked = False
         for sprite in self.sprites:
             sprite.unlock()
+        for background in self.backgrounds:
+            background.unlock()
 
     def add_effect(self, effect):
         self.effects.append(effect)
