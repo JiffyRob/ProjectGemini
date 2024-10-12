@@ -9,11 +9,11 @@ from scripts import (
     game_state,
     gui2d,
     platformer,
+    hoverboarding,
     snekgemini,
     sprite,
     topdown,
     util_draw,
-    visual_fx,
 )
 
 LERP_SPEED = 1
@@ -159,7 +159,9 @@ class Level(game_state.GameState):
             "DeadPlayer": platformer.player.DeadPlayer,
         },
         MAP_HOVERBOARD: {
-
+            "Drone": hoverboarding.Drone,
+            "DeadPlayer": hoverboarding.DeadPlayer,
+            "Rock": hoverboarding.Rock,
         },
     }
 
@@ -184,6 +186,7 @@ class Level(game_state.GameState):
             self.player = topdown.mobile.Player(self)
         elif map_type == self.MAP_HOVERBOARD:
             print("OOOOOOOH!  Race time!")
+            self.player = hoverboarding.Player(self)
         else:
             print('AAAAHAHH')
             raise
@@ -310,6 +313,8 @@ class Level(game_state.GameState):
             if direction == "right":
                 print("right", player_position, position)
                 player_position = (8, player_position[1])
+        elif map_type == cls.MAP_HOVERBOARD:
+            pass
         else:
             if direction == "down":
                 player_position = (position[0], 8)
@@ -333,6 +338,10 @@ class Level(game_state.GameState):
         level.backgrounds.extend(
             Parallax.load(level, data["customFields"]["Background"])
         )
+        if map_type == cls.MAP_HOVERBOARD:
+            level.backgrounds.append(
+                hoverboarding.ScrollingBackground(level)
+            )
         # tile layers
         entity_layer = data["customFields"]["entity_layer"]
         level.entity_layer = entity_layer
@@ -367,7 +376,7 @@ class Level(game_state.GameState):
             ):
                 for col, value in enumerate(line):
                     value = int(value)
-                    if collision_index:
+                    if collision_index and map_type != cls.MAP_HOVERBOARD:
                         if value == 1:
                             rect = pygame.FRect(col * 16, row * 16, 16, 16)
                             level.collision_rects.append(rect)
