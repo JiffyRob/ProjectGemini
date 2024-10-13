@@ -16,8 +16,6 @@ DONE = "SNKconst done"
 GET_VAR = "SNKconst get"
 WARNING = "SNKConst warning"
 
-NULL = "SNKconst null"
-
 pp.ParserElement.enable_packrat()
 logger = logging.getLogger(__name__)
 
@@ -100,7 +98,7 @@ class Lexer:
 
     number = pp.common.number
     string = pp.QuotedString("'", esc_char="\\") | pp.QuotedString('"', esc_char="\\")
-    varname = pp.common.identifier
+    varname = pp.common.identifier | pp.Literal("NULL")
     literal = number | string | varname
     expression = pp.Forward()
 
@@ -260,6 +258,8 @@ class SNEKProgram:
                     yield UNFINISHED
                     value = next(evaluator)
                 token = value
+            if isinstance(token, str) and token == "NULL":
+                token = None
             if isinstance(token, str) and token in self.namespace:
                 token = self.namespace[token]
             fixed.append(token)

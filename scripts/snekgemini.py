@@ -20,7 +20,7 @@ class Write(snek.SnekCommand):
         self.state = self.WRITTEN
 
     def get_value(self):
-        if self.context["LEVEL"] == snek.NULL:
+        if self.context["LEVEL"] is None:
             self.post_warning(
                 "Unable to locate level context.  Dialog request ignored."
             )
@@ -31,7 +31,7 @@ class Write(snek.SnekCommand):
             if self.blocking:
                 return snek.UNFINISHED
             else:
-                return snek.NULL
+                return None
         elif self.state == self.WRITING:
             return snek.UNFINISHED
         elif self.state == self.WRITTEN:
@@ -49,7 +49,7 @@ class Ask(Write):
         self.chosen = answer
 
     def get_value(self):
-        if self.context["LEVEL"] == snek.NULL:
+        if self.context["LEVEL"] is None:
             self.post_warning(
                 "Unable to locate level context.  Dialog request ignored."
             )
@@ -88,7 +88,7 @@ class FadeInCircle(snek.SnekCommand):
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
-        return snek.NULL
+        return None
 
 
 # TODO: Possibly reduce repetition...?
@@ -115,7 +115,7 @@ class FadeOutCircle(snek.SnekCommand):
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
-        return snek.NULL
+        return None
 
 
 class FadeIn(snek.SnekCommand):
@@ -131,7 +131,7 @@ class FadeIn(snek.SnekCommand):
             self.context["LEVEL"].add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
-        return snek.NULL
+        return None
 
 
 class FadeOut(snek.SnekCommand):
@@ -147,7 +147,7 @@ class FadeOut(snek.SnekCommand):
             self.context["LEVEL"].add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
-        return snek.NULL
+        return None
 
 
 class Fill(snek.SnekCommand):
@@ -163,7 +163,7 @@ class Fill(snek.SnekCommand):
             self.context["LEVEL"].add_effect(self.fader)
         if self.duration and not self.fader.done:
             return snek.UNFINISHED
-        return snek.NULL
+        return None
 
 
 def spawn_ship(level, ship_type, start_x, start_y, dest_x, dest_y):
@@ -180,8 +180,8 @@ def spawn(level, sprite_name, x, y, width, height, z=0, **custom_fields):
     level.spawn(sprite_name, (x, y, width, height), z, **custom_fields)
 
 
-def cutscene(script_name, runner=snek.NULL, level=None, extra_constants=None, extra_api=None):
-    if runner is not snek.NULL:
+def cutscene(script_name, runner=None, level=None, extra_constants=None, extra_api=None):
+    if runner is not None:
         level = runner.level
     if extra_constants is None:
         extra_constants = {}

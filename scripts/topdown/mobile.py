@@ -179,16 +179,17 @@ class Player(PhysicsSprite):
     def update(self, dt):
         if "entrance" in self.state:
             if self.state == "entrance-board":
-                self.rect.center += (self.dest - self.pos).clamp_magnitude(BOARD_SPEED) * dt
+                self.rect.center += (self.dest - self.pos).clamp_magnitude(BOARD_SPEED * dt)
                 if self.pos.distance_squared_to(self.dest) <= 1:
                     self.level.spawn("Hoverboard", (self.rect.topleft, (32, 32)))
                     self.level.game.save.hoverboarded = True
                     self.rect.center = pygame.Rect(self.rect.topleft, (32, 32)).center
                     self.state = "idle-right"
             if self.state == "entrance-fall":
-                self.rect.center += (self.dest - self.pos).clamp_magnitude(FALL_SPEED) * dt
+                self.rect.center += (self.dest - self.pos).clamp_magnitude(FALL_SPEED * dt)
                 if self.pos.distance_squared_to(self.dest) <= 1:
-                    self.state = "idle"
+                    self.state = "idle-right"
+                    self.level.shake()
             self.anim_dict[self.state].update(dt)
             self.image = self.anim_dict[self.state].image
             return sprite.Sprite.update(self, dt)
