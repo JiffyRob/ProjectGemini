@@ -1,6 +1,8 @@
 import pygame
 import pygame._sdl2.controller as controller
 
+from scripts import timer
+
 controller.init()
 
 HAT_AXIS_MOTION = pygame.event.custom_type()
@@ -176,9 +178,21 @@ class InputQueue:
         self.magnitudes = {}
         self.just_pressed = set()
         self.no_hold = set()
+        self.rumble_timer = timer.Timer()
+
+    def rumble(self, left=1, right=1, time=500):
+        for gamepad in self.controllers.values():
+            gamepad.rumble(left, right, 0)
+        self.rumble_timer = timer.Timer(time, self.stop_rumble)
+
+    def stop_rumble(self):
+        for gamepad in self.controllers.values():
+            gamepad.stop_rumble()
+        self.rumble_timer = timer.Timer()
 
     def update(self, events=None):
         self.just_pressed.clear()
+        self.rumble_timer.update()
         if events is None:
             events = pygame.event.get()
 

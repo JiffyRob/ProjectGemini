@@ -159,6 +159,7 @@ class Player(mobile.PhysicsSprite):
             if hit:
                 self.swap_state("pound-recover")
                 self.level.shake(axes=self.level.AXIS_Y)
+                self.level.game.input_queue.rumble(.5, .5, 250)
         elif not self.on_ground:
             if self.skidding:
                 self.swap_state("skid")
@@ -206,6 +207,10 @@ class Player(mobile.PhysicsSprite):
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
             self.health = max(0, self.health - amount)
             self.pain_timer.reset()
+            if self.health > 0:
+                self.level.game.input_queue.rumble(1, 1, 500)
+            else:
+                self.level.game.input_queue.rumble(1, 1, 1000)
             if deliverer is not None:
                 motion = (self.pos - deliverer.pos).scale_to_length(knockback)
                 self.rect.x += motion.x

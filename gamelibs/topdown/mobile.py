@@ -198,6 +198,7 @@ class Player(PhysicsSprite):
                 )
                 if self.pos.distance_squared_to(self.dest) <= 1:
                     self.state = "idle-right"
+                    self.level.game.input_queue.rumble(.5, .5, 1000)
                     self.level.shake()
             self.anim_dict[self.state].update(dt)
             self.image = self.anim_dict[self.state].image
@@ -231,6 +232,10 @@ class Player(PhysicsSprite):
 
     def hurt(self, amount):
         self.health = max(0, self.health - amount)
+        if self.health > 0:
+            self.level.game.input_queue.rumble(.75, .75, 500)
+        else:
+            self.level.game.input_queue.rumble(1, 1, 1000)
 
     def heal(self, amount):
         self.health = min(self.health_capacity, self.health + amount)

@@ -228,6 +228,10 @@ class Player(sprite.Sprite):
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
             self.health = max(0, self.health - amount)
             self.pain_timer.reset()
+            if self.health > 0:
+                self.level.game.input_queue.rumble(1, 1, 500)
+            else:
+                self.level.game.input_queue.rumble(1, 1, 1000)
 
     def exit(self):
         self.state = "exiting"
