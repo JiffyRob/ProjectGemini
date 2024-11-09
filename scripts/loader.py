@@ -18,6 +18,9 @@ class Loader:
         self.sound_path = self.base_path / "sound"
         self.music_path = self.base_path / "music"
         self.script_path = self.base_path / "data" / "snek"
+        self.font = None
+
+    def postwindow_init(self):
         self.font = pixelfont.PixelFont(self.get_spritesheet("font.png", (7, 8)))
 
     def join(self, path):
@@ -52,6 +55,10 @@ class Loader:
     @functools.cache
     def get_json(self, path, for_map=False):
         return json.load(self.join_data(path, for_map).with_suffix(".json").open())
+
+    @functools.cache
+    def get_settings(self):
+        return {**self.get_json("settings-default"), **self.get_json("settings")}
 
     @functools.cache
     def get_csv(self, path, item_delimiter=",", line_delimiter="\n", for_map=False):

@@ -1,0 +1,8 @@
+{
+  "vsync": true,
+  "scale": "integer",
+  "fullscreen": false,
+  "music-volume": 1,
+  "sfx-volume": 1,
+  "fps": 60
+}

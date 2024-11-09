@@ -36,7 +36,6 @@ class Game:
         self.save = game_save.GameSave(self)
         self.input_queue = input_binding.InputQueue()
         self.timers = []
-        self.scale_mode = util_draw.SCALEMODE_INTEGER
 
     @property
     def window_surface(self):
@@ -44,21 +43,34 @@ class Game:
 
     @property
     def mouse_pos(self):
-        if self.scale_mode == util_draw.SCALEMODE_INTEGER:
+        window_size = self.window.get_size() # self.window.get_surface()
+        window_rect = self.window.get_rect()
+        if self.settings["scale"] == util_draw.SCALEMODE_INTEGER:
             factor = min(
-                self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
-                self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
+                window_size[0] // util_draw.RESOLUTION[0],
+                window_size[1] // util_draw.RESOLUTION[1],
             )
             rect = pygame.Rect(
                 0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor
             )
-            rect.center = self.window.get_surface().get_rect().center
+            rect.center = window_rect.center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
-        if self.scale_mode == util_draw.SCALEMODE_STRETCH:
+        if self.settings["scale"] == util_draw.SCALEMODE_STRETCH:
             return pygame.Vector2(pygame.mouse.get_pos()).elementwise() * (
-                util_draw.RESOLUTION[0] / self.window.size[0],
-                util_draw.RESOLUTION[1] / self.window.size[1],
+                util_draw.RESOLUTION[0] / window_size[0],
+                util_draw.RESOLUTION[1] / window_size[1],
             )
+        if self.settings["scale"] == util_draw.SCALEMODE_ASPECT:
+            width_scale = window_size[0] / util_draw.RESOLUTION[0]
+            height_scale = window_size[1] / util_draw.RESOLUTION[1]
+            scale = min(width_scale, height_scale)
+            rect = pygame.Rect(
+                0,
+                0,
+                round(scale * window_size[0]),
+                round(scale * window_size[1]))
+            rect.center = window_rect.center
+            return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / scale
 
     def pop_state(self):
         self.stack.popleft()
@@ -125,12 +137,12 @@ class Game:
 
     def draw(self):
         self.window_surface.fill(self.stack[0].bgcolor)
-        self.window.get_surface().fill("black")
+        window_surface = self.window  # self.window.get_surface()
         self.stack[0].draw()
-        if self.scale_mode == util_draw.SCALEMODE_INTEGER:
+        if self.settings["scale"] == util_draw.SCALEMODE_INTEGER:
             factor = min(
-                self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
-                self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
+                window_surface.get_width() // util_draw.RESOLUTION[0],
+                window_surface.get_height() // util_draw.RESOLUTION[1],
             )
             rect = pygame.Rect(
                 0,
@@ -138,30 +150,56 @@ class Game:
                 util_draw.RESOLUTION[0] * factor,
                 util_draw.RESOLUTION[1] * factor,
             )
-            rect.center = self.window.get_surface().get_rect().center
-            self.window.get_surface().blit(
+            rect.center = window_surface.get_rect().center
+            window_surface.blit(
                 pygame.transform.scale_by(self.display_surface, (factor, factor)),
                 rect.topleft,
             )
-        if self.scale_mode == util_draw.SCALEMODE_STRETCH:
-            self.window.get_surface().blit(
+        if self.settings["scale"] == util_draw.SCALEMODE_STRETCH:
+            window_surface.blit(
                 pygame.transform.scale(self.display_surface, self.window.size),
                 (0, 0),
             )
-        self.window.flip()
+        if self.settings["scale"] == util_draw.SCALEMODE_ASPECT:
+            width_scale = window_surface.get_width() / util_draw.RESOLUTION[0]
+            height_scale = window_surface.get_height() / util_draw.RESOLUTION[1]
+            scale = min(width_scale, height_scale)
+            rect = pygame.Rect(
+                0,
+                0,
+                round(scale * util_draw.RESOLUTION[0]),
+                round(scale * util_draw.RESOLUTION[1])
+            )
+            rect.center = window_surface.get_rect().center
+            window_surface.blit(
+                pygame.transform.scale(self.display_surface, rect.size), rect,
+            )
+
+
+        pygame.display.flip()
+        # self.window.flip()
 
     async def run(self):
         self.running = True
-        self.window = sdl2.Window(
+        self.loader = loader.Loader()
+        self.settings = self.loader.get_settings()
+        """
+        # commented out for lack of vsync
+        self.window = pygame.window.Window(
             self.title,
             util_draw.RESOLUTION,
             sdl2.WINDOWPOS_CENTERED,
             resizable=True,
             maximized=True,
         )
-        self.window.get_surface()  # allows convert() calls to happen
+        self.window.get_surface()  # allows convert() calls
+        """
+        info = pygame.display.Info()
+
+        self.window = pygame.display.set_mode((info.current_w, info.current_h - 32), pygame.RESIZABLE, vsync=self.settings["vsync"])
+        pygame.display.set_caption(self.title)
+        self.loader.postwindow_init()
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
-        self.loader = loader.Loader()
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
         self.sound_manager = sound.SoundManager(self.loader)
@@ -173,12 +211,9 @@ class Game:
             self.input_queue.update()
             self.draw()
             dt = self.update(dt)
-            self.window.title = str(int(self.clock.get_fps())).zfill(
-                3
-            )  # TODO: Remove this
             await asyncio.sleep(0)
 
-        self.window.destroy()
+        # self.window.destroy()
         pygame.quit()
 
     def save_to_disk(self):
