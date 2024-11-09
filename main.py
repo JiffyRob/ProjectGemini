@@ -36,6 +36,7 @@ class Game:
         self.save = game_save.GameSave(self)
         self.input_queue = input_binding.InputQueue()
         self.timers = []
+        self.scale_mode = util_draw.SCALEMODE_INTEGER
 
     @property
     def window_surface(self):
@@ -43,7 +44,7 @@ class Game:
 
     @property
     def mouse_pos(self):
-        if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
+        if self.scale_mode == util_draw.SCALEMODE_INTEGER:
             factor = min(
                 self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
                 self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
@@ -53,7 +54,7 @@ class Game:
             )
             rect.center = self.window.get_surface().get_rect().center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
-        if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
+        if self.scale_mode == util_draw.SCALEMODE_STRETCH:
             return pygame.Vector2(pygame.mouse.get_pos()).elementwise() * (
                 util_draw.RESOLUTION[0] / self.window.size[0],
                 util_draw.RESOLUTION[1] / self.window.size[1],
@@ -126,7 +127,7 @@ class Game:
         self.window_surface.fill(self.stack[0].bgcolor)
         self.window.get_surface().fill("black")
         self.stack[0].draw()
-        if self.stack[0].scale_mode == util_draw.SCALEMODE_INTEGER:
+        if self.scale_mode == util_draw.SCALEMODE_INTEGER:
             factor = min(
                 self.window.get_surface().get_width() // util_draw.RESOLUTION[0],
                 self.window.get_surface().get_height() // util_draw.RESOLUTION[1],
@@ -142,7 +143,7 @@ class Game:
                 pygame.transform.scale_by(self.display_surface, (factor, factor)),
                 rect.topleft,
             )
-        if self.stack[0].scale_mode == util_draw.SCALEMODE_STRETCH:
+        if self.scale_mode == util_draw.SCALEMODE_STRETCH:
             self.window.get_surface().blit(
                 pygame.transform.scale(self.display_surface, self.window.size),
                 (0, 0),
