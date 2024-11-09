@@ -221,7 +221,6 @@ class Game:
         while self.running and len(self.stack):
             self.input_queue.update()
             if pygame.key.get_just_released()[pygame.K_F11]:
-                print("TOGGLE")
                 self.toggle_fullscreen()
             self.draw()
             dt = self.update(dt)
