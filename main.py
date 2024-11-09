@@ -2,8 +2,6 @@ import asyncio
 from collections import deque
 
 import pygame
-import pygame._sdl2 as sdl2
-import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 from scripts import (
     game_save,
