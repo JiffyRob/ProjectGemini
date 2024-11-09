@@ -72,6 +72,14 @@ class Game:
             rect.center = window_rect.center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / scale
 
+    def toggle_fullscreen(self):
+        self.settings["fullscreen"] = not self.settings["fullscreen"]
+        if self.settings["fullscreen"]:
+            self.settings["last-resolution"] = self.window.get_size()
+            self.window = pygame.display.set_mode(util_draw.RESOLUTION_FULLSCREEN, pygame.FULLSCREEN, vsync=self.settings["vsync"])
+        else:
+            self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE, vsync=self.settings["vsync"])
+
     def pop_state(self):
         self.stack.popleft()
 
@@ -194,10 +202,14 @@ class Game:
         )
         self.window.get_surface()  # allows convert() calls
         """
-        info = pygame.display.Info()
-
-        self.window = pygame.display.set_mode((info.current_w, info.current_h - 32), pygame.RESIZABLE, vsync=self.settings["vsync"])
+        if self.settings["last-resolution"] is None:
+            info = pygame.display.Info()
+            self.settings["last-resolution"] = (info.current_w, info.current_h - 32)
+        self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE, vsync=self.settings["vsync"])
         pygame.display.set_caption(self.title)
+        if self.settings["fullscreen"]:
+            self.toggle_fullscreen()
+            self.settings["fullscreen"] = True
         self.loader.postwindow_init()
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
         self.load_input_binding("arrow")
@@ -206,9 +218,11 @@ class Game:
         self.stack.appendleft(menu.MainMenu(self))
         dt = 0
         pygame.key.set_repeat(0, 0)
-
         while self.running and len(self.stack):
             self.input_queue.update()
+            if pygame.key.get_just_released()[pygame.K_F11]:
+                print("TOGGLE")
+                self.toggle_fullscreen()
             self.draw()
             dt = self.update(dt)
             await asyncio.sleep(0)
