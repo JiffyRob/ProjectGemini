@@ -227,13 +227,13 @@ class Game:
             dt = self.update(dt)
             await asyncio.sleep(0)
 
-        # self.window.destroy()
         pygame.quit()
 
     def save_to_disk(self):
         self.save.save()
 
     def quit(self):
+        self.loader.save_settings(self.settings)
         while len(self.stack) > 1:
             self.stack.clear()
             self.stack.appendleft(menu.MainMenu(self))

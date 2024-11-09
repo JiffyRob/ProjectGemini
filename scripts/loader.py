@@ -56,9 +56,22 @@ class Loader:
     def get_json(self, path, for_map=False):
         return json.load(self.join_data(path, for_map).with_suffix(".json").open())
 
+    def save_json(self, path, data):
+        path = self.join_data(path).with_suffix(".json")
+        with path.open("w") as file:
+            file.write(json.dumps(data))
+
     @functools.cache
     def get_settings(self):
         return {**self.get_json("settings-default"), **self.get_json("settings")}
+
+    def save_settings(self, settings):
+        overwritten_settings = {}
+        default_settings = self.get_json("settings-default")
+        for key, value in settings.items():
+            if value != default_settings[key]:
+                overwritten_settings[key] = value
+        self.save_json("settings", overwritten_settings)
 
     @functools.cache
     def get_csv(self, path, item_delimiter=",", line_delimiter="\n", for_map=False):
