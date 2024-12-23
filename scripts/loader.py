@@ -13,6 +13,7 @@ class Loader:
     def __init__(self):
         self.base_path = pathlib.Path(".")
         self.asset_path = self.base_path / "assets"
+        self.shader_path = self.base_path / "shaders"
         self.data_path = self.base_path / "data"
         self.save_path = self.data_path / "saves"
         self.sound_path = self.base_path / "sound"
@@ -46,6 +47,9 @@ class Loader:
 
     def join_script(self, path):
         return self.script_path / path
+
+    def join_shader(self, path):
+        return self.shader_path / path
 
     @functools.cache
     def get_text(self, path, for_map=False):
@@ -150,6 +154,18 @@ class Loader:
     @functools.cache
     def get_script(self, path):
         path = self.join_script(path).with_suffix(".snek")
+        with path.open() as file:
+            return file.read()
+
+    @functools.cache
+    def get_vertex_shader(self, path):
+        path = self.join_shader(path).with_suffix(".vert")
+        with path.open() as file:
+            return file.read()
+
+    @functools.cache
+    def get_fragment_shader(self, path):
+        path = self.join_shader(path).with_suffix(".frag")
         with path.open() as file:
             return file.read()
 

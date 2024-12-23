@@ -1,3 +1,4 @@
 pygame-ce
 numpy
 pyparsing
+zengl

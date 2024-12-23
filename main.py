@@ -2,6 +2,7 @@ import asyncio
 from collections import deque
 
 import pygame
+import zengl
 
 from scripts import (
     game_save,
@@ -34,10 +35,17 @@ class Game:
         self.save = game_save.GameSave(self)
         self.input_queue = input_binding.InputQueue()
         self.timers = []
+        self.context = None
+        self.window_surface_gl = None
+        self.pipeline = None
 
     @property
     def window_surface(self):
         return self.display_surface
+
+    @property
+    def gl_window_surface(self):
+        return self.window_surface_gl
 
     @property
     def mouse_pos(self):
@@ -74,9 +82,37 @@ class Game:
         self.settings["fullscreen"] = not self.settings["fullscreen"]
         if self.settings["fullscreen"]:
             self.settings["last-resolution"] = self.window.get_size()
-            self.window = pygame.display.set_mode(util_draw.RESOLUTION_FULLSCREEN, pygame.FULLSCREEN, vsync=self.settings["vsync"])
+            self.window = pygame.display.set_mode(util_draw.RESOLUTION_FULLSCREEN, pygame.FULLSCREEN | pygame.OPENGL, vsync=self.settings["vsync"])
         else:
-            self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE, vsync=self.settings["vsync"])
+            self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"])
+        
+    def videoresize(self, new_size):
+        if self.settings["scale"] == util_draw.SCALEMODE_STRETCH:
+            self.pipeline.viewport = (0, 0, *new_size)
+        if self.settings["scale"] == util_draw.SCALEMODE_ASPECT:
+            width_scale = new_size[0] / util_draw.RESOLUTION[0]
+            height_scale = new_size[1] / util_draw.RESOLUTION[1]
+            scale = min(width_scale, height_scale)
+            rect = pygame.Rect(
+                0,
+                0,
+                round(scale * util_draw.RESOLUTION[0]),
+                round(scale * util_draw.RESOLUTION[1]))
+            rect.centerx, rect.centery = new_size[0] // 2, new_size[1] // 2
+            self.pipeline.viewport = tuple(rect)
+        if self.settings["scale"] == util_draw.SCALEMODE_INTEGER:
+            factor = min(
+                new_size[0] // util_draw.RESOLUTION[0],
+                new_size[1] // util_draw.RESOLUTION[1],
+            )
+            rect = pygame.Rect(
+                0,
+                0,
+                util_draw.RESOLUTION[0] * factor,
+                util_draw.RESOLUTION[1] * factor,
+            )
+            rect.center = window_surface.get_rect().center
+            self.pipeline.viewport = tuple(rect)
 
     def pop_state(self):
         self.stack.popleft()
@@ -142,9 +178,17 @@ class Game:
         return dt
 
     def draw(self):
+        self.context.new_frame()
+
         self.window_surface.fill(self.stack[0].bgcolor)
+        self.gl_window_surface.clear()
+
         window_surface = self.window  # self.window.get_surface()
         self.stack[0].draw()
+        if not self.stack[0].opengl:
+            self.gl_window_surface.write(pygame.image.tobytes(self.display_surface, "RGBA", flipped=False))
+        self.pipeline.render()
+        self.context.end_frame()
         if self.settings["scale"] == util_draw.SCALEMODE_INTEGER:
             factor = min(
                 window_surface.get_width() // util_draw.RESOLUTION[0],
@@ -160,25 +204,6 @@ class Game:
             window_surface.blit(
                 pygame.transform.scale_by(self.display_surface, (factor, factor)),
                 rect.topleft,
-            )
-        if self.settings["scale"] == util_draw.SCALEMODE_STRETCH:
-            window_surface.blit(
-                pygame.transform.scale(self.display_surface, self.window.size),
-                (0, 0),
-            )
-        if self.settings["scale"] == util_draw.SCALEMODE_ASPECT:
-            width_scale = window_surface.get_width() / util_draw.RESOLUTION[0]
-            height_scale = window_surface.get_height() / util_draw.RESOLUTION[1]
-            scale = min(width_scale, height_scale)
-            rect = pygame.Rect(
-                0,
-                0,
-                round(scale * util_draw.RESOLUTION[0]),
-                round(scale * util_draw.RESOLUTION[1])
-            )
-            rect.center = window_surface.get_rect().center
-            window_surface.blit(
-                pygame.transform.scale(self.display_surface, rect.size), rect,
             )
 
 
@@ -203,13 +228,42 @@ class Game:
         if self.settings["last-resolution"] is None:
             info = pygame.display.Info()
             self.settings["last-resolution"] = (info.current_w, info.current_h - 32)
-        self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE, vsync=self.settings["vsync"])
+        self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"])
         pygame.display.set_caption(self.title)
         if self.settings["fullscreen"]:
             self.toggle_fullscreen()
-            self.settings["fullscreen"] = True
+            self.settings["fullscreen"] = True  # reset bc fullscreen toggle flips it
         self.loader.postwindow_init()
         self.display_surface = pygame.Surface(util_draw.RESOLUTION).convert()
+
+        self.context = zengl.context()
+        self.window_surface_gl = self.context.image(util_draw.RESOLUTION)
+        self.pipeline = self.context.pipeline(
+            vertex_shader=self.loader.get_vertex_shader("scale"),
+            fragment_shader=self.loader.get_fragment_shader("scale"),
+            framebuffer=None,
+            viewport=(0, 0, *self.settings["last-resolution"]),
+            topology="triangle_strip",
+            vertex_count=4,
+            layout=[
+                {
+                    "name": "input_texture",
+                    "binding": 0,
+                }
+            ],
+            resources=[
+                {
+                    "type": "sampler",
+                    "binding": 0,
+                    "image": self.gl_window_surface,
+                    "min_filter": "nearest",
+                    "mag_filter": "nearest",
+                    "wrap_x": "clamp_to_edge",
+                    "wrap_y": "clamp_to_edge",
+                }
+            ]
+        )
+
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
         self.sound_manager = sound.SoundManager(self.loader)
@@ -217,7 +271,11 @@ class Game:
         dt = 0
         pygame.key.set_repeat(0, 0)
         while self.running and len(self.stack):
-            self.input_queue.update()
+            events = tuple(pygame.event.get())
+            self.input_queue.update(events)
+            for event in events:
+                if event.type == pygame.VIDEORESIZE:
+                    self.videoresize(event.size)
             if pygame.key.get_just_released()[pygame.K_F11]:
                 self.toggle_fullscreen()
             self.draw()
