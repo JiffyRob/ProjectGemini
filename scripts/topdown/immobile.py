@@ -3,6 +3,7 @@ import pygame
 from scripts import snekgemini, sprite, snek
 from scripts.animation import Animation
 
+
 class Interactable(sprite.Sprite):
     groups = {"interactable"}
 
@@ -27,9 +28,7 @@ class Interactable(sprite.Sprite):
     def interact(self):
         if not self.running_script:
             self.running_script = True
-            self.interpreter = snekgemini.cutscene(
-                self.script, self, extra_constants=self.extra_constants
-            )
+            self.interpreter = snekgemini.cutscene(self.script, self, extra_constants=self.extra_constants)
 
     def update(self, dt):
         if self.running_script:
@@ -107,9 +106,7 @@ class House(Interactable):
 
     def update(self, dt):
         if self.level.player.collision_rect.colliderect(self.teleport_rect):
-            self.level.player.rect.top += (
-                self.teleport_rect.bottom - self.level.player.collision_rect.top
-            )
+            self.level.player.rect.top += self.teleport_rect.bottom - self.level.player.collision_rect.top
             self.level.switch_level(self.dest_map)
         return super().update(dt)
 
@@ -151,9 +148,7 @@ class Smith(Interactable):
 
     def update(self, dt):
         if self.level.player.collision_rect.colliderect(self.teleport_rect):
-            self.level.player.rect.top += (
-                self.teleport_rect.bottom - self.level.player.collision_rect.top
-            )
+            self.level.player.rect.top += self.teleport_rect.bottom - self.level.player.collision_rect.top
             self.level.switch_level(self.dest_map)
         return super().update(dt)
 
@@ -182,9 +177,7 @@ class Furniture(Interactable):
         super().__init__(
             level,
             rect=rect,
-            image=level.game.loader.get_spritesheet("tileset.png", (16, 16))[
-                self.IMAGES[self.type]
-            ],
+            image=level.game.loader.get_spritesheet("tileset.png", (16, 16))[self.IMAGES[self.type]],
             z=z,
             script="furniture",
             extra_constants={"TEXT": self.info},

@@ -50,16 +50,14 @@ class Game:
 
     @property
     def mouse_pos(self):
-        window_size = self.window.get_size() # self.window.get_surface()
+        window_size = self.window.get_size()  # self.window.get_surface()
         window_rect = self.window.get_rect()
         if self.settings["scale"] == util_draw.SCALEMODE_INTEGER:
             factor = min(
                 window_size[0] // util_draw.RESOLUTION[0],
                 window_size[1] // util_draw.RESOLUTION[1],
             )
-            rect = pygame.Rect(
-                0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor
-            )
+            rect = pygame.Rect(0, 0, util_draw.RESOLUTION[0] * factor, util_draw.RESOLUTION[1] * factor)
             rect.center = window_rect.center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / factor
         if self.settings["scale"] == util_draw.SCALEMODE_STRETCH:
@@ -71,11 +69,7 @@ class Game:
             width_scale = window_size[0] / util_draw.RESOLUTION[0]
             height_scale = window_size[1] / util_draw.RESOLUTION[1]
             scale = min(width_scale, height_scale)
-            rect = pygame.Rect(
-                0,
-                0,
-                round(scale * window_size[0]),
-                round(scale * window_size[1]))
+            rect = pygame.Rect(0, 0, round(scale * window_size[0]), round(scale * window_size[1]))
             rect.center = window_rect.center
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / scale
 
@@ -83,10 +77,14 @@ class Game:
         self.settings["fullscreen"] = not self.settings["fullscreen"]
         if self.settings["fullscreen"]:
             self.settings["last-resolution"] = self.window.get_size()
-            self.window = pygame.display.set_mode(util_draw.RESOLUTION_FULLSCREEN, pygame.FULLSCREEN | pygame.OPENGL, vsync=self.settings["vsync"])
+            self.window = pygame.display.set_mode(
+                util_draw.RESOLUTION_FULLSCREEN, pygame.FULLSCREEN | pygame.OPENGL, vsync=self.settings["vsync"]
+            )
         else:
-            self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"])
-        
+            self.window = pygame.display.set_mode(
+                self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"]
+            )
+
     def videoresize(self, new_size):
         if self.settings["scale"] == util_draw.SCALEMODE_STRETCH:
             self.pipeline.viewport = (0, 0, *new_size)
@@ -94,11 +92,7 @@ class Game:
             width_scale = new_size[0] / util_draw.RESOLUTION[0]
             height_scale = new_size[1] / util_draw.RESOLUTION[1]
             scale = min(width_scale, height_scale)
-            rect = pygame.Rect(
-                0,
-                0,
-                round(scale * util_draw.RESOLUTION[0]),
-                round(scale * util_draw.RESOLUTION[1]))
+            rect = pygame.Rect(0, 0, round(scale * util_draw.RESOLUTION[0]), round(scale * util_draw.RESOLUTION[1]))
             rect.centerx, rect.centery = new_size[0] // 2, new_size[1] // 2
             self.pipeline.viewport = tuple(rect)
         if self.settings["scale"] == util_draw.SCALEMODE_INTEGER:
@@ -138,14 +132,10 @@ class Game:
         self.timers.append((dt, callback))
 
     def load_input_binding(self, name):
-        self.input_queue.load_bindings(
-            self.loader.get_json(f"keybindings/{name}"), delete_old=True
-        )
+        self.input_queue.load_bindings(self.loader.get_json(f"keybindings/{name}"), delete_old=True)
 
     def add_input_binding(self, name):
-        self.input_queue.load_bindings(
-            self.loader.get_json(f"keybindings/{name}"), delete_old=False
-        )
+        self.input_queue.load_bindings(self.loader.get_json(f"keybindings/{name}"), delete_old=False)
 
     def time_phase(self, mult):
         self.dt_mult = mult
@@ -154,16 +144,14 @@ class Game:
         if track_name is None:
             self.sound_manager.stop_track()
         else:
-            self.sound_manager.switch_track(f"music/{track_name}.wav")
+            self.sound_manager.switch_track(f"music/{track_name}.ogg")
 
     def update(self, dt):
         kill_state = False
         if not self.stack[0].update(dt * self.dt_mult):
             kill_state = True
         # if fps drops below 10 the game will start to lag
-        dt = pygame.math.clamp(
-            self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1
-        )
+        dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1)
         # update delayed callbacks
         still_waiting = []
         for index in range(len(self.timers)):
@@ -207,7 +195,6 @@ class Game:
                 rect.topleft,
             )
 
-
         pygame.display.flip()
         # self.window.flip()
 
@@ -229,7 +216,9 @@ class Game:
         if self.settings["last-resolution"] is None:
             info = pygame.display.Info()
             self.settings["last-resolution"] = (info.current_w, info.current_h - 32)
-        self.window = pygame.display.set_mode(self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"])
+        self.window = pygame.display.set_mode(
+            self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"]
+        )
         pygame.display.set_caption(self.title)
         if self.settings["fullscreen"]:
             self.toggle_fullscreen()
@@ -262,7 +251,7 @@ class Game:
                     "wrap_x": "clamp_to_edge",
                     "wrap_y": "clamp_to_edge",
                 }
-            ]
+            ],
         )
 
         self.load_input_binding("arrow")

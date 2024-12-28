@@ -103,12 +103,7 @@ class Lexer:
     expression = pp.Forward()
 
     # commands and keywords
-    command = (
-        varname
-        + "("
-        + pp.Opt(pp.DelimitedList(expression, allow_trailing_delim=True))
-        + ")"
-    )
+    command = varname + "(" + pp.Opt(pp.DelimitedList(expression, allow_trailing_delim=True)) + ")"
     control = pp.one_of("if switch case while", as_keyword=True)
 
     # expressions
@@ -186,9 +181,7 @@ class SNEKProgram:
             "abs": snek_command(abs),
             "sub": snek_command(lambda a, *args: a - sum(args)),
             "div": snek_command(lambda *args: functools.reduce(operator.truediv, args)),
-            "fdiv": snek_command(
-                lambda *args: functools.reduce(operator.floordiv, args)
-            ),
+            "fdiv": snek_command(lambda *args: functools.reduce(operator.floordiv, args)),
             "getitem": snek_command(lambda x, y: x[y]),
             "time": snek_command(time.time() * 1000),
         }
@@ -276,9 +269,7 @@ class SNEKProgram:
                         # command has requested to evaluate an expression for context
                         # ugh too many nested loops
                         expr = next(callback)
-                        eval_callback = self._evaluate_expression(
-                            Lexer.tokenize(expr + ";\n")
-                        )
+                        eval_callback = self._evaluate_expression(Lexer.tokenize(expr + ";\n"))
                         while (eval_value := next(eval_callback)) == UNFINISHED:
                             yield eval_value
                         callback.get_var(expr, eval_value)
@@ -305,9 +296,7 @@ class SNEKProgram:
             # multiple binary operators strung together
             # currently we do the leftmost operation and then recurse again
             case [arg1, op, arg2, *rest]:
-                yield from self._evaluate_expression(
-                    [self.operators[op](arg1, arg2), *rest]
-                )
+                yield from self._evaluate_expression([self.operators[op](arg1, arg2), *rest])
 
     def _skip_to_end(self, index):
         brace_count = 1

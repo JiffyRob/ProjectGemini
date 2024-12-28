@@ -5,9 +5,7 @@ pygame.mixer.init()
 
 class ChannelRack:
     def __init__(self, channels, start_index=0):
-        self._free_channels = [
-            pygame.mixer.Channel(i + start_index) for i in range(channels)
-        ]
+        self._free_channels = [pygame.mixer.Channel(i + start_index) for i in range(channels)]
         self._free_channels = [i for i in self._free_channels if i is not None]
         self._used_channels = []
 
@@ -45,9 +43,7 @@ class SoundManager:
         self.sound_volume = 1
         self.music_volume = 1
 
-    def play_sound(
-        self, path, priority=10, loops=0, volume=1, fade_ms=0, polar_location=(0, 0)
-    ):
+    def play_sound(self, path, priority=10, loops=0, volume=1, fade_ms=0, polar_location=(0, 0)):
         sound = self.loader.load_sound(path)
         channel = self._channel_rack.allocate_channel(priority)
         if channel is not None:  # if all channels are in use and of higher priority

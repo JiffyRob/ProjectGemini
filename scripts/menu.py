@@ -62,10 +62,7 @@ class Background(sprite.GUISprite):
         super().__init__(
             level,
             nine_slice(
-                [
-                    level.game.loader.get_image("gui.png", f"Border{i}")
-                    for i in range(9)
-                ],
+                [level.game.loader.get_image("gui.png", f"Border{i}") for i in range(9)],
                 rect.size,
             ),
             rect,
@@ -81,24 +78,15 @@ class Button(sprite.GUISprite):
     def __init__(self, level, rect, top_image, on_click=lambda: None, z=0):
         self.image_dict = {
             self.STATE_NORMAL: three_slice(
-                [
-                    level.game.loader.get_image("gui.png", f"ButtonNormal{i}")
-                    for i in range(3)
-                ],
+                [level.game.loader.get_image("gui.png", f"ButtonNormal{i}") for i in range(3)],
                 rect.width,
             ),
             self.STATE_SELECTED: three_slice(
-                [
-                    level.game.loader.get_image("gui.png", f"ButtonSelected{i}")
-                    for i in range(3)
-                ],
+                [level.game.loader.get_image("gui.png", f"ButtonSelected{i}") for i in range(3)],
                 rect.width,
             ),
             self.STATE_DISABLED: three_slice(
-                [
-                    level.game.loader.get_image("gui.png", f"ButtonDisabled{i}")
-                    for i in range(3)
-                ],
+                [level.game.loader.get_image("gui.png", f"ButtonDisabled{i}") for i in range(3)],
                 rect.width,
             ),
         }
@@ -134,15 +122,9 @@ class KnifeIndicator(sprite.GUISprite):
         button_xs = [i[0] for i in button_coords if i[0] is not None]
         button_ys = [i[1] for i in button_coords if i[1] is not None]
         self.button_dict = button_dict
-        self.button_bounds = pygame.Rect(
-            min(button_xs), min(button_ys), max(button_xs), max(button_ys)
-        ).inflate(5, 5)
-        self.anim = animation.Animation(
-            [level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)]
-        )
-        self.red_anim = animation.Animation(
-            [level.game.loader.get_image("gui.png", f"RedKnife{i}") for i in range(4)]
-        )
+        self.button_bounds = pygame.Rect(min(button_xs), min(button_ys), max(button_xs), max(button_ys)).inflate(5, 5)
+        self.anim = animation.Animation([level.game.loader.get_image("gui.png", f"Knife{i}") for i in range(4)])
+        self.red_anim = animation.Animation([level.game.loader.get_image("gui.png", f"RedKnife{i}") for i in range(4)])
         self.state = self.STATE_GREEN
         self.age = 0
         self.button_coord = start_pos
@@ -169,22 +151,13 @@ class KnifeIndicator(sprite.GUISprite):
             current_x += delta_x
             current_y += delta_y
             current_coord = (current_x, current_y)
-            if (
-                current_coord in self.button_dict
-                and self.button_dict[current_coord].state == Button.STATE_NORMAL
-            ):
+            if current_coord in self.button_dict and self.button_dict[current_coord].state == Button.STATE_NORMAL:
                 return current_coord
             x_only_coord = (current_coord[0], None)
             y_only_coord = (None, current_coord[1])
-            if (
-                x_only_coord in self.button_dict
-                and self.button_dict[x_only_coord].state == Button.STATE_NORMAL
-            ):
+            if x_only_coord in self.button_dict and self.button_dict[x_only_coord].state == Button.STATE_NORMAL:
                 return x_only_coord
-            if (
-                y_only_coord in self.button_dict
-                and self.button_dict[y_only_coord].state == Button.STATE_NORMAL
-            ):
+            if y_only_coord in self.button_dict and self.button_dict[y_only_coord].state == Button.STATE_NORMAL:
                 return y_only_coord
         return None
 
@@ -278,9 +251,7 @@ class TextInput(sprite.GUISprite):
                 char = " "
             self.text[self.cursor_position] = char
             self.cursor_position += 1
-        self.cursor_position = pygame.math.clamp(
-            self.cursor_position, 0, len(self.text) - 1
-        )
+        self.cursor_position = pygame.math.clamp(self.cursor_position, 0, len(self.text) - 1)
 
 
 class Save(TextButton):
@@ -297,9 +268,7 @@ class Save(TextButton):
     def load(self):
         if self.level.delete_mode:
             if self.name:
-                self.level.game.stack.appendleft(
-                    DeleteConfirmationMenu(self.level.game, self.name)
-                )
+                self.level.game.stack.appendleft(DeleteConfirmationMenu(self.level.game, self.name))
             self.level.delete_mode_toggle()
             return
         if self.name:
@@ -440,9 +409,7 @@ class NameInputMenu(game_state.GameState):
         button_dict = {}
 
         for i, letter in enumerate(letters):
-            button = TextButton(
-                self, letter_rect, letter, partial(self.click_letter, letter)
-            )
+            button = TextButton(self, letter_rect, letter, partial(self.click_letter, letter))
             self.gui.append(button)
             button_dict[(button_x, button_y)] = button
             letter_rect.left = letter_rect.right
@@ -453,9 +420,7 @@ class NameInputMenu(game_state.GameState):
                 button_x = 0
                 button_y += 1
 
-        button_rect = pygame.Rect(
-            (0, keyboard_rect.bottom), self.game.loader.font.size("ABCD")
-        )
+        button_rect = pygame.Rect((0, keyboard_rect.bottom), self.game.loader.font.size("ABCD"))
         button_rect.centerx = keyboard_rect.centerx
         cancel_button = TextButton(self, button_rect, "Back", self.cancel)
         self.gui.append(cancel_button)
@@ -507,12 +472,8 @@ class DeleteConfirmationMenu(game_state.GameState):
         super().__init__(game, (0, 0, 0, 0))
         background_rect = pygame.Rect(0, 0, 256, 48)
         background_rect.center = self.game.screen_rect.center
-        button1_rect = pygame.Rect(
-            background_rect.left + 32, background_rect.top + 8, background_rect.width - 64, 16
-        )
-        button2_rect = pygame.Rect(
-            background_rect.left + 32, background_rect.top + 24, background_rect.width - 64, 16
-        )
+        button1_rect = pygame.Rect(background_rect.left + 32, background_rect.top + 8, background_rect.width - 64, 16)
+        button2_rect = pygame.Rect(background_rect.left + 32, background_rect.top + 24, background_rect.width - 64, 16)
         button_dict = {
             (0, 0): Button(
                 self,
@@ -528,8 +489,7 @@ class DeleteConfirmationMenu(game_state.GameState):
             ),
         }
         self.gui = [
-            Image(self, pygame.transform.scale(game.loader.get_surface("background.png"), game.screen_rect.size),
-                  game.screen_rect),
+            Image(self, pygame.transform.scale(game.loader.get_surface("background.png"), game.screen_rect.size), game.screen_rect),
             Background(self, background_rect, -1),
             *button_dict.values(),
             KnifeIndicator(self, button_dict),

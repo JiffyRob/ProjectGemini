@@ -22,9 +22,7 @@ def event_magnitude(event):
     return 1
 
 
-def event_to_strings(
-    event, joystick_deadzone=0.3, controller_unique=False, split_hats=False
-):
+def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, split_hats=False):
     event = pygame.Event(event.type, event.dict)
     if event.type == HAT_AXIS_MOTION:
         identifiers = ["HatAxisMotion"]
@@ -122,9 +120,7 @@ def interactive_id_printer():
     controllers = dict(init_controllers())
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 40)
-    surface = font.render(
-        "Events will be printed to console as strings", True, "black", "white"
-    )
+    surface = font.render("Events will be printed to console as strings", True, "black", "white")
     screen = pygame.display.set_mode(surface.get_size())
     screen.blit(surface, (0, 0))
     running = True
@@ -177,9 +173,7 @@ class InputQueue:
 
         for raw_event in events:
             if raw_event.type == pygame.JOYDEVICEADDED:
-                self.joysticks[raw_event.device_index] = pygame.Joystick(
-                    raw_event.device_index
-                )
+                self.joysticks[raw_event.device_index] = pygame.Joystick(raw_event.device_index)
             if raw_event.type == pygame.JOYDEVICEREMOVED:
                 self.joysticks[raw_event.instance_id].quit()
             if raw_event.type == pygame.CONTROLLERDEVICEADDED:
@@ -218,9 +212,7 @@ class InputQueue:
                 self.press_bindings.setdefault(user_action, set()).add(identifier)
                 release_action = releaser_string(user_action)
                 if release_action != user_action:
-                    self.release_bindings.setdefault(release_action, set()).add(
-                        identifier
-                    )
+                    self.release_bindings.setdefault(release_action, set()).add(identifier)
                     self.held[identifier] = False
                 else:
                     print(user_action, "Not releasable")

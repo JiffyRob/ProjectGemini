@@ -21,9 +21,7 @@ class Write(snek.SnekCommand):
 
     def get_value(self):
         if self.context["LEVEL"] is None:
-            self.post_warning(
-                "Unable to locate level context.  Dialog request ignored."
-            )
+            self.post_warning("Unable to locate level context.  Dialog request ignored.")
             return 1
         elif self.state == self.UNWRITTEN:
             self.context["LEVEL"].start_dialog(self.text, on_finish=self.finish_writing)
@@ -50,14 +48,10 @@ class Ask(Write):
 
     def get_value(self):
         if self.context["LEVEL"] is None:
-            self.post_warning(
-                "Unable to locate level context.  Dialog request ignored."
-            )
+            self.post_warning("Unable to locate level context.  Dialog request ignored.")
             return 1
         elif self.state == self.UNWRITTEN:
-            self.context["LEVEL"].start_dialog(
-                self.text, *self.answers, on_finish=self.finish_writing
-            )
+            self.context["LEVEL"].start_dialog(self.text, *self.answers, on_finish=self.finish_writing)
             self.state = self.WRITING
             return snek.UNFINISHED
         elif self.state == self.WRITING:
@@ -82,9 +76,7 @@ class FadeInCircle(snek.SnekCommand):
             if self.pos[1] is None:
                 self.pos[1] = player_pos[1]
             screen_pos = level.world_to_screen(self.pos)
-            self.fader = visual_fx.CircleTransitionIn(
-                util_draw.RESOLUTION, screen_pos, speed=400
-            )
+            self.fader = visual_fx.CircleTransitionIn(util_draw.RESOLUTION, screen_pos, speed=400)
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
@@ -109,9 +101,7 @@ class FadeOutCircle(snek.SnekCommand):
             if self.pos[1] is None:
                 self.pos[1] = player_pos[1]
             screen_pos = level.world_to_screen(self.pos)
-            self.fader = visual_fx.CircleTransitionOut(
-                util_draw.RESOLUTION, screen_pos, speed=self.speed
-            )
+            self.fader = visual_fx.CircleTransitionOut(util_draw.RESOLUTION, screen_pos, speed=self.speed)
             level.add_effect(self.fader)
         if self.blocking and not self.fader.done:
             return snek.UNFINISHED
@@ -221,18 +211,14 @@ def cutscene(script_name, runner=None, level=None, extra_constants=None, extra_a
             "play_soundtrack": snek.snek_command(level.game.play_soundtrack),
             "save": snek.snek_command(level.game.save_to_disk),
             "quit": snek.snek_command(level.game.quit),
-            "rickroll": snek.snek_command(
-                lambda: webbrowser.open("https://youtu.be/E4WlUXrJgy4")
-            ),
+            "rickroll": snek.snek_command(lambda: webbrowser.open("https://youtu.be/E4WlUXrJgy4")),
             "fadein": FadeIn,
             "fadeout": FadeOut,
             "fadein_circle": FadeInCircle,
             "fadeout_circle": FadeOutCircle,
             "fill": Fill,
             "clear_effects": snek.snek_command(level.clear_effects),
-            "run_cutscene": snek.snek_command(
-                lambda *args: level.run_cutscene(*args, override=True)
-            ),
+            "run_cutscene": snek.snek_command(lambda *args: level.run_cutscene(*args, override=True)),
             "attempt_map_cutscene": snek.snek_command(level.attempt_map_cutscene),
             **extra_api,
         },

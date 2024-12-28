@@ -9,9 +9,7 @@ def create_exp_easings(exp):
         return 1 - (1 - time) ** exp
 
     def ease_in_out(time):
-        return (
-            2 ** (exp - 1) * time**exp if time < 0.5 else 1 - (-2 * time + 2) ** exp / 2
-        )
+        return 2 ** (exp - 1) * time**exp if time < 0.5 else 1 - (-2 * time + 2) ** exp / 2
 
     return ease_in, ease_out, ease_in_out
 
@@ -131,11 +129,7 @@ def out_circ(time):
 
 
 def in_out_circ(time):
-    return (
-        (1 - math.sqrt(1 - (2 * time) ** 2)) / 2
-        if time < 0.5
-        else (math.sqrt(1 - (-2 * time + 2) ** 2) + 1) / 2
-    )
+    return (1 - math.sqrt(1 - (2 * time) ** 2)) / 2 if time < 0.5 else (math.sqrt(1 - (-2 * time + 2) ** 2) + 1) / 2
 
 
 def in_back(time):
@@ -158,9 +152,7 @@ def in_out_back(time):
 
 def in_elastic(time):
     if time not in {0, 1}:
-        return -(2 ** (10 * time - 10)) * math.sin(
-            (time * 10 - 10.75) * (2 * math.pi / 3)
-        )
+        return -(2 ** (10 * time - 10)) * math.sin((time * 10 - 10.75) * (2 * math.pi / 3))
     return time
 
 
@@ -176,9 +168,7 @@ def in_out_elastic(time):
         if time < 0.5:
             return -(2 ** (20 * time - 10) * math.sin((20 * time - 11.125) * c3)) / 2
         else:
-            return (
-                2 ** (-20 * time + 10) * math.sin((20 * time - 11.125) * c3)
-            ) / 2 + 1
+            return (2 ** (-20 * time + 10) * math.sin((20 * time - 11.125) * c3)) / 2 + 1
     return time
 
 
@@ -204,8 +194,4 @@ def in_bounce(time):
 
 
 def in_out_bounce(time):
-    return (
-        (1 - out_bounce(1 - 2 * time)) / 2
-        if time < 0.5
-        else (1 + out_bounce(2 * time - 1)) / 2
-    )
+    return (1 - out_bounce(1 - 2 * time)) / 2 if time < 0.5 else (1 + out_bounce(2 * time - 1)) / 2

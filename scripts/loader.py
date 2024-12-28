@@ -104,15 +104,9 @@ class Loader:
     @functools.cache
     def get_surface(self, path, rect=None):
         if rect:
-            return self.convert(
-                pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(
-                    rect
-                )
-            )
+            return self.convert(pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(rect))
         else:
-            return self.convert(
-                pygame.image.load(self.join_asset(path).with_suffix(".png"))
-            )
+            return self.convert(pygame.image.load(self.join_asset(path).with_suffix(".png")))
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):
@@ -148,7 +142,7 @@ class Loader:
 
     @functools.cache
     def get_sound(self, path):
-        path = self.join_sound(path).with_suffix(".wav")
+        path = self.join_sound(path).with_suffix(".ogg")
         return pygame.mixer.Sound(path)
 
     @functools.cache

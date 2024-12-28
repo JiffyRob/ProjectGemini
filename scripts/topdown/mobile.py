@@ -15,9 +15,7 @@ REVERSE = {"up": "down", "down": "up", "left": "right", "right": "left"}
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(
-        self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields
-    ):
+    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields):
         super().__init__(level, image=image, rect=rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()

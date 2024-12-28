@@ -35,14 +35,10 @@ class Space(game_state.GameState):
         ship_rect = pygame.Rect(0, 0, 48, 32)
         ship_rect.center = self.game.screen_rect.center
         self.ship = gui3d.Ship(self, ship_rect)
-        self.compass = gui3d.Compass(
-            self, pygame.Vector2(16, -16) + self.game.screen_rect.bottomleft
-        )
+        self.compass = gui3d.Compass(self, pygame.Vector2(16, -16) + self.game.screen_rect.bottomleft)
         self.gui = [self.ship, self.compass]
         self.sprites = []
-        self.ship_overlay = self.game.loader.get_surface_scaled_to(
-            "ship-inside.png", util_draw.RESOLUTION
-        )
+        self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
         self.gui_surface = pygame.Surface((util_draw.RESOLUTION), pygame.SRCALPHA)
         self.gui_gl_surface = self.game.context.image(util_draw.RESOLUTION)
 
@@ -64,7 +60,7 @@ class Space(game_state.GameState):
 
         angle = numpy.linspace(0.0, numpy.pi * 2.0, self.CIRCLE_RESOLUTION)
         xy = numpy.array([numpy.cos(angle), numpy.sin(angle)])
-        vertex_buffer = self.game.context.buffer(xy.T.astype('f4').tobytes())
+        vertex_buffer = self.game.context.buffer(xy.T.astype("f4").tobytes())
 
         self.depth_buffer = self.game.context.image(util_draw.RESOLUTION, "depth24plus")
         self.pipeline = self.game.context.pipeline(
@@ -115,7 +111,7 @@ class Space(game_state.GameState):
                     "wrap_x": "clamp_to_edge",
                     "wrap_y": "clamp_to_edge",
                 }
-            ]
+            ],
         )
 
         self.turn_speeds = {
@@ -140,11 +136,7 @@ class Space(game_state.GameState):
         if "enter" in pressed:
             for name, id in self.planet_ids.items():
                 rect = self.static_sprites.get_rect(id)
-                if (
-                    rect.width > 100
-                    and self.screen_rect.contains(rect)
-                    and self.static_sprites.screen_positions[id][2] > 0
-                ):
+                if rect.width > 100 and self.screen_rect.contains(rect) and self.static_sprites.screen_positions[id][2] > 0:
                     self.game.load_map(name)
         held = self.game.input_queue.held
         if held["up"]:
@@ -173,33 +165,15 @@ class Space(game_state.GameState):
         else:
             self.forward_speed -= self.forward_delta
             self.game.play_soundtrack("SpaceshipMain")
-        self.turn_speeds["up"] = pygame.math.clamp(
-            self.turn_speeds["up"], 0, self.max_turn_speed
-        )
-        self.turn_speeds["down"] = pygame.math.clamp(
-            self.turn_speeds["down"], 0, self.max_turn_speed
-        )
-        self.turn_speeds["left"] = pygame.math.clamp(
-            self.turn_speeds["left"], 0, self.max_turn_speed
-        )
-        self.turn_speeds["right"] = pygame.math.clamp(
-            self.turn_speeds["right"], 0, self.max_turn_speed
-        )
-        self.camera.rotation *= math3d.Quaternion(
-            dt * self.turn_speeds["up"], (1, 0, 0)
-        )
-        self.camera.rotation *= math3d.Quaternion(
-            -dt * self.turn_speeds["down"], (1, 0, 0)
-        )
-        self.camera.rotation *= math3d.Quaternion(
-            -dt * self.turn_speeds["left"], (0, 1, 0)
-        )
-        self.camera.rotation *= math3d.Quaternion(
-            dt * self.turn_speeds["right"], (0, 1, 0)
-        )
-        self.forward_speed = pygame.math.clamp(
-            self.forward_speed, self.min_forward_speed, self.max_forward_speed
-        )
+        self.turn_speeds["up"] = pygame.math.clamp(self.turn_speeds["up"], 0, self.max_turn_speed)
+        self.turn_speeds["down"] = pygame.math.clamp(self.turn_speeds["down"], 0, self.max_turn_speed)
+        self.turn_speeds["left"] = pygame.math.clamp(self.turn_speeds["left"], 0, self.max_turn_speed)
+        self.turn_speeds["right"] = pygame.math.clamp(self.turn_speeds["right"], 0, self.max_turn_speed)
+        self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["up"], (1, 0, 0))
+        self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["down"], (1, 0, 0))
+        self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["left"], (0, 1, 0))
+        self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["right"], (0, 1, 0))
+        self.forward_speed = pygame.math.clamp(self.forward_speed, self.min_forward_speed, self.max_forward_speed)
         motion = pygame.Vector3(0, 0, self.forward_speed * dt)
         self.camera.pos += self.camera.rotation * motion
 

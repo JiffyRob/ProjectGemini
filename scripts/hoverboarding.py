@@ -13,7 +13,18 @@ class ScrollingBackground(sprite.Sprite):
     STATE_WATER = 1
     STATE_SLOWDOWN = 2
 
-    def __init__(self, level, rect=((0, 0,), util_draw.RESOLUTION), z=0):
+    def __init__(
+        self,
+        level,
+        rect=(
+            (
+                0,
+                0,
+            ),
+            util_draw.RESOLUTION,
+        ),
+        z=0,
+    ):
         tileset = level.game.loader.get_surface("tileset.png")
         self.land_tile = tileset.subsurface((112, 176, 16, 16))
         self.land_sea_transition = tileset.subsurface((128, 176, 16, 16))
@@ -65,12 +76,14 @@ class ScrollingBackground(sprite.Sprite):
             self.swap_cooldown.update()
             self.slowdown_timer.update()
             self.speedup_timer.update()
-            if self.state == self.STATE_GROUND and .05 < self.swap_cooldown.percent_complete() < .95:
+            if self.state == self.STATE_GROUND and 0.05 < self.swap_cooldown.percent_complete() < 0.95:
                 if not random.randint(0, self.land_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
                 if not random.randint(0, self.stump_chance):
-                    self.level.spawn("Stump", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
-            elif self.state == self.STATE_WATER and .05 < self.swap_cooldown.percent_complete() < .95:
+                    self.level.spawn(
+                        "Stump", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8
+                    )
+            elif self.state == self.STATE_WATER and 0.05 < self.swap_cooldown.percent_complete() < 0.95:
                 if not random.randint(0, self.sea_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
             if not self.speedup_timer.done():
@@ -244,7 +257,7 @@ class Drone(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 10, 10), z=0, **custom_fields):
         frames = level.game.loader.get_spritesheet("drone.png", (10, 10))
         self.images = {
-            "ascent":  SingleAnimation(frames[0]),
+            "ascent": SingleAnimation(frames[0]),
             "descent": SingleAnimation(frames[0]),
             "idle": SingleAnimation(frames[0]),
             "shoot": SingleAnimation(frames[1]),

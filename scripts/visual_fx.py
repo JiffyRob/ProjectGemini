@@ -136,9 +136,7 @@ class ColorTransitionIn(ColorTransitionOut):
     def update(self, dt):
         self.age += dt
         self.done = self.age >= self.duration
-        self.color.a = pygame.math.clamp(
-            255 - round(self.age * 255 / self.duration), 0, 255
-        )
+        self.color.a = pygame.math.clamp(255 - round(self.age * 255 / self.duration), 0, 255)
         return not self.done
 
 
@@ -179,17 +177,13 @@ class Blink(VisualEffect):
             new_surface = pygame.Surface(surface.get_size())
             new_surface.fill(surface.get_colorkey())
             new_surface.set_colorkey(surface.get_colorkey())
-            pygame.transform.threshold(
-                new_surface, surface, surface.get_colorkey(), set_color=self.color
-            )
+            pygame.transform.threshold(new_surface, surface, surface.get_colorkey(), set_color=self.color)
             surface.blit(new_surface, (0, 0))
         if index >= self.count * 2:
             self.done = True
 
     def draw_over(self, dest_surface, dest_rect):
-        raise TypeError(
-            f"{self.__class__} cannot be drawn over other surfaces due to no transparency info"
-        )
+        raise TypeError(f"{self.__class__} cannot be drawn over other surfaces due to no transparency info")
 
 
 class Hide(VisualEffect):
