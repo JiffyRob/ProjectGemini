@@ -1,11 +1,11 @@
-<html lang="en-us"><script src="https://pygame-web.github.io/archives/0.8/pythons.js" type=module id="site" data-python="cpython3.11" data-os="vtx,fs,snd,gui" async defer>#<!--
+<html lang="en-us"><script src="https://pygame-web.github.io/pygbag/0.0/pythons.js" type=module id="site" data-python="python3.12" data-LINES=42 data-COLUMNS=132 data-os="vtx,fs,snd,gui" async defer>#<!--
 
 print("""
 Loading projectgemini from projectgemini.apk
-    Pygbag Version : 0.8.6
-    Template Version : 0.8.3
-    Python  : 3.11
-    CDN URL : https://pygame-web.github.io/archives/0.8/
+    Pygbag Version : 0.0.0
+    Template Version : 0.9.2
+    Python  : 3.12
+    CDN URL : https://pygame-web.github.io/pygbag/0.0/
     Screen  : 1280x720
     Title   : projectgemini
     Folder  : projectgemini
@@ -14,6 +14,11 @@ Loading projectgemini from projectgemini.apk
 
 """)
 
+import sys
+import asyncio
+import platform
+import json
+from pathlib import Path
 
 # screen pixels (real, hardware)
 WIDTH=1024  # 1280
@@ -46,43 +51,14 @@ def uy(*argv):
     return acc
 
 
-
-
 # do not rename
 async def custom_site():
-
-    import sys
-    import asyncio
-    import platform
-    import json
-    from pathlib import Path
-
-
-
     import embed
-
 
     platform.document.body.style.background = "#7f7f7f"
 
-    import pygame
-
-    def compose():
-        pygame.display.update()
-        window.chromakey(None, *screen.get_colorkey(), 40)
-
-    pygame.init()
-    pygame.font.init()
-
-    screen = pygame.display.set_mode([ux(.100),uy(.100)], pygame.SRCALPHA, 32)
-    screen.set_colorkey( (0,0,0,0), pygame.RLEACCEL )
-    screen.fill( (0,0,0,0) )
-
-    compose()
-
     platform.window.transfer.hidden = true
     platform.window.canvas.style.visibility = "visible"
-
-
 
     apk = "projectgemini.apk"
 
@@ -101,35 +77,19 @@ async def custom_site():
         "mount" : {
             "point" : appdir.as_posix(),
             "path" : "/",
-        },
-        "path" : f"/ => {appdir.as_posix()}",
-    }
+        }
 
+    }
 
     track = platform.window.MM.prepare(apk, json.dumps(cfg))
 
     marginx = ux(.020) # 20%
     marginy = uy(.045) # 45%
 
-
-    def pg_bar(pos):
-        nonlocal marginx, marginy
-        # resolution of progress bar, recalculate since it may not be know yet.
-        total = track.len or 10  # avoid div0
-        slot = ux(.060)/ total # 60%
-
-        pygame.draw.rect(screen,(10,10,10),( marginx-ux(10), marginy-uy(10), (total*slot)+ux(20), uy(110) ) )
-        pygame.draw.rect(screen,(0,255,0), ( marginx, marginy, track.pos*slot, uy(90)) )
-
+    print(" /////////////////////////////////////////////////////////: ")
     # wait until zip mount + overlayfs is complete
     while not track.ready:
-        pg_bar(track.pos)
-        compose()
         await asyncio.sleep(.1)
-
-    # fill it up in case it was cached and instant download
-    pg_bar(track.len)
-    compose()
 
 
     # preloader will change dir and prepend it to sys.path
@@ -143,51 +103,40 @@ async def custom_site():
 
     main = appdir / "assets" / "main.py"
 
-    # start async top level machinery and add a console.
-    await TopLevel_async_handler.start_toplevel(platform.shell, console=window.python.config.debug)
-
-    # now that apk is mounted we have access to font cache
-    # but we need to fill __file__ that is not yet set
-    __import__(__name__).__file__ = str(main)
-
-
-    # now make a prompt
-    fnt = pygame.sysfont.SysFont("freesans",  uy(80) )
-
-    def ui_callback(pkg, error=None):
-        nonlocal fnt
-        if error:
-            prompt = fnt.render(f"{error}", True, "black")
-        else:
-            prompt = fnt.render(f"Setting [{pkg}] up", True, "black")
-        pg_bar(track.len)
-        screen.blit(prompt, ( marginx+ ux(80), marginy - uy(10) ) )
-        compose()
-
-    # test/wait if user media interaction required
+    # test/wait user media interaction
     if not platform.window.MM.UME:
 
+        # now that apk is mounted we have access to font cache
+        # but we need to fill __file__ that is not yet set
+        __import__(__name__).__file__ = main
+
         # now make a prompt
-        fnt = pygame.sysfont.SysFont("freesans",  uy(80) )
-        prompt = fnt.render("Ready to start !", True, "blue")
-        pg_bar(track.len)
-        screen.blit(prompt, ( marginx+ ux(80), marginy - uy(10) ) )
-        compose()
+        print("Ready to start !")
+
         print("""
         * Waiting for media user engagement : please click/touch page *
     """)
         while not platform.window.MM.UME:
             await asyncio.sleep(.1)
 
-    # cleanup
-    screen.fill( (0,0,0,0) )
-    pygame.display.flip()
+    # start async top level machinery if not started and add a console in any case if requested.
+    await TopLevel_async_handler.start_toplevel(platform.shell, console=window.python.config.debug)
 
-    await shell.runpy(main, callback=ui_callback)
+    # now that apk is mounted we have access to font cache
+    # but we need to fill __file__/__name__ that are not yet set
+    __import__(__name__).__file__ = main
 
 
+    def ui_callback(pkg):
+        print(f"installing {pkg}")
 
-import asyncio
+    await shell.source(main, callback=ui_callback)
+
+    # if you don't reach that step
+    # your main.py has an infinite sync loop somewhere !
+    print("noctxl.html: ready")
+
+    shell.interactive()
 
 asyncio.run( custom_site() )
 
@@ -241,9 +190,9 @@ config = {
     can_close : 0,
     archive : "projectgemini",
     gui_debug : 3,
-    cdn : "https://pygame-web.github.io/archives/0.8/",
+    cdn : "https://pygame-web.github.io/pygbag/0.0/",
     autorun : 0,
-    PYBUILD : "3.11"
+    PYBUILD : "3.12"
 }
 
 </script>
@@ -255,11 +204,6 @@ config = {
     <meta name="viewport" content="height=device-height, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes"/>
-
-    <link rel="prefetch" href="https://pygame-web.github.io/archives/0.8/pythonrc.py">
-    <link rel="prefetch" href="https://pygame-web.github.io/archives/0.8/vt/xterm.js">
-    <link rel="prefetch" href="https://pygame-web.github.io/archives/0.8/vt/xterm-addon-image.js">
-    <link rel="prefetch" href="https://pygame-web.github.io/archives/0.8/vt/xterm-addon-image.js">
 
 
     <link rel="icon" type="image/png" href="favicon.png" sizes="16x16">
@@ -328,20 +272,29 @@ config = {
         }
 
         .trinfo{
-           position:relative;
-           right:0px;
+           position: relative;
+           right: 0px;
            border: 1px solid black;
         }
 
         .framed{
-           position:relative;
-           top:150px;
-           right:10px;
+           position: relative;
+           top: 150px;
+           right: 10px;
            border: 1px solid black;
         }
     </style>
 
-    <script src="https://pygame-web.github.io/archives/0.8//browserfs.min.js"></script>
+    <script>
+/*
+        if (navigator.serviceWorker)
+            navigator.serviceWorker.register("https://pygame-web.github.io/pygbag/0.0/pygbag0.0.0.js")
+        else
+            console.warn("Service workers not supported")
+*/
+    </script>
+
+    <script src="https://pygame-web.github.io/pygbag/0.0//browserfs.min.js"></script>
 
 </head>
 
@@ -354,6 +307,7 @@ config = {
             <progress value="0" max="100" id="progress"></progress>
         </div>
     </div>
+
 
 
     <canvas class="emscripten" id="canvas"
@@ -393,7 +347,8 @@ height="1px"
             <iframe id="iframe" class="framed" name="iframe"
 width="470px" height="90%"
 allowtransparency="true"
-style="z-index: 10; style="background: #FFFFFF;"
+style="z-index: 10;"
+style="background: #FFFFFF;"
 frameborder="1"
                 allowfullscreen="true"
                 webkitallowfullscreen="true"
@@ -401,7 +356,7 @@ frameborder="1"
                 mozallowfullscreen="true"
                 sandbox="allow-same-origin allow-top-navigation allow-scripts allow-pointer-lock"
                 allow="autoplay; fullscreen *; geolocation; microphone; camera; midi; monetization; xr-spatial-tracking; gamepad; gyroscope; accelerometer; xr; cross-origin-isolated"
-                src="https://pygame-web.github.io/archives/0.8/empty.html"
+                src="https://pygame-web.github.io/pygbag/0.0/empty.html"
                 scrolling="yes">
             </iframe>
         </div>
