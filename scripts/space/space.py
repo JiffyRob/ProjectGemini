@@ -52,11 +52,11 @@ class Space(game_state.GameState):
         self.radii = numpy.zeros(self.SPRITE_COUNT, "f4") + 0.3
 
         self.planet_ids = {}
-        planets = ((self.PLANET_TERRA1, (0, 0, -1000)), (self.PLANET_KEERGAN, (0, 0, 1000)))
+        planets = ((self.PLANET_TERRA1, (0, 0, -150)), (self.PLANET_KEERGAN, (0, 0, 150)))
         for i, (planet, location) in enumerate(planets):
             self.locations[i] = location
             self.planets[i] = planet
-            self.radii[i] = 1
+            self.radii[i] = 0.4
 
         print(self.locations)
         print(self.planets)
@@ -74,8 +74,8 @@ class Space(game_state.GameState):
             topology="triangle_fan",
             uniforms={
                 "time": 0.0,
-                "near_z": 400.0,
-                "far_z": 2000.0,
+                "near_z": 5.0,
+                "far_z": 200.0,
                 "viewpos_x": 10.0,
                 "viewpos_y": 0.0,
                 "viewpos_z": 0.0,
@@ -125,13 +125,12 @@ class Space(game_state.GameState):
             "right": 0,
         }
         self.turn_delta = 0.007
-        self.max_turn_speed = 0.8
+        self.max_turn_speed = 0.6
         self.forward_delta = 10
-        self.min_forward_speed = 40
-        self.max_forward_speed = 1000
+        self.min_forward_speed = 10
+        self.max_forward_speed = 100
         self.forward_speed = self.min_forward_speed
         self.age = 0
-        # self.camera.rotation *= math3d.Quaternion(3.1415, (0, 1, 0))
 
     def update(self, dt):
         self.age += dt
@@ -146,7 +145,6 @@ class Space(game_state.GameState):
                     and self.screen_rect.contains(rect)
                     and self.static_sprites.screen_positions[id][2] > 0
                 ):
-                    print(f"entering {name}!")
                     self.game.load_map(name)
         held = self.game.input_queue.held
         if held["up"]:
@@ -213,8 +211,6 @@ class Space(game_state.GameState):
         self.pipeline.uniforms["rot_y"][:] = struct.pack("f", self.camera.rotation.vector.y)
         self.pipeline.uniforms["rot_z"][:] = struct.pack("f", self.camera.rotation.vector.z)
         self.pipeline.uniforms["rot_theta"][:] = struct.pack("f", self.camera.rotation.real)
-
-        print(self.camera.pos)
 
         for sprite in self.gui:
             sprite.update(dt)

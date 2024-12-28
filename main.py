@@ -3,6 +3,7 @@ from collections import deque
 
 import pygame
 import zengl
+import numpy
 
 from scripts import (
     game_save,
@@ -267,8 +268,7 @@ class Game:
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
         self.sound_manager = sound.SoundManager(self.loader)
-        # self.stack.appendleft(menu.MainMenu(self))
-        self.stack.appendleft(space.Space(self))
+        self.stack.appendleft(menu.MainMenu(self))
         dt = 0
         pygame.key.set_repeat(0, 0)
         while self.running and len(self.stack):
