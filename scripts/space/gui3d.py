@@ -1,7 +1,7 @@
 import numpy
 import pygame
 
-from scripts import sprite
+from scripts import sprite, pixelfont
 from scripts.animation import Animation
 from scripts.space import math3d
 
@@ -116,3 +116,52 @@ class Compass(sprite.GUISprite):
             endpoint = self.origin + offset[:2]
             pygame.draw.line(surface, color, self.origin, endpoint, width=2)
             surface.blit(letter, self.origin + offset[:2] * 1.5 - (3, 4))
+
+
+class PlanetIndicator(sprite.GUISprite):
+    STATE_IDLE = 0
+    STATE_PLANET = 1
+    STATE_PAUSED = 2
+
+    def __init__(self, level, rect):
+        super().__init__(level)
+        self.level = level
+        self.rect = rect
+        self.log_speed = 30
+        self.idle_log_speed = 2
+        self.age = 0
+        self.font = pixelfont.PixelFont(self.level.game.loader.get_spritesheet("font.png", (7, 8)))
+        self.state = self.STATE_IDLE
+        self.last_state = self.STATE_IDLE
+
+    def confirm_quit(self):
+        self.state = self.STATE_PAUSED
+
+    def reset(self):
+        self.state = self.STATE_IDLE
+        self.age = 0
+        self.last_state = self.STATE_IDLE
+
+    def update(self, dt):
+        super().update(dt)
+        self.age += dt
+        if self.state != self.STATE_PAUSED:
+            planet = self.level.possible_planet
+            if planet:
+                self.state = self.STATE_PLANET
+            else:
+                self.state = self.STATE_IDLE
+            if self.state != self.last_state:
+                self.age = 0
+        self.last_state = self.state
+
+    def draw(self, surface):
+        if self.state == self.STATE_IDLE:
+            text = "." * int((self.age * self.idle_log_speed) % 4)
+        elif self.state == self.STATE_PLANET:
+            text = f"Auto land on planet {self.level.possible_planet}?\nYes: enter"
+            text = text[:min(int(self.age * self.log_speed), len(text))]
+        elif self.state == self.STATE_PAUSED:
+            text = f"Save and quit?\nYes: enter, No: esc"
+            text = text[:min(int(self.age * self.log_speed), len(text))]
+        self.font.render_to(surface, self.rect, text)
