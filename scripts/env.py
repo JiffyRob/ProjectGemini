@@ -43,10 +43,12 @@ def update_settings(updated_settings):
 
 
 def write_settings():
-    print("write settings")
+    if not PYGBAG:
+        return
     HTML_WINDOW.localStorage.setItem("settings", json.dumps(settings))
 
 
 def write_saves():
-    print("write saves")
+    if not PYGBAG:
+        return
     HTML_WINDOW.localStorage.setItem("saves", json.dumps(saves))

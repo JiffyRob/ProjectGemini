@@ -160,8 +160,8 @@ class PlanetIndicator(sprite.GUISprite):
             text = "." * int((self.age * self.idle_log_speed) % 4)
         elif self.state == self.STATE_PLANET:
             text = f"Auto land on planet {self.level.possible_planet}?\nYes: enter"
-            text = text[:min(int(self.age * self.log_speed), len(text))]
+            text = text[: min(int(self.age * self.log_speed), len(text))]
         elif self.state == self.STATE_PAUSED:
             text = f"Save and quit?\nYes: enter, No: esc"
-            text = text[:min(int(self.age * self.log_speed), len(text))]
+            text = text[: min(int(self.age * self.log_speed), len(text))]
         self.font.render_to(surface, self.rect, text)
