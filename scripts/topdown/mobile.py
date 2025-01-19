@@ -1,4 +1,3 @@
-from queue import Queue
 from math import sin
 import random
 
@@ -348,14 +347,14 @@ def search(start: tuple | pygame.Vector2):
         )
 
     # breadth first search (https://www.redblobgames.com/pathfinding/a-star/introduction.html)
-    frontier = Queue()
-    frontier.put(tuple(start))
+    frontier = list()
+    frontier.append(tuple(start))
     reached = set()
     reached.add(tuple(start))
     while True:
-        current = frontier.get()
+        current = frontier.pop(0)
         for next in neighbors(current):
             if next not in reached:
-                frontier.put(next)
+                frontier.append(next)
                 reached.add(next)
         yield current

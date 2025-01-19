@@ -174,6 +174,7 @@ class Player(sprite.Sprite):
         return pygame.Rect(self.rect.left + 8, self.rect.top + 14, 12, 11)
 
     def hurt(self, amount):
+        return
         if self.pain_timer.done():
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
             self.health = max(0, self.health - amount)

@@ -3,7 +3,7 @@ from math import ceil, sin
 
 import pygame
 
-from scripts import animation, game_state, loader, sprite, timer
+from scripts import animation, game_state, loader, sprite, timer, env
 
 
 def nine_slice(images, size):
@@ -343,14 +343,15 @@ class MainMenu(game_state.GameState):
         self.gui.append(delete_button)
 
         button_rect.top = button_rect.bottom + 3
-        exit_button = Button(
-            self,
-            button_rect,
-            self.game.loader.font.render("Exit Game"),
-            self.game.exit,
-        )
-        self.gui.append(exit_button)
-        button_dict[(0, i + 2)] = exit_button
+        if not env.PYGBAG:
+            exit_button = Button(
+                self,
+                button_rect,
+                self.game.loader.font.render("Exit Game"),
+                self.game.exit,
+            )
+            self.gui.append(exit_button)
+            button_dict[(0, i + 2)] = exit_button
 
         self.knife = KnifeIndicator(self, button_dict=button_dict)
         self.gui.append(self.knife)

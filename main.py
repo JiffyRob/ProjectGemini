@@ -14,6 +14,7 @@ from scripts import (
     sound,
     space,
     util_draw,
+    env,
 )
 
 pygame.init()
@@ -217,7 +218,7 @@ class Game:
             info = pygame.display.Info()
             self.settings["last-resolution"] = (info.current_w, info.current_h - 32)
         self.window = pygame.display.set_mode(
-            self.settings["last-resolution"], pygame.RESIZABLE | pygame.OPENGL, vsync=self.settings["vsync"]
+            self.settings["last-resolution"], pygame.RESIZABLE * env.PYGBAG | pygame.OPENGL, vsync=self.settings["vsync"]
         )
         pygame.display.set_caption(self.title)
         if self.settings["fullscreen"]:
@@ -253,7 +254,7 @@ class Game:
                 }
             ],
         )
-
+        self.videoresize(self.settings["last-resolution"])
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
         self.sound_manager = sound.SoundManager(self.loader)
@@ -280,12 +281,13 @@ class Game:
 
     def quit(self):
         self.loader.save_settings(self.settings)
+        self.loader.flush()
         while len(self.stack) > 1:
             self.stack.clear()
             self.stack.appendleft(menu.MainMenu(self))
 
     def exit(self):
-        self.running = False
+        self.running = env.PYGBAG
 
 
 asyncio.run(Game().run())

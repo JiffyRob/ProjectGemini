@@ -5,7 +5,7 @@ import pathlib
 
 import pygame
 
-from scripts import pixelfont
+from scripts import pixelfont, env
 from scripts.util_draw import COLORKEY
 
 
@@ -67,7 +67,7 @@ class Loader:
 
     @functools.cache
     def get_settings(self):
-        return {**self.get_json("settings-default"), **self.get_json("settings")}
+        return {**self.get_json("settings-default"), **self.get_json("settings"), **env.get_settings()}
 
     def save_settings(self, settings):
         overwritten_settings = {}
@@ -76,6 +76,8 @@ class Loader:
             if value != default_settings[key]:
                 overwritten_settings[key] = value
         self.save_json("settings", overwritten_settings)
+        env.update_settings(settings)
+        env.write_settings()
 
     @functools.cache
     def get_csv(self, path, item_delimiter=",", line_delimiter="\n", for_map=False):
@@ -166,6 +168,8 @@ class Loader:
     # not cached because save files change
     def get_save(self, path):
         path = self.join_save(path).with_suffix(".sav")
+        if env.PYGBAG and "1" not in str(path):  # this path is the "new game" save
+            return env.get_save(path)
         return json.load(path.open())
         # compress save files later - leave for debug
         with gzip.open(path) as file:
@@ -173,20 +177,34 @@ class Loader:
 
     def save_data(self, path, data):
         path = self.join_save(path).with_suffix(".sav")
+        env.update_save(path, data)
         return json.dump(data, path.open("w"))
         # compress save files later - leave for debug
         with gzip.open(path, "wb") as file:
             json.dump(data, file)
 
     def delete_save(self, path):
-        self.join_save(path).with_suffix(".sav").unlink()
+        path = self.join_save(path).with_suffix(".sav")
+        if env.PYGBAG:
+            env.delete_save(path)
+            env.write_saves()
+        else:
+            path.unlink()
 
     def get_save_names(self, amount=5):
         names = []
         i = 0
-        for i, save_path in enumerate(self.save_path.glob("*")):
+        if env.PYGBAG:
+            paths = [pathlib.Path(i) for i in env.saves.keys()]
+        else:
+            paths = self.save_path.glob("*")
+        for i, save_path in enumerate(paths):
             if save_path.stem != "start1":
                 names.append(save_path.stem)
         if i < amount:
             names.extend(("" for _ in range(amount - i)))
         return names[:amount]
+
+    def flush(self):
+        env.write_saves()
+        env.write_settings()
