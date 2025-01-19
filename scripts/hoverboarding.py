@@ -39,9 +39,9 @@ class ScrollingBackground(sprite.Sprite):
         self.x_offset = 0
         self.images = deque()
         self.rect = pygame.FRect(rect)
-        self.land_rock_chance = 100
-        self.sea_rock_chance = 50
-        self.stump_chance = 100
+        self.land_rock_chance = 150
+        self.sea_rock_chance = 100
+        self.stump_chance = 150
         self.locked = False
         self.finished = False
         self.age = 0

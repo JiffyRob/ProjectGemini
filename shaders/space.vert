@@ -21,6 +21,7 @@ uniform float far_z;
 out vec2 instance_coord;
 flat out int planet_id;
 flat out int flippy;
+out float frag_radius;
 
 void main() {
     // imagine using matrices...HAH!
@@ -45,4 +46,5 @@ void main() {
     instance_coord = vertex / 2.0;
     planet_id = planet_id_;
     flippy = gl_InstanceID % 2;
+    frag_radius = scaled_radius;
 }
