@@ -19,6 +19,15 @@ class Space(game_state.GameState):
     PLANET_TERRA2 = 2
     PLANET_KEERGAN = 3
 
+    IDS_TO_NAMES = {
+        PLANET_STAR: "Star",
+        PLANET_TERRA1: "Terra1",
+        PLANET_TERRA2: "Gemini2",
+        PLANET_KEERGAN: "Keergan",
+    }
+
+    PLANET_CHECK_TOLERANCE = 100
+
     def __init__(self, game):
         super().__init__(game, color="black", opengl=True)
         # self.game.renderer.logical_size = (1920, 1080)
@@ -30,8 +39,8 @@ class Space(game_state.GameState):
             math3d.Quaternion(),
             pygame.Vector2(util_draw.RESOLUTION) / 2,
             pygame.Vector2(60, 60),  # TODO : FOV
-            200,
-            2000,
+            5,
+            5000,
         )
         ship_rect = pygame.Rect(0, 0, 48, 32)
         ship_rect.center = self.game.screen_rect.center
@@ -52,11 +61,12 @@ class Space(game_state.GameState):
         self.planet_ids = numpy.zeros(self.PLANET_COUNT, "i4")
         self.planet_radii = numpy.zeros(self.PLANET_COUNT, "f4") + 5.0
 
-        self.planet_ids_to_indices = {}
         planets = ((self.PLANET_TERRA1, (0, 0, -150)), (self.PLANET_KEERGAN, (0, 0, 150)))
+        self.planet_names = {}
         for i, (planet, location) in enumerate(planets):
             self.planet_locations[i] = location
             self.planet_ids[i] = planet
+            self.planet_names[i] = self.IDS_TO_NAMES[planet]
 
         angle = numpy.linspace(0.0, numpy.pi * 2.0, self.CIRCLE_RESOLUTION)
         xy = numpy.array([numpy.cos(angle), numpy.sin(angle)])
@@ -69,8 +79,8 @@ class Space(game_state.GameState):
             framebuffer=[self.game.gl_window_surface, self.depth_buffer],
             topology="triangle_fan",
             uniforms={
-                "near_z": 5.0,
-                "far_z": 500.0,
+                "near_z": self.camera.near_z,
+                "far_z": self.camera.far_z,
                 "viewpos_x": 10.0,
                 "viewpos_y": 0.0,
                 "viewpos_z": 0.0,
@@ -96,8 +106,8 @@ class Space(game_state.GameState):
             topology="triangle_fan",
             uniforms={
                 "time": 0.0,
-                "near_z": 5.0,
-                "far_z": 500.0,
+                "near_z": self.camera.near_z,
+                "far_z": self.camera.far_z,
                 "viewpos_x": 10.0,
                 "viewpos_y": 0.0,
                 "viewpos_z": 0.0,
@@ -153,17 +163,16 @@ class Space(game_state.GameState):
         self.max_forward_speed = 100
         self.forward_speed = self.min_forward_speed
         self.age = 0
+        self.possible_planet = None
 
     def update(self, dt):
         self.age += dt
         pressed = self.game.input_queue.just_pressed
         if "quit" in pressed:
             self.game.quit()
-        if "enter" in pressed:
-            for name, id in self.planet_ids_to_indices.items():
-                rect = self.static_sprites.get_rect(id)
-                if rect.width > 100 and self.screen_rect.contains(rect) and self.static_sprites.screen_positions[id][2] > 0:
-                    self.game.load_map(name)
+        if "enter" in pressed and self.possible_planet:
+            self.game.load_map(self.possible_planet)
+
         held = self.game.input_queue.held
         if held["up"]:
             self.turn_speeds["up"] += self.turn_delta
@@ -191,6 +200,7 @@ class Space(game_state.GameState):
         else:
             self.forward_speed -= self.forward_delta
             self.game.play_soundtrack("SpaceshipMain")
+
         self.turn_speeds["up"] = pygame.math.clamp(self.turn_speeds["up"], 0, self.max_turn_speed)
         self.turn_speeds["down"] = pygame.math.clamp(self.turn_speeds["down"], 0, self.max_turn_speed)
         self.turn_speeds["left"] = pygame.math.clamp(self.turn_speeds["left"], 0, self.max_turn_speed)
@@ -201,6 +211,18 @@ class Space(game_state.GameState):
         self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["right"], (0, 1, 0))
         self.forward_speed = pygame.math.clamp(self.forward_speed, self.min_forward_speed, self.max_forward_speed)
         motion = pygame.Vector3(0, 0, self.forward_speed * dt)
+
+        planet_check_position = self.camera.pos
+        moved = self.planet_locations.copy()
+        math3d.inverse_camera_transform_points_sizes(moved, numpy.zeros((self.PLANET_COUNT, 2)), self.camera)
+        moved = moved[:, 2]
+        distances = numpy.linalg.norm(self.planet_locations - planet_check_position, axis=1)[moved > 0]
+        self.possible_planet = None
+        if distances.size:
+            nearest = distances.argmin()
+            if distances[nearest] < self.PLANET_CHECK_TOLERANCE:
+                self.possible_planet = self.planet_names[self.planet_ids[nearest]]
+
         self.camera.pos += self.camera.rotation * motion
 
         self.star_pipeline.uniforms["viewpos_x"][:] = struct.pack("f", self.camera.pos.x)
