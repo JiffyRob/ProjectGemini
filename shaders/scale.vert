@@ -1,7 +1,7 @@
 #version 300 es
 
 precision highp float;
-precision lowp int;
+precision highp int;
 
 vec2 vertices[4] = vec2[](
     vec2(-1.0, 1.0),

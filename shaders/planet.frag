@@ -3,7 +3,7 @@
 // This shader contains code by various authors.  Please see comments for details.
 // Original until stated otherwise
 
-precision lowp float;
+precision highp float;
 
 // per pixel
 in vec2 instance_coord;

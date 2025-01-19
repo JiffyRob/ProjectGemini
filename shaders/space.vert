@@ -1,6 +1,6 @@
 #version 300 es
 
-precision lowp float;
+precision highp float;
 
 layout (location=0) in vec3 loc;
 layout (location=1) in int planet_id_;
