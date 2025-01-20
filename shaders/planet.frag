@@ -7,13 +7,10 @@ precision highp float;
 
 // per pixel
 in vec2 instance_coord;
-
-// per planet
 flat in int planet_id;
 flat in int flippy;
-
-// per frame
-uniform float time;
+in float frag_radius;
+in float frag_time;
 
 // parameters
 float terrain_seed = 100.0;
@@ -236,7 +233,7 @@ void main() {
     // planet rendering
     float planet_radius = 0.5 - cloud_height;
     if (dist < planet_radius) {
-        vec3 pp = (vec4(p.xyz, 1) * rotationMatrix(rotation_axis, time * rotation_speed)).xyz;
+        vec3 pp = (vec4(p.xyz, 1) * rotationMatrix(rotation_axis, frag_time * rotation_speed)).xyz;
         float elevation = (cnoise(vec3(terrain_seed) + pp * bumpiness) + 1.0) / 2.0;
         int terrain = get_terrain(elevation);
         switch (terrain) {
@@ -253,10 +250,10 @@ void main() {
     }
     if (dist < 0.5) {
       vec3 pp = vec3(instance_coord.xy, sqrt(0.25 - instance_coord.x * instance_coord.x - instance_coord.y * instance_coord.y));
-        pp = (vec4(pp.xyz, 1) * rotationMatrix(rotation_axis, time * cloud_rotation_speed)).xyz;
+        pp = (vec4(pp.xyz, 1) * rotationMatrix(rotation_axis, frag_time * cloud_rotation_speed)).xyz;
         pp.x /= 3.0;
         vec3 point = vec3(terrain_seed);
-        point.z += swirly_speed * time;
+        point.z += swirly_speed * frag_time;
         bool has_clouds = (cnoise(point + pp * swishiness) + 1.0) / 2.0 < cloudiness;
         if (has_clouds) {
             out_color = vec4(cloud_colors[index].rgb, 1.0);

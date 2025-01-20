@@ -2,11 +2,11 @@
 
 precision highp float;
 
-uniform bool blinkies;
-
-flat in int planet_id;
 in vec2 instance_coord;
+flat in int planet_id;
+flat in int flippy;
 in float frag_radius;
+in float frag_time;
 
 out vec4 out_color;
 
@@ -22,10 +22,10 @@ const float SPIKE_RADIUS = 0.02;
 const float BLOOM_LEVEL = 5.0;
 
 void main() {
-    out_color = STAR_COLORS[planet_id];
+    out_color = STAR_COLORS[flippy];
     float dist = distance(instance_coord, vec2(0.0, 0.0));
-    bool draw_spikes = (frag_radius >= SPIKE_RADIUS) && blinkies;
-    bool draw_bloom = (frag_radius >= BLOOM_RADIUS) && blinkies;
+    bool draw_spikes = (frag_radius >= SPIKE_RADIUS);
+    bool draw_bloom = (frag_radius >= BLOOM_RADIUS);
     draw_spikes = draw_spikes && ((abs(instance_coord.x) < TOLERANCE) || (abs(instance_coord.y) < TOLERANCE));
     out_color.a = 1.0 - step(STAR_RADIUS, dist);
     out_color.a += mix(float(draw_bloom), 0.0, dist * 3.0);
