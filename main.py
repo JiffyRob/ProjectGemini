@@ -152,7 +152,7 @@ class Game:
         if not self.stack[0].update(dt * self.dt_mult):
             kill_state = True
         # if fps drops below 10 the game will start to lag
-        dt = pygame.math.clamp(self.clock.tick(self.fps) * self.dt_mult / 1000, -0.1, 0.1)
+        dt = pygame.math.clamp(self.clock.tick(self.settings["frame-cap"] * (not env.PYGBAG)) * self.dt_mult / 1000, -0.1, 0.1)
         # update delayed callbacks
         still_waiting = []
         for index in range(len(self.timers)):
@@ -258,8 +258,8 @@ class Game:
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
         self.sound_manager = sound.SoundManager(self.loader)
-        # self.stack.appendleft(menu.MainMenu(self))
-        self.stack.appendleft(space.Space(self))
+        self.stack.appendleft(menu.MainMenu(self))
+        # self.stack.appendleft(space.Space(self))
         dt = 0
         pygame.key.set_repeat(0, 0)
         while self.running and len(self.stack):
@@ -284,7 +284,7 @@ class Game:
         self.loader.flush()
         while len(self.stack) > 1:
             self.stack.clear()
-            self.stack.appendleft(menu.MainMenu(self))
+        self.stack.appendleft(menu.MainMenu(self))
 
     def exit(self):
         self.running = env.PYGBAG

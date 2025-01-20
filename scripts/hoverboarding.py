@@ -32,6 +32,7 @@ class ScrollingBackground(sprite.Sprite):
         self.sea_tile = level.game.loader.get_spritesheet("liquid.png")[4]
         self.state = self.STATE_WATER
         self.swap_cooldown = timer.Timer(10000)
+        self.spawn_cooldown = timer.Timer(100)
         self.speedup_time = 5000
         self.speedup_timer = timer.Timer(5000)
         self.slowdown_timer = timer.Timer(70000)
@@ -39,9 +40,9 @@ class ScrollingBackground(sprite.Sprite):
         self.x_offset = 0
         self.images = deque()
         self.rect = pygame.FRect(rect)
-        self.land_rock_chance = 150
-        self.sea_rock_chance = 100
-        self.stump_chance = 150
+        self.land_rock_chance = 150 // 6
+        self.sea_rock_chance = 100 // 6
+        self.stump_chance = 150 // 6
         self.locked = False
         self.finished = False
         self.age = 0
@@ -74,18 +75,21 @@ class ScrollingBackground(sprite.Sprite):
             self.age += dt
             self.x_offset -= self.level.speed * dt
             self.swap_cooldown.update()
+            self.spawn_cooldown.update()
             self.slowdown_timer.update()
             self.speedup_timer.update()
-            if self.state == self.STATE_GROUND and 0.05 < self.swap_cooldown.percent_complete() < 0.95:
+            if self.state == self.STATE_GROUND and 0.05 < self.swap_cooldown.percent_complete() < 0.95 and self.spawn_cooldown.done():
                 if not random.randint(0, self.land_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
                 if not random.randint(0, self.stump_chance):
                     self.level.spawn(
                         "Stump", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8
                     )
-            elif self.state == self.STATE_WATER and 0.05 < self.swap_cooldown.percent_complete() < 0.95:
+                self.spawn_cooldown.reset()
+            elif self.state == self.STATE_WATER and 0.05 < self.swap_cooldown.percent_complete() < 0.95 and self.spawn_cooldown.done():
                 if not random.randint(0, self.sea_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+                self.spawn_cooldown.reset()
             if not self.speedup_timer.done():
                 self.level.speed = 200 * easings.in_out_quad(self.age / self.speedup_time * 1000)
             if self.slowdown_timer.done():
@@ -174,7 +178,6 @@ class Player(sprite.Sprite):
         return pygame.Rect(self.rect.left + 8, self.rect.top + 14, 12, 11)
 
     def hurt(self, amount):
-        return
         if self.pain_timer.done():
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
             self.health = max(0, self.health - amount)

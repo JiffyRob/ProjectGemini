@@ -187,10 +187,12 @@ class Space(game_state.GameState):
             else:
                 self.planet_indicator.confirm_quit()
                 self.quitting = True
-        if "enter" in pressed and self.possible_planet:
+        if "enter" in pressed:
+            print(self.quitting)
             if self.quitting:
+                self.game.save_to_disk()
                 self.game.quit()
-            else:
+            elif self.possible_planet:
                 self.game.load_map(self.possible_planet)
 
         if not self.quitting:
