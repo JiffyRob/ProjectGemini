@@ -27,8 +27,31 @@ class Quaternion:
     def __neg__(self):
         return self.invert()
 
+    def copy(self):
+        return Quaternion.from_standard(self.real, *self.vector)
+
     def invert(self):
         return Quaternion.from_standard(self.real, *-self.vector)
+
+    def dot(self, other):
+        return self.real * other.real + sum(self.vector.elementwise() * other.vector.elementwise())
+
+    def nlerp(self, other, t):
+        a = self
+        if self.dot(other) < 0:
+            a = self.invert()
+        b = other
+        return Quaternion.from_standard(
+            a.real + t * (b.real - a.real),
+            *a.vector + t * (b.vector - a.vector),
+        ).normalize()
+
+    def normalize(self):
+        length = math.sqrt(self.real ** 2 + sum(self.vector.elementwise() ** 2))
+        return Quaternion.from_standard(
+            self.real / length,
+            *self.vector / length,
+        )
 
     def __bool__(self):
         return bool(self.vector)

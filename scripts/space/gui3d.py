@@ -122,6 +122,7 @@ class PlanetIndicator(sprite.GUISprite):
     STATE_IDLE = 0
     STATE_PLANET = 1
     STATE_PAUSED = 2
+    STATE_ENTER = 3
 
     def __init__(self, level, rect):
         super().__init__(level)
@@ -137,6 +138,12 @@ class PlanetIndicator(sprite.GUISprite):
     def confirm_quit(self):
         self.state = self.STATE_PAUSED
 
+    def enter(self):
+        self.state = self.STATE_ENTER
+
+    def confirm_enter(self):
+        self.state = self.STATE_PLANET
+
     def reset(self):
         self.state = self.STATE_IDLE
         self.age = 0
@@ -145,14 +152,8 @@ class PlanetIndicator(sprite.GUISprite):
     def update(self, dt):
         super().update(dt)
         self.age += dt
-        if self.state != self.STATE_PAUSED:
-            planet = self.level.possible_planet
-            if planet:
-                self.state = self.STATE_PLANET
-            else:
-                self.state = self.STATE_IDLE
-            if self.state != self.last_state:
-                self.age = 0
+        if self.state != self.last_state:
+            self.age = 0
         self.last_state = self.state
 
     def draw(self, surface):
@@ -164,4 +165,6 @@ class PlanetIndicator(sprite.GUISprite):
         elif self.state == self.STATE_PAUSED:
             text = f"Save and quit?\nYes: enter, No: esc"
             text = text[: min(int(self.age * self.log_speed), len(text))]
+        elif self.state == self.STATE_ENTER:
+            text = f"Autopilot: FUNCTIONAL\nInitiating landing..."
         self.font.render_to(surface, self.rect, text)

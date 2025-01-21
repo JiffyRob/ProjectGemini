@@ -5,5 +5,6 @@
   "music-volume": 1,
   "sfx-volume": 1,
   "fps": 60,
-  "last-resolution": null
+  "last-resolution": null,
+  "frame-cap": 60
 }

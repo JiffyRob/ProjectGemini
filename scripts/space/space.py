@@ -1,4 +1,5 @@
 import struct
+from calendar import month
 
 import numpy
 import pygame
@@ -27,6 +28,11 @@ class Space(game_state.GameState):
     }
 
     PLANET_CHECK_TOLERANCE = 100
+    LANDING_TOLERANCE = 760
+
+    STATE_NORMAL = 0
+    STATE_PAUSE = 1
+    STATE_ENTRY = 2
 
     def __init__(self, game):
         super().__init__(game, color="black", opengl=True)
@@ -71,6 +77,8 @@ class Space(game_state.GameState):
             self.planet_locations[i] = location
             self.planet_ids[i] = planet
             self.planet_names[i] = self.IDS_TO_NAMES[planet]
+
+        print(self.planet_ids)
 
         angle = numpy.linspace(0.0, numpy.pi * 2.0, self.CIRCLE_RESOLUTION)
         xy = numpy.array([numpy.cos(angle), numpy.sin(angle)])
@@ -175,27 +183,29 @@ class Space(game_state.GameState):
         self.forward_speed = self.min_forward_speed
         self.age = 0
         self.possible_planet = None
-        self.quitting = False
+        self.possible_planet_index = None
+        self.dest_rotation = None
+        self.state = self.STATE_NORMAL
 
     def update(self, dt):
         self.age += dt
         pressed = self.game.input_queue.just_pressed
         if "quit" in pressed:
-            if self.quitting:
-                self.quitting = False
+            if self.state == self.STATE_PAUSE:
+                self.state = self.STATE_NORMAL
                 self.planet_indicator.reset()
-            else:
+            elif self.state == self.STATE_NORMAL:
                 self.planet_indicator.confirm_quit()
-                self.quitting = True
+                self.state = self.STATE_PAUSE
         if "enter" in pressed:
-            print(self.quitting)
-            if self.quitting:
+            if self.state == self.STATE_PAUSE:
                 self.game.save_to_disk()
                 self.game.quit()
-            elif self.possible_planet:
-                self.game.load_map(self.possible_planet)
+            elif self.state == self.STATE_NORMAL and self.possible_planet is not None:
+                self.state = self.STATE_ENTRY
+                self.planet_indicator.enter()
 
-        if not self.quitting:
+        if self.state == self.STATE_NORMAL:
             held = self.game.input_queue.held
             if held["up"]:
                 self.turn_speeds["up"] += self.turn_delta
@@ -233,37 +243,54 @@ class Space(game_state.GameState):
             self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["left"], (0, 1, 0))
             self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["right"], (0, 1, 0))
             self.forward_speed = pygame.math.clamp(self.forward_speed, self.min_forward_speed, self.max_forward_speed)
-            motion = pygame.Vector3(0, 0, self.forward_speed * dt)
 
+        elif self.state == self.STATE_ENTRY:
+            print("entering planet...somehow")
+            motion = pygame.Vector3(*self.planet_locations[self.possible_planet_index] - self.camera.pos)
+            print(motion.length_squared())
+            if motion.length_squared() <= self.LANDING_TOLERANCE:
+                self.game.load_map(self.possible_planet)
+            self.camera.pos += motion.clamp_magnitude(self.min_forward_speed) * dt
+
+        if self.state == self.STATE_NORMAL:
             planet_check_position = self.camera.pos
             moved = self.planet_locations.copy()
             math3d.inverse_camera_transform_points_sizes(moved, numpy.zeros((self.PLANET_COUNT, 2)), self.camera)
             moved = moved[:, 2]
-            distances = numpy.linalg.norm(self.planet_locations - planet_check_position, axis=1)[moved > 0]
+            valid = moved > 0
+            distances = numpy.linalg.norm(self.planet_locations - planet_check_position, axis=1)
             self.possible_planet = None
-            if distances.size:
-                nearest = distances.argmin()
-                if distances[nearest] < self.PLANET_CHECK_TOLERANCE:
-                    self.possible_planet = self.planet_names[self.planet_ids[nearest]]
+            self.possible_planet_index = None
+            if valid.any():
+                masked = numpy.ma.masked_array(moved, mask=~valid)
+                nearest = numpy.argmin(masked)
 
+                if distances[nearest] < self.PLANET_CHECK_TOLERANCE:
+                    self.possible_planet = self.IDS_TO_NAMES[int(self.planet_ids[nearest])]
+                    self.possible_planet_index = nearest
+                    self.planet_indicator.confirm_enter()
+
+        if self.state == self.STATE_NORMAL:
+            motion = pygame.Vector3(0, 0, self.forward_speed * dt)
             self.camera.pos += self.camera.rotation * motion
 
-            uniforms = numpy.frombuffer(self.uniform_buffer.read(), "f4").copy()
-            uniforms[:] = [
-                self.camera.pos.x,
-                self.camera.pos.y,
-                self.camera.pos.z,
-                self.camera.rotation.real,
-                self.camera.rotation.vector.x,
-                self.camera.rotation.vector.y,
-                self.camera.rotation.vector.z,
-                self.camera.near_z,
-                self.camera.far_z,
-                self.age,
-                0.0,
-                0.0,
-            ]
-            self.uniform_buffer.write(uniforms.tobytes())
+
+        uniforms = numpy.frombuffer(self.uniform_buffer.read(), "f4").copy()
+        uniforms[:] = [
+            self.camera.pos.x,
+            self.camera.pos.y,
+            self.camera.pos.z,
+            self.camera.rotation.real,
+            self.camera.rotation.vector.x,
+            self.camera.rotation.vector.y,
+            self.camera.rotation.vector.z,
+            self.camera.near_z,
+            self.camera.far_z,
+            self.age,
+            0.0,
+            0.0,
+        ]
+        self.uniform_buffer.write(uniforms.tobytes())
 
         for sprite in self.gui:
             sprite.update(dt)

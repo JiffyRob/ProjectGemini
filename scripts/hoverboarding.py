@@ -78,7 +78,11 @@ class ScrollingBackground(sprite.Sprite):
             self.spawn_cooldown.update()
             self.slowdown_timer.update()
             self.speedup_timer.update()
-            if self.state == self.STATE_GROUND and 0.05 < self.swap_cooldown.percent_complete() < 0.95 and self.spawn_cooldown.done():
+            if (
+                self.state == self.STATE_GROUND
+                and 0.05 < self.swap_cooldown.percent_complete() < 0.95
+                and self.spawn_cooldown.done()
+            ):
                 if not random.randint(0, self.land_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
                 if not random.randint(0, self.stump_chance):
@@ -86,7 +90,11 @@ class ScrollingBackground(sprite.Sprite):
                         "Stump", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8
                     )
                 self.spawn_cooldown.reset()
-            elif self.state == self.STATE_WATER and 0.05 < self.swap_cooldown.percent_complete() < 0.95 and self.spawn_cooldown.done():
+            elif (
+                self.state == self.STATE_WATER
+                and 0.05 < self.swap_cooldown.percent_complete() < 0.95
+                and self.spawn_cooldown.done()
+            ):
                 if not random.randint(0, self.sea_rock_chance):
                     self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
                 self.spawn_cooldown.reset()
