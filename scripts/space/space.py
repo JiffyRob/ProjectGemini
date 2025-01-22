@@ -6,8 +6,7 @@ import pygame
 import zengl
 
 from scripts import game_state, util_draw
-from scripts.animation import AnimatedSurface
-from scripts.space import gui3d, math3d, sprite3d
+from scripts.space import gui3d, math3d
 
 
 class Space(game_state.GameState):
@@ -270,6 +269,9 @@ class Space(game_state.GameState):
                     self.possible_planet = self.IDS_TO_NAMES[int(self.planet_ids[nearest])]
                     self.possible_planet_index = nearest
                     self.planet_indicator.confirm_enter()
+
+            if self.possible_planet is None:
+                self.planet_indicator.fail_confirmation()
 
         if self.state == self.STATE_NORMAL:
             motion = pygame.Vector3(0, 0, self.forward_speed * dt)

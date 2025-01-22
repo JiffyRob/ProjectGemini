@@ -144,6 +144,9 @@ class PlanetIndicator(sprite.GUISprite):
     def confirm_enter(self):
         self.state = self.STATE_PLANET
 
+    def fail_confirmation(self):
+        self.state = self.STATE_IDLE
+
     def reset(self):
         self.state = self.STATE_IDLE
         self.age = 0
