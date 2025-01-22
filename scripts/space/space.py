@@ -62,6 +62,7 @@ class Space(game_state.GameState):
 
         rng = numpy.random.default_rng(1)  # TODO: random seeding?
         self.star_locations = rng.uniform(low=-2000, high=2000, size=(self.STAR_COUNT, 3)).astype("f4")
+        self.star_ids = numpy.tile(numpy.array([0, 1]), self.STAR_COUNT // 2 + 1)
         self.star_radii = numpy.zeros(self.STAR_COUNT, "f4") + 1.0
 
         self.planet_locations = numpy.zeros((self.PLANET_COUNT, 3), "f4")
@@ -97,7 +98,7 @@ class Space(game_state.GameState):
             topology="triangle_fan",
             vertex_buffers=[
                 *zengl.bind(self.game.context.buffer(self.star_locations), "3f /i", 0),
-                *zengl.bind(self.game.context.buffer(self.planet_ids), "1i /i", 1),
+                *zengl.bind(self.game.context.buffer(self.star_ids), "1i /i", 1),
                 *zengl.bind(vertex_buffer, "2f", 2),
                 *zengl.bind(self.game.context.buffer(self.star_radii), "1f /i", 3),
             ],
@@ -142,7 +143,7 @@ class Space(game_state.GameState):
                 }
             ],
             vertex_count=self.CIRCLE_RESOLUTION,
-            instance_count=self.STAR_COUNT,
+            instance_count=self.PLANET_COUNT,
         )
         self.gui_pipeline = self.game.context.pipeline(
             vertex_shader=self.game.loader.get_vertex_shader("scale"),
@@ -274,23 +275,23 @@ class Space(game_state.GameState):
             motion = pygame.Vector3(0, 0, self.forward_speed * dt)
             self.camera.pos += self.camera.rotation * motion
 
-
-        uniforms = numpy.frombuffer(self.uniform_buffer.read(), "f4").copy()
-        uniforms[:] = [
-            self.camera.pos.x,
-            self.camera.pos.y,
-            self.camera.pos.z,
-            self.camera.rotation.real,
-            self.camera.rotation.vector.x,
-            self.camera.rotation.vector.y,
-            self.camera.rotation.vector.z,
-            self.camera.near_z,
-            self.camera.far_z,
-            self.age,
-            0.0,
-            0.0,
-        ]
-        self.uniform_buffer.write(uniforms.tobytes())
+        uniforms = numpy.array(
+            [
+                self.camera.pos.x,
+                self.camera.pos.y,
+                self.camera.pos.z,
+                0.0,
+                self.camera.rotation.vector.x,
+                self.camera.rotation.vector.y,
+                self.camera.rotation.vector.z,
+                self.camera.rotation.real,
+                self.camera.near_z,
+                self.camera.far_z,
+                self.age,
+            ],
+            "f4",
+        )
+        self.uniform_buffer.write(uniforms)
 
         for sprite in self.gui:
             sprite.update(dt)

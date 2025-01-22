@@ -47,7 +47,7 @@ class Quaternion:
         ).normalize()
 
     def normalize(self):
-        length = math.sqrt(self.real ** 2 + sum(self.vector.elementwise() ** 2))
+        length = math.sqrt(self.real**2 + sum(self.vector.elementwise() ** 2))
         return Quaternion.from_standard(
             self.real / length,
             *self.vector / length,

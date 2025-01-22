@@ -8,7 +8,6 @@ precision highp float;
 // per pixel
 in vec2 instance_coord;
 flat in int planet_id;
-flat in int flippy;
 in float frag_radius;
 in float frag_time;
 
@@ -202,12 +201,6 @@ void main() {
     // handle planet parameters
     float dist = distance(instance_coord, vec2(0.0));
     switch (planet_id) {
-        case STAR:
-          out_color = vec4(0.0);
-          if (dist < 0.5) {
-            out_color = STAR_COLORS[flippy];
-          }
-          return;
         case PLANET_TERRA:
           break;
         case PLANET_TERRA2:

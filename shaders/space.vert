@@ -8,17 +8,16 @@ layout (location=2) in vec2 vertex;
 layout (location=3) in float radius;
 
 layout (std140) uniform Common {
-    vec3 viewpos;
-    float rot_theta;
-    vec3 rot_vector;
+    vec4 viewpos;
+    vec4 rot_vector;
     float near_z;
     float far_z;
     float time;
+    float blah;
 };
 
 out vec2 instance_coord;
 flat out int planet_id;
-flat out int flippy;
 out float frag_radius;
 out float frag_time;
 
@@ -30,7 +29,7 @@ void main() {
     // rotate point
     vec3 rotvec = -vec3(rot_vector.x, rot_vector.y, rot_vector.z);
     vec3 cross_product = cross(rotvec, moved);
-    moved = moved + (cross_product * 2.0 * rot_theta) + (2.0 * cross(rotvec, cross_product));
+    moved = moved + (cross_product * 2.0 * rot_vector.w) + (2.0 * cross(rotvec, cross_product));
     // z scaling
     float scale_factor = near_z / moved.z;
     float scaled_radius = radius * scale_factor;
@@ -44,7 +43,6 @@ void main() {
     gl_Position = vec4(moved.xy + vertex * scaled_radius * 2.0, moved.z, 1.0 + float(planet_id_) * 0.0001);
     instance_coord = vertex / 2.0;
     planet_id = planet_id_;
-    flippy = gl_InstanceID % 2;
     frag_radius = scaled_radius;
     frag_time = time;
 }
