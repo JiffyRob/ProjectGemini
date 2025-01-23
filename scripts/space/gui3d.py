@@ -1,7 +1,8 @@
 import numpy
 import pygame
+from OpenGL.wrapper import none_or_pass
 
-from scripts import sprite, pixelfont
+from scripts import sprite, pixelfont, util_draw
 from scripts.animation import Animation
 from scripts.space import math3d
 
@@ -171,3 +172,52 @@ class PlanetIndicator(sprite.GUISprite):
         elif self.state == self.STATE_ENTER:
             text = f"Autopilot: FUNCTIONAL\nInitiating landing..."
         self.font.render_to(surface, self.rect, text)
+
+
+class GUIRendererHW:
+    def __init__(self, level, gui):
+        self.level = level
+        self.gui = gui
+
+        self.surface = None
+        self.gl_surface = None
+        self.pipline = None
+
+        self.recompile_shaders()
+
+
+    def recompile_shaders(self):
+        self.surface = pygame.Surface(util_draw.RESOLUTION, pygame.SRCALPHA)
+        self.gl_surface = self.level.game.context.image(util_draw.RESOLUTION)
+
+        self.pipeline = self.level.game.context.pipeline(
+            vertex_shader=self.level.game.loader.get_vertex_shader("scale"),
+            fragment_shader=self.level.game.loader.get_fragment_shader("overlay"),
+            framebuffer=[self.level.game.gl_window_surface],
+            topology="triangle_strip",
+            vertex_count=4,
+            layout=[
+                {
+                    "name": "input_texture",
+                    "binding": 0,
+                }
+            ],
+            resources=[
+                {
+                    "type": "sampler",
+                    "binding": 0,
+                    "image": self.gl_surface,
+                    "min_filter": "nearest",
+                    "mag_filter": "nearest",
+                    "wrap_x": "clamp_to_edge",
+                    "wrap_y": "clamp_to_edge",
+                }
+            ],
+        )
+
+    def render(self):
+        self.surface.fill((0, 0, 0, 0))
+        for element in self.gui:
+            element.draw(self.surface)
+        self.gl_surface.write(pygame.image.tobytes(self.surface, "RGBA", True))
+        self.pipeline.render()

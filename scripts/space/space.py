@@ -6,26 +6,10 @@ import pygame
 import zengl
 
 from scripts import game_state, util_draw
-from scripts.space import gui3d, math3d
+from scripts.space import gui3d, math3d, glsprite3d, planets
 
 
 class Space(game_state.GameState):
-    CIRCLE_RESOLUTION = 16
-    STAR_COUNT = 200000
-    PLANET_COUNT = 2
-
-    PLANET_STAR = 0
-    PLANET_TERRA1 = 1
-    PLANET_TERRA2 = 2
-    PLANET_KEERGAN = 3
-
-    IDS_TO_NAMES = {
-        PLANET_STAR: "Star",
-        PLANET_TERRA1: "Terra1",
-        PLANET_TERRA2: "Gemini2",
-        PLANET_KEERGAN: "Keergan",
-    }
-
     PLANET_CHECK_TOLERANCE = 100
     LANDING_TOLERANCE = 760
 
@@ -56,118 +40,22 @@ class Space(game_state.GameState):
         self.gui = [self.ship, self.compass, self.planet_indicator]
         self.sprites = []
         self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
-        self.gui_surface = pygame.Surface((util_draw.RESOLUTION), pygame.SRCALPHA)
-        self.gui_gl_surface = self.game.context.image(util_draw.RESOLUTION)
 
-        rng = numpy.random.default_rng(1)  # TODO: random seeding?
-        self.star_locations = rng.uniform(low=-2000, high=2000, size=(self.STAR_COUNT, 3)).astype("f4")
-        self.star_ids = numpy.tile(numpy.array([0, 1]), self.STAR_COUNT // 2 + 1)
-        self.star_radii = numpy.zeros(self.STAR_COUNT, "f4") + 1.0
+        self.planets = planets.PLANETS
+        planet_count = len(self.planets)
 
-        self.planet_locations = numpy.zeros((self.PLANET_COUNT, 3), "f4")
-        self.planet_ids = numpy.zeros(self.PLANET_COUNT, "i4")
-        self.planet_radii = numpy.zeros(self.PLANET_COUNT, "f4") + 5.0
+        self.planet_locations = numpy.zeros((planet_count, 3), "f4")
+        self.planet_ids = numpy.zeros(planet_count, "i4")
+        self.planet_radii = numpy.zeros(planet_count, "f4") + 5.0
 
-        planets = (
-            (self.PLANET_TERRA1, (0, 0, -150)),
-            (self.PLANET_KEERGAN, (0, 0, 150)),
-        )
         self.planet_names = {}
-        for (i, (planet, location)), _ in zip(enumerate(planets), range(self.PLANET_COUNT)):
+        for i, (planet, location) in enumerate(self.planets):
             self.planet_locations[i] = location
             self.planet_ids[i] = planet
-            self.planet_names[i] = self.IDS_TO_NAMES[planet]
+            self.planet_names[i] = planets.IDS_TO_NAMES[planet]
 
-        print(self.planet_ids)
-
-        angle = numpy.linspace(0.0, numpy.pi * 2.0, self.CIRCLE_RESOLUTION)
-        xy = numpy.array([numpy.cos(angle), numpy.sin(angle)])
-        vertex_buffer = self.game.context.buffer(xy.T.astype("f4").tobytes())
-
-        self.depth_buffer = self.game.context.image(util_draw.RESOLUTION, "depth24plus")
-
-        self.uniform_buffer = self.game.context.buffer(size=48)
-
-        self.uniform_buffer.view()
-
-        self.star_pipeline = self.game.context.pipeline(
-            vertex_shader=self.game.loader.get_vertex_shader("space"),
-            fragment_shader=self.game.loader.get_fragment_shader("star"),
-            framebuffer=[self.game.gl_window_surface, self.depth_buffer],
-            topology="triangle_fan",
-            vertex_buffers=[
-                *zengl.bind(self.game.context.buffer(self.star_locations), "3f /i", 0),
-                *zengl.bind(self.game.context.buffer(self.star_ids), "1i /i", 1),
-                *zengl.bind(vertex_buffer, "2f", 2),
-                *zengl.bind(self.game.context.buffer(self.star_radii), "1f /i", 3),
-            ],
-            layout=[
-                {
-                    "name": "Common",
-                    "binding": 0,
-                }
-            ],
-            resources=[
-                {
-                    "type": "uniform_buffer",
-                    "binding": 0,
-                    "buffer": self.uniform_buffer,
-                }
-            ],
-            vertex_count=self.CIRCLE_RESOLUTION,
-            instance_count=self.STAR_COUNT,
-        )
-        self.planet_pipeline = self.game.context.pipeline(
-            vertex_shader=self.game.loader.get_vertex_shader("space"),
-            fragment_shader=self.game.loader.get_fragment_shader("planet"),
-            framebuffer=[self.game.gl_window_surface, self.depth_buffer],
-            topology="triangle_fan",
-            vertex_buffers=[
-                *zengl.bind(self.game.context.buffer(self.planet_locations), "3f /i", 0),
-                *zengl.bind(self.game.context.buffer(self.planet_ids), "1i /i", 1),
-                *zengl.bind(vertex_buffer, "2f", 2),
-                *zengl.bind(self.game.context.buffer(self.planet_radii), "1f /i", 3),
-            ],
-            layout=[
-                {
-                    "name": "Common",
-                    "binding": 0,
-                }
-            ],
-            resources=[
-                {
-                    "type": "uniform_buffer",
-                    "binding": 0,
-                    "buffer": self.uniform_buffer,
-                }
-            ],
-            vertex_count=self.CIRCLE_RESOLUTION,
-            instance_count=self.PLANET_COUNT,
-        )
-        self.gui_pipeline = self.game.context.pipeline(
-            vertex_shader=self.game.loader.get_vertex_shader("scale"),
-            fragment_shader=self.game.loader.get_fragment_shader("overlay"),
-            framebuffer=[self.game.gl_window_surface],
-            topology="triangle_strip",
-            vertex_count=4,
-            layout=[
-                {
-                    "name": "input_texture",
-                    "binding": 0,
-                }
-            ],
-            resources=[
-                {
-                    "type": "sampler",
-                    "binding": 0,
-                    "image": self.gui_gl_surface,
-                    "min_filter": "nearest",
-                    "mag_filter": "nearest",
-                    "wrap_x": "clamp_to_edge",
-                    "wrap_y": "clamp_to_edge",
-                }
-            ],
-        )
+        self.space_renderer = glsprite3d.SpaceRendererHW(self, self.planets)
+        self.gui_renderer = gui3d.GUIRendererHW(self, self.gui)
 
         self.turn_speeds = {
             "up": 0,
@@ -255,7 +143,7 @@ class Space(game_state.GameState):
         if self.state == self.STATE_NORMAL:
             planet_check_position = self.camera.pos
             moved = self.planet_locations.copy()
-            math3d.inverse_camera_transform_points_sizes(moved, numpy.zeros((self.PLANET_COUNT, 2)), self.camera)
+            math3d.inverse_camera_transform_points_sizes(moved, numpy.zeros((len(self.planet_locations), 2)), self.camera)
             moved = moved[:, 2]
             valid = moved > 0
             distances = numpy.linalg.norm(self.planet_locations - planet_check_position, axis=1)
@@ -266,7 +154,7 @@ class Space(game_state.GameState):
                 nearest = numpy.argmin(masked)
 
                 if distances[nearest] < self.PLANET_CHECK_TOLERANCE:
-                    self.possible_planet = self.IDS_TO_NAMES[int(self.planet_ids[nearest])]
+                    self.possible_planet = planets.IDS_TO_NAMES[int(self.planet_ids[nearest])]
                     self.possible_planet_index = nearest
                     self.planet_indicator.confirm_enter()
 
@@ -277,23 +165,7 @@ class Space(game_state.GameState):
             motion = pygame.Vector3(0, 0, self.forward_speed * dt)
             self.camera.pos += self.camera.rotation * motion
 
-        uniforms = numpy.array(
-            [
-                self.camera.pos.x,
-                self.camera.pos.y,
-                self.camera.pos.z,
-                0.0,
-                self.camera.rotation.vector.x,
-                self.camera.rotation.vector.y,
-                self.camera.rotation.vector.z,
-                self.camera.rotation.real,
-                self.camera.near_z,
-                self.camera.far_z,
-                self.age,
-            ],
-            "f4",
-        )
-        self.uniform_buffer.write(uniforms)
+        self.space_renderer.update(dt, self.camera)
 
         for sprite in self.gui:
             sprite.update(dt)
@@ -301,11 +173,5 @@ class Space(game_state.GameState):
         return True
 
     def draw(self):
-        self.gui_surface.fill((0, 0, 0, 0))
-        for sprite in self.gui:
-            sprite.draw(self.gui_surface)
-        self.depth_buffer.clear()
-        self.gui_gl_surface.write(pygame.image.tobytes(self.gui_surface, "RGBA", True))
-        self.star_pipeline.render()
-        self.planet_pipeline.render()
-        self.gui_pipeline.render()
+        self.space_renderer.render()
+        self.gui_renderer.render()
