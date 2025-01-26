@@ -14,6 +14,34 @@ SCALEMODE_INTEGER = "integer"
 SCALEMODE_STRETCH = "stretch"
 SCALEMODE_ASPECT = "aspect"
 
+SCALEMODES = [SCALEMODE_INTEGER, SCALEMODE_STRETCH, SCALEMODE_ASPECT]
+
+PRESET_LOWEST = "burnt potato"
+PRESET_LOW = "snazzy potato"
+PRESET_MEDIUM = "premium potato"
+PRESET_HIGH = "ultra potato"
+PRESET_ULTRA = "potato god"
+
+QUALITY_PRESETS = [
+    PRESET_LOWEST,
+    PRESET_LOW,
+    PRESET_MEDIUM,
+    PRESET_HIGH,
+    PRESET_ULTRA,
+]
+
+FRAMECAP_LOW = 30
+FRAMECAP_MED = 60
+FRAMECAP_HIGH = 120
+FRAMECAP_NONE = None  # nobody will ever hit this number
+
+FRAMECAPS = [
+    FRAMECAP_LOW,
+    FRAMECAP_MED,
+    FRAMECAP_HIGH,
+    FRAMECAP_NONE,
+]
+
 
 def debug_show(surface):
     window = sdl2.Window("debug", pygame.Vector2(surface.get_size()) * 4)
