@@ -106,14 +106,18 @@ class Compass(sprite.GUISprite):
     def __init__(self, level, origin):
         super().__init__(level)
         self.origin = origin
-        self.positions = numpy.array(((0, 1, 0), (1, 0, 0), (0, 0, 1)), dtype=numpy.float64) * 10
+        self.positions = (
+            numpy.array(((0, 1, 0), (1, 0, 0), (0, 0, 1)), dtype=numpy.float64) * 10
+        )
         self.colors = ("red", "green", "blue")
         self.letters = [level.game.loader.font.render(i) for i in ("N", "E", "Q")]
 
     def draw(self, surface):
         positions_copy = self.positions.copy()
         math3d.rotate_points(positions_copy, -self.level.camera.rotation)
-        for offset, color, letter in sorted(zip(positions_copy, self.colors, self.letters), key=lambda x: -x[0][2]):
+        for offset, color, letter in sorted(
+            zip(positions_copy, self.colors, self.letters), key=lambda x: -x[0][2]
+        ):
             endpoint = self.origin + offset[:2]
             pygame.draw.line(surface, color, self.origin, endpoint, width=2)
             surface.blit(letter, self.origin + offset[:2] * 1.5 - (3, 4))
@@ -132,7 +136,9 @@ class PlanetIndicator(sprite.GUISprite):
         self.log_speed = 30
         self.idle_log_speed = 2
         self.age = 0
-        self.font = pixelfont.PixelFont(self.level.game.loader.get_spritesheet("font.png", (7, 8)))
+        self.font = pixelfont.PixelFont(
+            self.level.game.loader.get_spritesheet("font.png", (7, 8))
+        )
         self.state = self.STATE_IDLE
         self.last_state = self.STATE_IDLE
 
@@ -185,7 +191,6 @@ class GUIRendererHW:
 
         self.recompile_shaders()
 
-
     def recompile_shaders(self):
         self.surface = pygame.Surface(util_draw.RESOLUTION, pygame.SRCALPHA)
         self.gl_surface = self.level.game.context.image(util_draw.RESOLUTION)
@@ -193,7 +198,7 @@ class GUIRendererHW:
         self.pipeline = self.level.game.context.pipeline(
             vertex_shader=self.level.game.loader.get_vertex_shader("scale"),
             fragment_shader=self.level.game.loader.get_fragment_shader("overlay"),
-            framebuffer=[self.level.game.gl_window_surface],
+            framebuffer=[self.level.game.window.get_gl_surface()],
             topology="triangle_strip",
             vertex_count=4,
             layout=[

@@ -22,7 +22,9 @@ def event_magnitude(event):
     return 1
 
 
-def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, split_hats=False):
+def event_to_strings(
+    event, joystick_deadzone=0.3, controller_unique=False, split_hats=False
+):
     event = pygame.Event(event.type, event.dict)
     if event.type == HAT_AXIS_MOTION:
         identifiers = ["HatAxisMotion"]
@@ -41,7 +43,9 @@ def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, spli
     if event.type == pygame.CONTROLLERAXISMOTION:
         event.value /= CONTROLLER_AXIS_SIZE
 
-    if ("Joy" in identifiers[0] or "Controller" in identifiers[0]) and controller_unique:
+    if (
+        "Joy" in identifiers[0] or "Controller" in identifiers[0]
+    ) and controller_unique:
         identifiers.insert(0, pygame.joystick.Joystick(event.instance_id).get_guid())
 
     if event.type in {pygame.JOYHATMOTION}:
@@ -67,7 +71,12 @@ def event_to_strings(event, joystick_deadzone=0.3, controller_unique=False, spli
         identifiers.append(event.axis)
         identifiers.append(event.value)
 
-    if event.type in {pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN, pygame.CONTROLLERBUTTONUP, pygame.CONTROLLERBUTTONDOWN}:
+    if event.type in {
+        pygame.JOYBUTTONUP,
+        pygame.JOYBUTTONDOWN,
+        pygame.CONTROLLERBUTTONUP,
+        pygame.CONTROLLERBUTTONDOWN,
+    }:
         identifiers.append(event.button)
 
     if event.type in {pygame.JOYAXISMOTION, pygame.CONTROLLERAXISMOTION}:
@@ -120,7 +129,9 @@ def interactive_id_printer():
     controllers = dict(init_controllers())
     clock = pygame.time.Clock()
     font = pygame.font.SysFont(None, 40)
-    surface = font.render("Events will be printed to console as strings", True, "black", "white")
+    surface = font.render(
+        "Events will be printed to console as strings", True, "black", "white"
+    )
     screen = pygame.display.set_mode(surface.get_size())
     screen.blit(surface, (0, 0))
     running = True
@@ -173,11 +184,15 @@ class InputQueue:
 
         for raw_event in events:
             if raw_event.type == pygame.JOYDEVICEADDED:
-                self.joysticks[raw_event.device_index] = pygame.Joystick(raw_event.device_index)
+                self.joysticks[raw_event.device_index] = pygame.Joystick(
+                    raw_event.device_index
+                )
             if raw_event.type == pygame.JOYDEVICEREMOVED:
                 self.joysticks[raw_event.instance_id].quit()
             if raw_event.type == pygame.CONTROLLERDEVICEADDED:
-                self.controllers[raw_event.device_index] = controller.Controller(raw_event.device_index)
+                self.controllers[raw_event.device_index] = controller.Controller(
+                    raw_event.device_index
+                )
             if raw_event.type == pygame.CONTROLLERDEVICEREMOVED:
                 self.controllers[raw_event.instance_id].quit()
             for action_id in event_to_strings(
@@ -212,7 +227,9 @@ class InputQueue:
                 self.press_bindings.setdefault(user_action, set()).add(identifier)
                 release_action = releaser_string(user_action)
                 if release_action != user_action:
-                    self.release_bindings.setdefault(release_action, set()).add(identifier)
+                    self.release_bindings.setdefault(release_action, set()).add(
+                        identifier
+                    )
                     self.held[identifier] = False
                 else:
                     print(user_action, "Not releasable")

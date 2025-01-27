@@ -47,7 +47,10 @@ class NoLoopAnimation:
         self.time = 0
 
     def done(self):
-        return min(round(self.time / self.speed), len(self.frames) - 1) == len(self.frames) - 1
+        return (
+            min(round(self.time / self.speed), len(self.frames) - 1)
+            == len(self.frames) - 1
+        )
 
     @property
     def image(self):
@@ -91,4 +94,6 @@ class AnimatedSurface(pygame.Surface):
         if new_index != self.index:
             self.index = new_index
             self.fill((0, 0, 0, 0))
-            self.blit(flip_surface(self.frames[self.index], self.flip_x, self.flip_y), (0, 0))
+            self.blit(
+                flip_surface(self.frames[self.index], self.flip_x, self.flip_y), (0, 0)
+            )

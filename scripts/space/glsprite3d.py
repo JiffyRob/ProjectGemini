@@ -5,6 +5,7 @@ import zengl
 from scripts import util_draw
 from scripts.space import planets
 
+
 class SpaceRendererHW:
     STAR_COUNT = 200_000
 
@@ -33,7 +34,9 @@ class SpaceRendererHW:
         planet_count = len(self.planets)
 
         rng = numpy.random.default_rng(1)  # TODO: random seeding?
-        self.star_locations = rng.uniform(low=-2000, high=2000, size=(self.STAR_COUNT, 3)).astype("f4")
+        self.star_locations = rng.uniform(
+            low=-2000, high=2000, size=(self.STAR_COUNT, 3)
+        ).astype("f4")
         self.star_ids = numpy.tile(numpy.array([0, 1]), self.STAR_COUNT // 2 + 1)
         self.star_radii = numpy.zeros(self.STAR_COUNT, "f4") + 1.0
 
@@ -51,7 +54,9 @@ class SpaceRendererHW:
         xy = numpy.array([numpy.cos(angle), numpy.sin(angle)])
         vertex_buffer = self.level.game.context.buffer(xy.T.astype("f4").tobytes())
 
-        self.depth_buffer = self.level.game.context.image(util_draw.RESOLUTION, "depth24plus")
+        self.depth_buffer = self.level.game.context.image(
+            util_draw.RESOLUTION, "depth24plus"
+        )
 
         self.uniform_buffer = self.level.game.context.buffer(size=48)
 
@@ -60,13 +65,17 @@ class SpaceRendererHW:
         self.star_pipeline = self.level.game.context.pipeline(
             vertex_shader=self.level.game.loader.get_vertex_shader("space"),
             fragment_shader=self.level.game.loader.get_fragment_shader("star"),
-            framebuffer=[self.level.game.gl_window_surface, self.depth_buffer],
+            framebuffer=[self.level.game.window.get_gl_surface(), self.depth_buffer],
             topology="triangle_fan",
             vertex_buffers=[
-                *zengl.bind(self.level.game.context.buffer(self.star_locations), "3f /i", 0),
+                *zengl.bind(
+                    self.level.game.context.buffer(self.star_locations), "3f /i", 0
+                ),
                 *zengl.bind(self.level.game.context.buffer(self.star_ids), "1i /i", 1),
                 *zengl.bind(vertex_buffer, "2f", 2),
-                *zengl.bind(self.level.game.context.buffer(self.star_radii), "1f /i", 3),
+                *zengl.bind(
+                    self.level.game.context.buffer(self.star_radii), "1f /i", 3
+                ),
             ],
             layout=[
                 {
@@ -87,13 +96,19 @@ class SpaceRendererHW:
         self.planet_pipeline = self.level.game.context.pipeline(
             vertex_shader=self.level.game.loader.get_vertex_shader("space"),
             fragment_shader=self.level.game.loader.get_fragment_shader("planet"),
-            framebuffer=[self.level.game.gl_window_surface, self.depth_buffer],
+            framebuffer=[self.level.game.window.get_gl_surface(), self.depth_buffer],
             topology="triangle_fan",
             vertex_buffers=[
-                *zengl.bind(self.level.game.context.buffer(self.planet_locations), "3f /i", 0),
-                *zengl.bind(self.level.game.context.buffer(self.planet_ids), "1i /i", 1),
+                *zengl.bind(
+                    self.level.game.context.buffer(self.planet_locations), "3f /i", 0
+                ),
+                *zengl.bind(
+                    self.level.game.context.buffer(self.planet_ids), "1i /i", 1
+                ),
                 *zengl.bind(vertex_buffer, "2f", 2),
-                *zengl.bind(self.level.game.context.buffer(self.planet_radii), "1f /i", 3),
+                *zengl.bind(
+                    self.level.game.context.buffer(self.planet_radii), "1f /i", 3
+                ),
             ],
             layout=[
                 {
@@ -136,5 +151,3 @@ class SpaceRendererHW:
         self.depth_buffer.clear()
         self.star_pipeline.render()
         self.planet_pipeline.render()
-
-

@@ -21,7 +21,9 @@ class Battery(sprite.Sprite):
         if custom_fields.get("trigger_id"):
             self.groups = self.__class__.groups | {custom_fields["trigger_id"]}
         rect = pygame.FRect(rect)
-        self.collision_rect = pygame.Rect(rect.left, rect.centery, rect.width, rect.height / 2)
+        self.collision_rect = pygame.Rect(
+            rect.left, rect.centery, rect.width, rect.height / 2
+        )
         self.time_reverse_collision_rect = rect
         super().__init__(level, self.anim_dict[self.state], rect, z - 1)
 
@@ -49,7 +51,9 @@ class GunPlatform(sprite.Sprite):
     def __init__(self, level, rect, z, **custom_fields):
         super().__init__(level, None, rect, z - 1)
         self.collision_rect = self.rect
-        on_frame, *shoot_frames, off_frame = level.game.loader.get_spritesheet("platformer-sprites.png", (32, 8))[24:29]
+        on_frame, *shoot_frames, off_frame = level.game.loader.get_spritesheet(
+            "platformer-sprites.png", (32, 8)
+        )[24:29]
         self.facing_left = custom_fields["facing_left"]
         self.anim_dict = {
             self.STATE_OFF: SingleAnimation(off_frame, self.facing_left),
@@ -63,7 +67,9 @@ class GunPlatform(sprite.Sprite):
         self.rotation_speed = 100
         self.angle = custom_fields["angle"]
         self.radius = 48
-        self.dest = pygame.Vector2(custom_fields["dest"]["cx"] * 16 + 8, custom_fields["dest"]["cy"] * 16 + 8)
+        self.dest = pygame.Vector2(
+            custom_fields["dest"]["cx"] * 16 + 8, custom_fields["dest"]["cy"] * 16 + 8
+        )
         self.dest_dt = 0
         self.shoot_timer = timer.DTimer(2000)
         if self.facing_left:
@@ -97,7 +103,9 @@ class GunPlatform(sprite.Sprite):
             )
             if self.state == self.STATE_MOVING:
                 self.dest_dt += dt
-                self.rect.center = self.start.lerp(self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1)))
+                self.rect.center = self.start.lerp(
+                    self.dest + circle_offset, easings.out_quint(min(self.dest_dt, 1))
+                )
                 if self.dest_dt > 1:
                     self.state = self.STATE_ARRIVED
             if self.state in {self.STATE_ARRIVED, self.STATE_SHOOTING}:
@@ -106,7 +114,8 @@ class GunPlatform(sprite.Sprite):
                 self.rect.center = self.dest + circle_offset
             if (
                 self.state == self.STATE_ARRIVED
-                and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y) < 8
+                and ((self.rect.topleft + self.shoot_start).y - self.level.player.pos.y)
+                < 8
                 and self.shoot_timer.done()
             ):
                 self.shoot()

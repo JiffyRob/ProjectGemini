@@ -57,7 +57,11 @@ class Parallax:
         data = level.game.loader.get_json("backgrounds.json")
         defaults = data.get("default", None)
         background_data = data.get(name, None)
-        if background_data is None or defaults is None or background_data.get("source", None) is None:
+        if (
+            background_data is None
+            or defaults is None
+            or background_data.get("source", None) is None
+        ):
             print("WARNING: Unable to load background data")
             return
         background_data = {**defaults, **background_data}
@@ -73,7 +77,10 @@ class Parallax:
                 size = pygame.Vector2(layer["frames"][0][2:]) + util_draw.RESOLUTION
                 layer["loop_x"] = layer["loop_y"] = True
                 layer["anchor_bottom"] = False
-                frames = [util_draw.repeat_surface(source_surface.subsurface(i), size) for i in layer["frames"]]
+                frames = [
+                    util_draw.repeat_surface(source_surface.subsurface(i), size)
+                    for i in layer["frames"]
+                ]
                 item_size = pygame.Vector2(layer["frames"][0][2:])
             elif mode == "backdrop":
                 size = pygame.Vector2(256, 256)
@@ -85,7 +92,9 @@ class Parallax:
                     anchor_bottom = True
                 frames = [
                     util_draw.repeat_surface(
-                        pygame.transform.scale(source_surface.subsurface(i), (256, 256)),
+                        pygame.transform.scale(
+                            source_surface.subsurface(i), (256, 256)
+                        ),
                         size,
                     )
                     for i in layer["frames"]
@@ -223,7 +232,9 @@ class Level(game_state.GameState):
         self.shake_delta += delta
         self.shake_axes = axes
 
-    def run_cutscene(self, cutscene_id, extra_constants=None, override=False, extra_api=None):
+    def run_cutscene(
+        self, cutscene_id, extra_constants=None, override=False, extra_api=None
+    ):
         if self.script is None or override:
             self.script = snekgemini.cutscene(
                 cutscene_id,
@@ -248,7 +259,13 @@ class Level(game_state.GameState):
 
     def switch_level(self, dest, direction=None, position=None, entrance="normal"):
         self.run_cutscene(
-            "level_switch", extra_constants={"NEXT_LEVEL": dest, "DIRECTION": direction, "POSITION": position, "ENTRANCE": entrance}
+            "level_switch",
+            extra_constants={
+                "NEXT_LEVEL": dest,
+                "DIRECTION": direction,
+                "POSITION": position,
+                "ENTRANCE": entrance,
+            },
         )
 
     def lock(self):
@@ -278,7 +295,9 @@ class Level(game_state.GameState):
     def spawn(self, sprite_name, rect, z=None, **custom_fields):
         if z is None:
             z = self.entity_layer
-        new_sprite = self.sprite_classes[self.map_type][sprite_name](self, rect, z, **custom_fields)
+        new_sprite = self.sprite_classes[self.map_type][sprite_name](
+            self, rect, z, **custom_fields
+        )
         self.add_sprite(new_sprite)
         return new_sprite
 
@@ -300,7 +319,9 @@ class Level(game_state.GameState):
             self.groups[group].add(sprite)
 
     def start_dialog(self, text, *answers, face=None, on_finish=lambda answer: None):
-        self.dialog = gui2d.Dialog(self, gui2d.dialog_rect(face is not None), text, answers, self.finish_dialog)
+        self.dialog = gui2d.Dialog(
+            self, gui2d.dialog_rect(face is not None), text, answers, self.finish_dialog
+        )
         self.gui.append(self.dialog)
         self.on_dialog_finish = on_finish
 
@@ -350,7 +371,9 @@ class Level(game_state.GameState):
         )
         # background creation
         level.bgcolor = data["bgColor"]
-        level.backgrounds.extend(Parallax.load(level, data["customFields"]["Background"]))
+        level.backgrounds.extend(
+            Parallax.load(level, data["customFields"]["Background"])
+        )
         if map_type == cls.MAP_HOVERBOARD:
             level.backgrounds.append(hoverboarding.ScrollingBackground(level))
         # tile layers
@@ -381,8 +404,12 @@ class Level(game_state.GameState):
                 )
         # collision data creation
         # TODO: refactor this disgusting mess of fors and ifs
-        for collision_index, filename in enumerate(("Collision.csv", "Collision_B.csv")):
-            for row, line in enumerate(game.loader.get_csv(folder / filename, for_map=True)):
+        for collision_index, filename in enumerate(
+            ("Collision.csv", "Collision_B.csv")
+        ):
+            for row, line in enumerate(
+                game.loader.get_csv(folder / filename, for_map=True)
+            ):
                 for col, value in enumerate(line):
                     value = int(value)
                     if collision_index and map_type != cls.MAP_HOVERBOARD:
@@ -416,7 +443,9 @@ class Level(game_state.GameState):
         self.sprites = {sprite for sprite in self.sprites if sprite.update(dt)}
         for group in self.groups.values():
             group &= self.sprites
-        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(self.player.pos, LERP_SPEED)
+        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
+            self.player.pos, LERP_SPEED
+        )
         self.viewport_rect.clamp_ip(self.map_rect)
         # if player died, end game
         if self.player.health <= 0:
@@ -443,15 +472,22 @@ class Level(game_state.GameState):
         super().draw()
         # draw backgrounds
         shake_offset = pygame.Vector2(
-            uniform(-self.shake_magnitude, self.shake_magnitude) * bool(self.shake_axes & self.AXIS_X),
-            uniform(-self.shake_magnitude, self.shake_magnitude) * bool(self.shake_axes & self.AXIS_Y),
+            uniform(-self.shake_magnitude, self.shake_magnitude)
+            * bool(self.shake_axes & self.AXIS_X),
+            uniform(-self.shake_magnitude, self.shake_magnitude)
+            * bool(self.shake_axes & self.AXIS_Y),
         )
         offset = -pygame.Vector2(self.viewport_rect.topleft)
         for background in self.backgrounds:
             background.draw(self.game.window_surface, offset.copy())
         # draw map + sprites
-        for sprite in sorted(self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery):
-            rect = sprite.rect.move((-int(self.viewport_rect.left), -int(self.viewport_rect.top)) + shake_offset)
+        for sprite in sorted(
+            self.sprites, key=lambda sprite: sprite.z * 1000 + sprite.rect.centery
+        ):
+            rect = sprite.rect.move(
+                (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
+                + shake_offset
+            )
             if sprite.to_draw is not None:
                 self.game.window_surface.blit(
                     sprite.to_draw,

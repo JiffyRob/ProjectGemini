@@ -100,18 +100,28 @@ class Player(mobile.PhysicsSprite):
         if not self.locked:
             held_input = self.level.game.input_queue.held
             just_input = self.level.game.input_queue.just_pressed
-            if self.state == "jump" and "duck" in just_input and self.jump_cause == self.JUMP_NORMAL:
+            if (
+                self.state == "jump"
+                and "duck" in just_input
+                and self.jump_cause == self.JUMP_NORMAL
+            ):
                 self.knife_pound()
             if self.state in {"idle", "walk", "jump", "skid"}:
                 if held_input["left"] and not self.from_wall:
                     self.walk_left()
                 if held_input["right"] and not self.from_wall:
                     self.walk_right()
-                if not held_input["left"] and not held_input["right"] and self.on_ground:
+                if (
+                    not held_input["left"]
+                    and not held_input["right"]
+                    and self.on_ground
+                ):
                     self.decelerate()
             else:
                 self.velocity.x = 0
-            self.velocity.x = pygame.math.clamp(self.velocity.x, -WALK_SPEED, WALK_SPEED)
+            self.velocity.x = pygame.math.clamp(
+                self.velocity.x, -WALK_SPEED, WALK_SPEED
+            )
             if held_input["jump"]:
                 self.jump(just=("jump" in just_input))
             elif self.jump_cause == self.JUMP_NORMAL:
@@ -133,7 +143,10 @@ class Player(mobile.PhysicsSprite):
             hit = self.on_ground
             if not hit and not self.ducking:
                 for sprite in self.level.groups["time-reversable"]:
-                    if sprite.time_reverse_collision_rect.colliderect(self.below_rect) or self.on_ground:
+                    if (
+                        sprite.time_reverse_collision_rect.colliderect(self.below_rect)
+                        or self.on_ground
+                    ):
                         sprite.reverse_time()
                         sprite.collision_rect.update(sprite.time_reverse_collision_rect)
                         self.velocity.y *= 0
@@ -216,7 +229,11 @@ class Player(mobile.PhysicsSprite):
 
     def decelerate(self):
         if self.velocity.x:
-            self.velocity.x -= self.velocity.x / abs(self.velocity.x) * min(DECCEL_SPEED, abs(self.velocity.x))
+            self.velocity.x -= (
+                self.velocity.x
+                / abs(self.velocity.x)
+                * min(DECCEL_SPEED, abs(self.velocity.x))
+            )
 
     def jump(self, cause=JUMP_NORMAL, just=False):
         forced = cause in {self.JUMP_KNIFE, self.JUMP_PAIN, self.JUMP_BOOSTED}

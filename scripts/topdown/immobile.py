@@ -28,7 +28,9 @@ class Interactable(sprite.Sprite):
     def interact(self):
         if not self.running_script:
             self.running_script = True
-            self.interpreter = snekgemini.cutscene(self.script, self, extra_constants=self.extra_constants)
+            self.interpreter = snekgemini.cutscene(
+                self.script, self, extra_constants=self.extra_constants
+            )
 
     def update(self, dt):
         if self.running_script:
@@ -106,7 +108,9 @@ class House(Interactable):
 
     def update(self, dt):
         if self.level.player.collision_rect.colliderect(self.teleport_rect):
-            self.level.player.rect.top += self.teleport_rect.bottom - self.level.player.collision_rect.top
+            self.level.player.rect.top += (
+                self.teleport_rect.bottom - self.level.player.collision_rect.top
+            )
             self.level.switch_level(self.dest_map)
         return super().update(dt)
 
@@ -148,7 +152,9 @@ class Smith(Interactable):
 
     def update(self, dt):
         if self.level.player.collision_rect.colliderect(self.teleport_rect):
-            self.level.player.rect.top += self.teleport_rect.bottom - self.level.player.collision_rect.top
+            self.level.player.rect.top += (
+                self.teleport_rect.bottom - self.level.player.collision_rect.top
+            )
             self.level.switch_level(self.dest_map)
         return super().update(dt)
 
@@ -177,7 +183,9 @@ class Furniture(Interactable):
         super().__init__(
             level,
             rect=rect,
-            image=level.game.loader.get_spritesheet("tileset.png", (16, 16))[self.IMAGES[self.type]],
+            image=level.game.loader.get_spritesheet("tileset.png", (16, 16))[
+                self.IMAGES[self.type]
+            ],
             z=z,
             script="furniture",
             extra_constants={"TEXT": self.info},
@@ -191,7 +199,12 @@ class Bush(sprite.Sprite):
     groups = {"static-collision"}
 
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
-        super().__init__(level, level.game.loader.get_surface("tileset.png", rect=(160, 64, 16, 16)), rect, z)
+        super().__init__(
+            level,
+            level.game.loader.get_surface("tileset.png", rect=(160, 64, 16, 16)),
+            rect,
+            z,
+        )
         self.collision_rect = self.rect.copy()
 
 
@@ -199,8 +212,12 @@ class Hoverboard(sprite.Sprite):
     groups = {"interactable"}
 
     def __init__(self, level, rect=(0, 0, 32, 32), z=0, **custom_fields):
-        self.anim = Animation(level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[:4])
-        self.exit_anim = Animation(level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[4:8])
+        self.anim = Animation(
+            level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[:4]
+        )
+        self.exit_anim = Animation(
+            level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[4:8]
+        )
         self.exiting = False
         super().__init__(level, self.anim.image, rect, z - 1)
 
@@ -215,7 +232,12 @@ class Hoverboard(sprite.Sprite):
         self.exiting = True
 
     def interact(self):
-        self.level.run_cutscene("hoverboard", extra_api={"ride_off_into_sunset": snek.snek_command(self.ride_off_into_sunset)})
+        self.level.run_cutscene(
+            "hoverboard",
+            extra_api={
+                "ride_off_into_sunset": snek.snek_command(self.ride_off_into_sunset)
+            },
+        )
 
     def update(self, dt):
         self.anim.update(dt)
@@ -236,5 +258,7 @@ class Hoverboard(sprite.Sprite):
                     short_name += "_up" * abs(y)
                 if y > 0:
                     short_name += "_down" * y
-                self.level.switch_level(short_name, direction="right", position=self.pos)
+                self.level.switch_level(
+                    short_name, direction="right", position=self.pos
+                )
         return super().update(dt)

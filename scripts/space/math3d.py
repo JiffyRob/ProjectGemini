@@ -11,7 +11,9 @@ class Quaternion:
         self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
 
     def magnitude(self):
-        return math.sqrt(self.real**2 + self.vector.x**2 + self.vector.y**2 + self.vector.z**2)
+        return math.sqrt(
+            self.real**2 + self.vector.x**2 + self.vector.y**2 + self.vector.z**2
+        )
 
     @classmethod
     def from_standard(cls, r, i, j, k):
@@ -34,7 +36,9 @@ class Quaternion:
         return Quaternion.from_standard(self.real, *-self.vector)
 
     def dot(self, other):
-        return self.real * other.real + sum(self.vector.elementwise() * other.vector.elementwise())
+        return self.real * other.real + sum(
+            self.vector.elementwise() * other.vector.elementwise()
+        )
 
     def nlerp(self, other, t):
         a = self
@@ -68,10 +72,16 @@ class Quaternion:
             )
         if isinstance(other, pygame.Vector3):
             cross_product = self.vector.cross(other)
-            return other + (cross_product * 2 * self.real) + 2 * self.vector.cross(cross_product)
+            return (
+                other
+                + (cross_product * 2 * self.real)
+                + 2 * self.vector.cross(cross_product)
+            )
         if isinstance(other, float):
             return Quaternion.from_standard(self.real * other, *self.vector)
-        raise TypeError(f"No multiplication between Quaternions and '{type(other)}' allowed")
+        raise TypeError(
+            f"No multiplication between Quaternions and '{type(other)}' allowed"
+        )
 
     def __repr__(self):
         return f"<{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}>"

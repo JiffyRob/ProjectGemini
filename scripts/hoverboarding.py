@@ -61,10 +61,14 @@ class ScrollingBackground(sprite.Sprite):
             self.swap_cooldown.reset()
             if self.state == self.STATE_GROUND:
                 self.state = self.STATE_WATER
-                return util_draw.repeat_surface(self.land_sea_transition, (16, self.rect.height))
+                return util_draw.repeat_surface(
+                    self.land_sea_transition, (16, self.rect.height)
+                )
             else:
                 self.state = self.STATE_GROUND
-                return util_draw.repeat_surface(self.sea_land_transition, (16, self.rect.height))
+                return util_draw.repeat_surface(
+                    self.sea_land_transition, (16, self.rect.height)
+                )
         elif self.state == self.STATE_GROUND:
             return util_draw.repeat_surface(self.land_tile, (16, self.rect.height))
         else:
@@ -84,10 +88,26 @@ class ScrollingBackground(sprite.Sprite):
                 and self.spawn_cooldown.done()
             ):
                 if not random.randint(0, self.land_rock_chance):
-                    self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+                    self.level.spawn(
+                        "Rock",
+                        (
+                            util_draw.RESOLUTION[0] + 8,
+                            random.randint(0, util_draw.RESOLUTION[1]),
+                            16,
+                            16,
+                        ),
+                        z=8,
+                    )
                 if not random.randint(0, self.stump_chance):
                     self.level.spawn(
-                        "Stump", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8
+                        "Stump",
+                        (
+                            util_draw.RESOLUTION[0] + 8,
+                            random.randint(0, util_draw.RESOLUTION[1]),
+                            16,
+                            16,
+                        ),
+                        z=8,
                     )
                 self.spawn_cooldown.reset()
             elif (
@@ -96,12 +116,28 @@ class ScrollingBackground(sprite.Sprite):
                 and self.spawn_cooldown.done()
             ):
                 if not random.randint(0, self.sea_rock_chance):
-                    self.level.spawn("Rock", (util_draw.RESOLUTION[0] + 8, random.randint(0, util_draw.RESOLUTION[1]), 16, 16), z=8)
+                    self.level.spawn(
+                        "Rock",
+                        (
+                            util_draw.RESOLUTION[0] + 8,
+                            random.randint(0, util_draw.RESOLUTION[1]),
+                            16,
+                            16,
+                        ),
+                        z=8,
+                    )
                 self.spawn_cooldown.reset()
             if not self.speedup_timer.done():
-                self.level.speed = 200 * easings.in_out_quad(self.age / self.speedup_time * 1000)
+                self.level.speed = 200 * easings.in_out_quad(
+                    self.age / self.speedup_time * 1000
+                )
             if self.slowdown_timer.done():
-                self.level.speed = 200 * (1 - easings.in_out_quad((self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time))
+                self.level.speed = 200 * (
+                    1
+                    - easings.in_out_quad(
+                        (self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time
+                    )
+                )
                 self.state = self.STATE_SLOWDOWN
                 self.level.message("drones", "leave")
             if self.stop_timer.done():
@@ -151,7 +187,9 @@ class Player(sprite.Sprite):
         self.state = "entering"
         self.facing = "right"
         self.pain_timer = timer.Timer(1000)
-        super().__init__(level, self.anim_dict[f"{self.state}-{self.facing}"].image, rect, z)
+        super().__init__(
+            level, self.anim_dict[f"{self.state}-{self.facing}"].image, rect, z
+        )
         self.rect.right = 0
 
     def interact(self):
@@ -222,7 +260,12 @@ class Player(sprite.Sprite):
                         short_name += "_up" * abs(y)
                     if y > 0:
                         short_name += "_down" * y
-                    self.level.switch_level(short_name, direction="right", position=self.pos, entrance="board")
+                    self.level.switch_level(
+                        short_name,
+                        direction="right",
+                        position=self.pos,
+                        entrance="board",
+                    )
             elif self.state != "empty":
                 held_input = self.level.game.input_queue.held
                 just_input = self.level.game.input_queue.just_pressed
@@ -248,7 +291,9 @@ class Player(sprite.Sprite):
 
 class DeadPlayer(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
-        self.anim = NoLoopAnimation(level.game.loader.get_spritesheet("me.png")[30:35], 0.1)
+        self.anim = NoLoopAnimation(
+            level.game.loader.get_spritesheet("me.png")[30:35], 0.1
+        )
         super().__init__(level, self.anim.image, rect, z)
 
     def update(self, dt):
@@ -317,7 +362,10 @@ class Drone(sprite.Sprite):
                     return False
             else:
                 self.age += dt
-                desired_position = pygame.Vector2(self.level.player.pos.x + self.distance, self.level.player.pos.y + self.offset)
+                desired_position = pygame.Vector2(
+                    self.level.player.pos.x + self.distance,
+                    self.level.player.pos.y + self.offset,
+                )
                 dist = (desired_position - self.true_pos).length_squared()
                 if dist > 64:
                     motion = desired_position - self.true_pos

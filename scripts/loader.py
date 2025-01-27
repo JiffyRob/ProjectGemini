@@ -67,7 +67,11 @@ class Loader:
 
     @functools.cache
     def get_settings(self):
-        return {**self.get_json("settings-default"), **self.get_json("settings"), **env.get_settings()}
+        return {
+            **self.get_json("settings-default"),
+            **self.get_json("settings"),
+            **env.get_settings(),
+        }
 
     def save_settings(self, settings):
         overwritten_settings = {}
@@ -106,9 +110,15 @@ class Loader:
     @functools.cache
     def get_surface(self, path, rect=None):
         if rect:
-            return self.convert(pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(rect))
+            return self.convert(
+                pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(
+                    rect
+                )
+            )
         else:
-            return self.convert(pygame.image.load(self.join_asset(path).with_suffix(".png")))
+            return self.convert(
+                pygame.image.load(self.join_asset(path).with_suffix(".png"))
+            )
 
     @functools.cache
     def get_surface_scaled_by(self, path, factor=(2, 2)):

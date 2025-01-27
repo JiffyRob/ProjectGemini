@@ -14,7 +14,9 @@ REVERSE = {"up": "down", "down": "up", "left": "right", "right": "left"}
 
 
 class PhysicsSprite(sprite.Sprite):
-    def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields):
+    def __init__(
+        self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields
+    ):
         super().__init__(level, image=image, rect=rect, z=z)
         self.weight = weight
         self.velocity = pygame.Vector2()
@@ -145,7 +147,9 @@ class Player(PhysicsSprite):
                 short_name += "_up" * abs(y)
             if y > 0:
                 short_name += "_down" * y
-            self.level.switch_level(short_name, direction=directions[0], position=self.pos)
+            self.level.switch_level(
+                short_name, direction=directions[0], position=self.pos
+            )
         else:
             self.level.run_cutscene("level_exit")
 
@@ -176,14 +180,18 @@ class Player(PhysicsSprite):
     def update(self, dt):
         if "entrance" in self.state:
             if self.state == "entrance-board":
-                self.rect.center += (self.dest - self.pos).clamp_magnitude(BOARD_SPEED * dt)
+                self.rect.center += (self.dest - self.pos).clamp_magnitude(
+                    BOARD_SPEED * dt
+                )
                 if self.pos.distance_squared_to(self.dest) <= 1:
                     self.level.spawn("Hoverboard", (self.rect.topleft, (32, 32)))
                     self.level.game.save.hoverboarded = True
                     self.rect.center = pygame.Rect(self.rect.topleft, (32, 32)).center
                     self.state = "idle-right"
             if self.state == "entrance-fall":
-                self.rect.center += (self.dest - self.pos).clamp_magnitude(FALL_SPEED * dt)
+                self.rect.center += (self.dest - self.pos).clamp_magnitude(
+                    FALL_SPEED * dt
+                )
                 if self.pos.distance_squared_to(self.dest) <= 1:
                     self.state = "idle-right"
                     self.level.shake()
@@ -286,7 +294,10 @@ class Drone(sprite.Sprite):
                     self.state = "idle"
             else:
                 self.age += dt
-                desired_position = pygame.Vector2(self.level.player.pos.x + self.distance, self.level.player.pos.y + self.offset)
+                desired_position = pygame.Vector2(
+                    self.level.player.pos.x + self.distance,
+                    self.level.player.pos.y + self.offset,
+                )
                 dist = (desired_position - self.true_pos).length_squared()
                 if dist > 16:
                     motion = desired_position - self.true_pos
@@ -326,7 +337,9 @@ class Drone(sprite.Sprite):
 
 class DeadPlayer(sprite.Sprite):
     def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
-        self.anim = NoLoopAnimation(level.game.loader.get_spritesheet("me.png")[30:35], 0.1)
+        self.anim = NoLoopAnimation(
+            level.game.loader.get_spritesheet("me.png")[30:35], 0.1
+        )
         super().__init__(level, self.anim.image, rect, z)
 
     def update(self, dt):

@@ -36,10 +36,14 @@ class Space(game_state.GameState):
         self.ship = gui3d.Ship(self, ship_rect)
         compass_pos = pygame.Vector2(16, -16) + self.game.screen_rect.bottomleft
         self.compass = gui3d.Compass(self, compass_pos)
-        self.planet_indicator = gui3d.PlanetIndicator(self, pygame.Rect(compass_pos + (32, -8), (200, 16)))
+        self.planet_indicator = gui3d.PlanetIndicator(
+            self, pygame.Rect(compass_pos + (32, -8), (200, 16))
+        )
         self.gui = [self.ship, self.compass, self.planet_indicator]
         self.sprites = []
-        self.ship_overlay = self.game.loader.get_surface_scaled_to("ship-inside.png", util_draw.RESOLUTION)
+        self.ship_overlay = self.game.loader.get_surface_scaled_to(
+            "ship-inside.png", util_draw.RESOLUTION
+        )
 
         self.planets = planets.PLANETS
         planet_count = len(self.planets)
@@ -122,19 +126,39 @@ class Space(game_state.GameState):
                 self.forward_speed -= self.forward_delta
                 self.game.play_soundtrack("SpaceshipMain")
 
-            self.turn_speeds["up"] = pygame.math.clamp(self.turn_speeds["up"], 0, self.max_turn_speed)
-            self.turn_speeds["down"] = pygame.math.clamp(self.turn_speeds["down"], 0, self.max_turn_speed)
-            self.turn_speeds["left"] = pygame.math.clamp(self.turn_speeds["left"], 0, self.max_turn_speed)
-            self.turn_speeds["right"] = pygame.math.clamp(self.turn_speeds["right"], 0, self.max_turn_speed)
-            self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["up"], (1, 0, 0))
-            self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["down"], (1, 0, 0))
-            self.camera.rotation *= math3d.Quaternion(-dt * self.turn_speeds["left"], (0, 1, 0))
-            self.camera.rotation *= math3d.Quaternion(dt * self.turn_speeds["right"], (0, 1, 0))
-            self.forward_speed = pygame.math.clamp(self.forward_speed, self.min_forward_speed, self.max_forward_speed)
+            self.turn_speeds["up"] = pygame.math.clamp(
+                self.turn_speeds["up"], 0, self.max_turn_speed
+            )
+            self.turn_speeds["down"] = pygame.math.clamp(
+                self.turn_speeds["down"], 0, self.max_turn_speed
+            )
+            self.turn_speeds["left"] = pygame.math.clamp(
+                self.turn_speeds["left"], 0, self.max_turn_speed
+            )
+            self.turn_speeds["right"] = pygame.math.clamp(
+                self.turn_speeds["right"], 0, self.max_turn_speed
+            )
+            self.camera.rotation *= math3d.Quaternion(
+                dt * self.turn_speeds["up"], (1, 0, 0)
+            )
+            self.camera.rotation *= math3d.Quaternion(
+                -dt * self.turn_speeds["down"], (1, 0, 0)
+            )
+            self.camera.rotation *= math3d.Quaternion(
+                -dt * self.turn_speeds["left"], (0, 1, 0)
+            )
+            self.camera.rotation *= math3d.Quaternion(
+                dt * self.turn_speeds["right"], (0, 1, 0)
+            )
+            self.forward_speed = pygame.math.clamp(
+                self.forward_speed, self.min_forward_speed, self.max_forward_speed
+            )
 
         elif self.state == self.STATE_ENTRY:
             print("entering planet...somehow")
-            motion = pygame.Vector3(*self.planet_locations[self.possible_planet_index] - self.camera.pos)
+            motion = pygame.Vector3(
+                *self.planet_locations[self.possible_planet_index] - self.camera.pos
+            )
             print(motion.length_squared())
             if motion.length_squared() <= self.LANDING_TOLERANCE:
                 self.game.load_map(self.possible_planet)
@@ -143,10 +167,14 @@ class Space(game_state.GameState):
         if self.state == self.STATE_NORMAL:
             planet_check_position = self.camera.pos
             moved = self.planet_locations.copy()
-            math3d.inverse_camera_transform_points_sizes(moved, numpy.zeros((len(self.planet_locations), 2)), self.camera)
+            math3d.inverse_camera_transform_points_sizes(
+                moved, numpy.zeros((len(self.planet_locations), 2)), self.camera
+            )
             moved = moved[:, 2]
             valid = moved > 0
-            distances = numpy.linalg.norm(self.planet_locations - planet_check_position, axis=1)
+            distances = numpy.linalg.norm(
+                self.planet_locations - planet_check_position, axis=1
+            )
             self.possible_planet = None
             self.possible_planet_index = None
             if valid.any():
@@ -154,7 +182,9 @@ class Space(game_state.GameState):
                 nearest = numpy.argmin(masked)
 
                 if distances[nearest] < self.PLANET_CHECK_TOLERANCE:
-                    self.possible_planet = planets.IDS_TO_NAMES[int(self.planet_ids[nearest])]
+                    self.possible_planet = planets.IDS_TO_NAMES[
+                        int(self.planet_ids[nearest])
+                    ]
                     self.possible_planet_index = nearest
                     self.planet_indicator.confirm_enter()
 
