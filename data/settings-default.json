@@ -1,10 +1,7 @@
 {
   "vsync": true,
-  "scale": "integer",
+  "scale": "aspect",
   "fullscreen": false,
-  "music-volume": 1,
-  "sfx-volume": 1,
-  "fps": 60,
-  "last-resolution": null,
-  "frame-cap": 60
+  "frame-cap": 60,
+  "graphics": "snazzy potato"
 }

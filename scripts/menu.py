@@ -118,7 +118,7 @@ class ToggleSwitch(sprite.GUISprite):
     STATE_NORMAL = 1
     STATE_SELECTED = 2
 
-    FRAME_DELAY = 0.033
+    FRAME_DELAY = 0.06
 
     def __init__(self, level, rect, z=0, on_toggle=lambda value: None, start_on=False):
         frames = level.game.loader.get_spritesheet("switch", (16, 8))
@@ -150,6 +150,7 @@ class ToggleSwitch(sprite.GUISprite):
                 self.frame += 1
             else:
                 self.frame -= 1
+            self.age = 0
         frames = self.anim_dict[self.state]
         self.frame = pygame.math.clamp(self.frame, 0, len(frames) - 1)
         return super().update(dt)
@@ -176,9 +177,9 @@ class Selector(sprite.GUISprite):
     STATE_SELECTED = 2
 
     COLORS = {
-        STATE_DISABLED: "#000000",
-        STATE_NORMAL: "#333443",
-        STATE_SELECTED: "#ffffff",
+        STATE_DISABLED: "#4c505b",
+        STATE_NORMAL: "#777e86",
+        STATE_SELECTED: "#cbcbcb",
     }
 
     def __init__(self, level, rect, values, z=0, on_toggle=lambda value: None, initial_value=None):
@@ -254,7 +255,7 @@ class Setting(sprite.GUISprite):
             switch_rect.size = (16, 8)
             switch_rect.right = rect.right
             switch_rect.centery = rect.centery
-            self.toggler = ToggleSwitch(level, switch_rect, z, on_switch, start_value)
+            self.toggler = ToggleSwitch(level, switch_rect, z, on_switch, not start_value)
         if self.type == self.TYPE_SCALEMODE:
             switch_rect = rect.copy()
             switch_rect.size = (128, self.rect.height)
@@ -726,6 +727,7 @@ class SettingsMenu(game_state.GameState):
         self.gui = []
         y = 0
         z = 1
+        print(self.game.settings)
         for (name,  value) in self.game.settings.items():
             rect = pygame.Rect(32, y * 20 + 48, background_rect.width - 32 - 8, 16)
             if value in {True, False}:
@@ -739,20 +741,23 @@ class SettingsMenu(game_state.GameState):
             else:
                 print(name, value)
                 raise
-            element = Setting(self, rect, name, setting_type, value, partial(self.switch_setting, name), z)
+            element = Setting(self, rect, name, setting_type, value, partial(self.game.switch_setting, name), z)
             self.gui.append(element)
             button_dict[(0, y)] = element
             y += 1
+
+        rect = pygame.Rect(32, y * 20 + 48, 128, 16)
+        rect.centerx = background_rect.centerx
+        back_button = Button(self, rect, self.game.loader.font.render("OK"), self.pop, 1)
+        button_dict[(0, y)] = back_button
 
         self.gui.extend([
             Image(self, pygame.transform.scale(game.loader.get_surface("background.png"), game.screen_rect.size), game.screen_rect),
             Background(self, background_rect, -1),
             *button_dict.values(),
             KnifeIndicator(self, button_dict),
+            back_button,
         ])
-
-    def switch_setting(self, name, value):
-        print(name, value)
 
     def update(self, dt):
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]

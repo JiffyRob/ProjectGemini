@@ -54,6 +54,22 @@ class Game:
     def pop_state(self):
         self.stack.popleft()
 
+    def set_graphics(self, value):
+        print('setting graphics to', value)
+
+    def switch_setting(self, name, value):
+        if name == "vsync":
+            self.window.set_vsync(value)
+        if name == "scale":
+            self.window.set_scalemode(value)
+        if name == "fullscreen":
+            self.window.set_fullscreen(value)
+        if name == "frame-cap":
+            pass
+        if name == "graphics":
+            self.set_graphics(value)
+        self.settings[name] = value
+
     def load_map(self, map_name, direction=None, position=None, entrance=None):
         print("loading level:", map_name)
         new_map = level.Level.load(self, map_name, direction, position, entrance)
@@ -101,7 +117,7 @@ class Game:
             kill_state = True
         # if fps drops below 10 the game will start to lag
         dt = pygame.math.clamp(
-            self.clock.tick(self.settings["frame-cap"] * (not env.PYGBAG))
+            self.clock.tick((self.settings["frame-cap"] or 0) * (not env.PYGBAG))
             * self.dt_mult
             / 1000,
             -0.1,
@@ -123,6 +139,7 @@ class Game:
 
     def draw(self):
         self.context.new_frame()
+        self.window.get_soft_surface().fill(self.stack[0].bgcolor)
         self.stack[0].draw()
         self.window.render(not self.stack[0].opengl)
         self.context.end_frame()
@@ -133,14 +150,10 @@ class Game:
         self.loader = loader.Loader()
         self.settings = self.loader.get_settings()
 
-        if self.settings["last-resolution"] is None:
-            info = pygame.display.Info()
-            self.settings["last-resolution"] = (info.current_w, info.current_h - 32)
-
         self.window = window.WindowOld(
             self,
             "Project Gemini",
-            self.settings["last-resolution"],
+            util_draw.RESOLUTION,
             self.settings["scale"],
             self.settings["vsync"],
             self.settings["fullscreen"],

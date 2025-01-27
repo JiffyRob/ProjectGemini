@@ -5,7 +5,6 @@ import pygame._sdl2 as sdl2
 import pygame._sdl2.video as sdl2  # needed for WASM compat
 
 RESOLUTION = (256, 224)
-RESOLUTION_FULLSCREEN = (800, 600)
 ASPECT_RATIO = RESOLUTION[0] / RESOLUTION[1]
 
 COLORKEY = (255, 0, 255)
@@ -16,11 +15,11 @@ SCALEMODE_ASPECT = "aspect"
 
 SCALEMODES = [SCALEMODE_INTEGER, SCALEMODE_STRETCH, SCALEMODE_ASPECT]
 
-PRESET_LOWEST = "burnt potato"
-PRESET_LOW = "snazzy potato"
-PRESET_MEDIUM = "premium potato"
-PRESET_HIGH = "ultra potato"
-PRESET_ULTRA = "potato god"
+PRESET_LOWEST = "budget potato"
+PRESET_LOW = "average potato"
+PRESET_MEDIUM = "snazzy potato"
+PRESET_HIGH = "expensive potato"
+PRESET_ULTRA = "ludicrous potato"
 
 QUALITY_PRESETS = [
     PRESET_LOWEST,
@@ -35,11 +34,12 @@ FRAMECAP_MED = 60
 FRAMECAP_HIGH = 120
 FRAMECAP_NONE = None  # nobody will ever hit this number
 
+# physics are not deterministic enough for high FPS gaming RN
 FRAMECAPS = [
     FRAMECAP_LOW,
     FRAMECAP_MED,
-    FRAMECAP_HIGH,
-    FRAMECAP_NONE,
+    # FRAMECAP_HIGH,
+    # FRAMECAP_NONE,
 ]
 
 

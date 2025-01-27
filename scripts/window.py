@@ -196,8 +196,9 @@ class WindowOld:
 
     def init(self, resolution, vsync, fullscreen):
         if fullscreen:
+            size = pygame.display.get_desktop_sizes()[0]
             pygame.display.set_mode(
-                util_draw.RESOLUTION_FULLSCREEN, pygame.OPENGL, vsync=True
+                size, pygame.OPENGL | pygame.FULLSCREEN, vsync=True
             )
         else:
             pygame.display.set_mode(
@@ -215,7 +216,7 @@ class WindowOld:
             vertex_shader=self.game.loader.get_vertex_shader("scale"),
             fragment_shader=self.game.loader.get_fragment_shader("scale"),
             framebuffer=None,
-            viewport=(0, 0, *pygame.display.get_surface().get_size()),
+            viewport=(0, 0, *util_draw.RESOLUTION),
             topology="triangle_strip",
             vertex_count=4,
             layout=[
@@ -238,7 +239,7 @@ class WindowOld:
         )
 
     def reset_viewport(self):
-        window_size = self.resolution
+        window_size = pygame.display.get_window_size()
         if self.scalemode == util_draw.SCALEMODE_STRETCH:
             self.pipeline.viewport = (0, 0, *window_size)
         if self.scalemode == util_draw.SCALEMODE_ASPECT:
@@ -275,9 +276,16 @@ class WindowOld:
         self.init(self.resolution, self.vsync, not self.fullscreen)
         self.reset_viewport()
 
-    def change_scalemode(self, new_method):
+    def set_fullscreen(self, fullscreen):
+        self.init(self.resolution, self.vsync, fullscreen)
+        self.reset_viewport()
+
+    def set_scalemode(self, new_method):
         self.scalemode = new_method
         self.reset_viewport()
+
+    def set_vsync(self, vsync):
+        self.init(self.resolution, vsync, self.fullscreen)
 
     def get_soft_surface(self):
         return self.software_surface
