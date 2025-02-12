@@ -1,0 +1,66 @@
+{
+	"identifier": "GeminiI",
+	"uniqueIdentifer": "27644310-c210-11ef-b0cb-2343422a0a33",
+	"x": 288,
+	"y": -1760,
+	"width": 480,
+	"height": 496,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"start": [
+			393,
+			363
+		],
+		"entity_layer": 8,
+		"Background": null,
+		"Biome": "Sand_Topdown",
+		"Soundtrack": null,
+		"Maptype": "TopDown"
+	},
+	"layers": [
+		"Collision.png",
+		"AutoLayer.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities": {
+		"Ship": [
+			{
+				"id": "Ship",
+				"iid": "20adc9d0-c210-11ef-b0cb-b94731b63bcc",
+				"layer": "Entities",
+				"x": 368,
+				"y": 320,
+				"width": 16,
+				"height": 16,
+				"color": 14984818,
+				"customFields" : {}
+			}
+		],
+		"Drone": [
+			{
+				"id": "Drone",
+				"iid": "8a48da60-c210-11ef-b0cb-6784c92de56f",
+				"layer": "Entities",
+				"x": 288,
+				"y": 144,
+				"width": 16,
+				"height": 16,
+				"color": 39387,
+				"customFields" : {}
+			},
+			{
+				"id": "Drone",
+				"iid": "8c10f030-c210-11ef-b0cb-c366ff231c26",
+				"layer": "Entities",
+				"x": 176,
+				"y": 352,
+				"width": 16,
+				"height": 16,
+				"color": 39387,
+				"customFields" : {}
+			}
+		]
+	}
+}

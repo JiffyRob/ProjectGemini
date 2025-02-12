@@ -6953,7 +6953,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\n\n --Father"]
+									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,
@@ -9405,7 +9405,7 @@
 			"__bgPos": null,
 			"externalRelPath": null,
 			"fieldInstances": [
-				{ "__identifier": "start", "__type": "Array<Int>", "__value": [393,363], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [393] }, { "id": "V_Int", "params": [363] } ] },
+				{ "__identifier": "start", "__type": "Array<Int>", "__value": [], "__tile": null, "defUid": 10, "realEditorValues": [] },
 				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [] },
 				{ "__identifier": "Background", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Sand_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
@@ -9442,56 +9442,7 @@
 					"seed": 2466554,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
-					"entityInstances": [
-						{
-							"__identifier": "Ship",
-							"__grid": [23,20],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": { "tilesetUid": 15, "x": 208, "y": 0, "w": 48, "h": 32 },
-							"__smartColor": "#E4A672",
-							"iid": "20adc9d0-c210-11ef-b0cb-b94731b63bcc",
-							"width": 16,
-							"height": 16,
-							"defUid": 73,
-							"px": [368,320],
-							"fieldInstances": [],
-							"__worldX": 656,
-							"__worldY": -1440
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [18,9],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "8a48da60-c210-11ef-b0cb-6784c92de56f",
-							"width": 16,
-							"height": 16,
-							"defUid": 194,
-							"px": [288,144],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": -1616
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [11,22],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "8c10f030-c210-11ef-b0cb-c366ff231c26",
-							"width": 16,
-							"height": 16,
-							"defUid": 194,
-							"px": [176,352],
-							"fieldInstances": [],
-							"__worldX": 464,
-							"__worldY": -1408
-						}
-					]
+					"entityInstances": []
 				},
 				{
 					"__identifier": "Above",

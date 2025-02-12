@@ -175,6 +175,12 @@ class Loader:
         with path.open() as file:
             return file.read()
 
+    @functools.cache
+    def get_shader_library(self, path):
+        path = self.join_shader(path).with_suffix(".glsl")
+        with path.open() as file:
+            return file.read()
+
     # not cached because save files change
     def get_save(self, path):
         path = self.join_save(path).with_suffix(".sav")

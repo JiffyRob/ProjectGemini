@@ -6953,7 +6953,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\n\n --Father"]
+									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,

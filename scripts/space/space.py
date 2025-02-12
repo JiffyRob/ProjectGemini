@@ -1,12 +1,8 @@
-import struct
-from calendar import month
-
 import numpy
 import pygame
-import zengl
 
 from scripts import game_state, util_draw
-from scripts.space import gui3d, math3d, glsprite3d, planets
+from scripts.space import gui3d, math3d, glsprite3d
 
 
 class Space(game_state.GameState):
@@ -45,20 +41,7 @@ class Space(game_state.GameState):
             "ship-inside.png", util_draw.RESOLUTION
         )
 
-        self.planets = planets.PLANETS
-        planet_count = len(self.planets)
-
-        self.planet_locations = numpy.zeros((planet_count, 3), "f4")
-        self.planet_ids = numpy.zeros(planet_count, "i4")
-        self.planet_radii = numpy.zeros(planet_count, "f4") + 5.0
-
-        self.planet_names = {}
-        for i, (planet, location) in enumerate(self.planets):
-            self.planet_locations[i] = location
-            self.planet_ids[i] = planet
-            self.planet_names[i] = planets.IDS_TO_NAMES[planet]
-
-        self.space_renderer = glsprite3d.SpaceRendererHW(self, self.planets)
+        self.space_renderer = glsprite3d.SpaceRendererHW(self)
         self.gui_renderer = gui3d.GUIRendererHW(self, self.gui)
 
         self.turn_speeds = {
@@ -78,6 +61,22 @@ class Space(game_state.GameState):
         self.possible_planet_index = None
         self.dest_rotation = None
         self.state = self.STATE_NORMAL
+
+    @property
+    def planet_locations(self):
+        return self.space_renderer.planet_locations
+
+    @property
+    def planet_ids(self):
+        return self.space_renderer.planet_ids
+
+    @property
+    def planet_radii(self):
+        return self.space_renderer.planet_radii
+
+    @property
+    def planet_names(self):
+        return self.space_renderer.planet_names
 
     def update(self, dt):
         self.age += dt
@@ -171,7 +170,7 @@ class Space(game_state.GameState):
                 moved, numpy.zeros((len(self.planet_locations), 2)), self.camera
             )
             moved = moved[:, 2]
-            valid = moved > 0
+            valid = moved > self.camera.near_z
             distances = numpy.linalg.norm(
                 self.planet_locations - planet_check_position, axis=1
             )
@@ -182,9 +181,7 @@ class Space(game_state.GameState):
                 nearest = numpy.argmin(masked)
 
                 if distances[nearest] < self.PLANET_CHECK_TOLERANCE:
-                    self.possible_planet = planets.IDS_TO_NAMES[
-                        int(self.planet_ids[nearest])
-                    ]
+                    self.possible_planet = self.planet_names[nearest]
                     self.possible_planet_index = nearest
                     self.planet_indicator.confirm_enter()
 

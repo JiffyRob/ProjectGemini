@@ -1,0 +1,115 @@
+#line 2 2
+void configure_planet(int planet_id, out PlanetTerrain terrain, out PlanetAtmosphere atmosphere, out PlanetPhysics physics) {
+    switch (planet_id) {
+        case PLANET_GeminiI:
+            terrain.seed = P_terrain_seed_GeminiI;
+            terrain.bumpiness = P_bumpiness_GeminiI;
+            terrain.water_level = P_water_level_GeminiI;
+            terrain.high_level = P_high_level_GeminiI;
+            terrain.water_colors[0] = P_water_color1_GeminiI;
+            terrain.water_colors[1] = P_water_color2_GeminiI;
+            terrain.low_ground_colors[0] = P_low_color1_GeminiI;
+            terrain.low_ground_colors[1] = P_low_color2_GeminiI;
+            terrain.high_ground_colors[0] = P_high_color1_GeminiI;
+            terrain.high_ground_colors[1] = P_high_color2_GeminiI;
+            atmosphere.cloudiness = P_cloudiness_GeminiI;
+            atmosphere.swishiness = P_swishiness_GeminiI;
+            atmosphere.height = P_cloud_height_GeminiI;
+            atmosphere.swirl_speed = P_swirl_speed_GeminiI;
+            atmosphere.rotation_multiplier = P_cloud_rotation_speed_GeminiI;
+            atmosphere.cloud_colors[0] = P_cloud_color1_GeminiI;
+            atmosphere.cloud_colors[1] = P_cloud_color2_GeminiI;
+            physics.rotation_axis = P_rotation_axis_GeminiI;
+            physics.rotation_speed = P_rotation_speed_GeminiI;
+            physics.radius = P_radius_GeminiI;
+            break;
+        case PLANET_GeminiII:
+            terrain.seed = P_terrain_seed_GeminiII;
+            terrain.bumpiness = P_bumpiness_GeminiII;
+            terrain.water_level = P_water_level_GeminiII;
+            terrain.high_level = P_high_level_GeminiII;
+            terrain.water_colors[0] = P_water_color1_GeminiII;
+            terrain.water_colors[1] = P_water_color2_GeminiII;
+            terrain.low_ground_colors[0] = P_low_color1_GeminiII;
+            terrain.low_ground_colors[1] = P_low_color2_GeminiII;
+            terrain.high_ground_colors[0] = P_high_color1_GeminiII;
+            terrain.high_ground_colors[1] = P_high_color2_GeminiII;
+            atmosphere.cloudiness = P_cloudiness_GeminiII;
+            atmosphere.swishiness = P_swishiness_GeminiII;
+            atmosphere.height = P_cloud_height_GeminiII;
+            atmosphere.swirl_speed = P_swirl_speed_GeminiII;
+            atmosphere.rotation_multiplier = P_cloud_rotation_speed_GeminiII;
+            atmosphere.cloud_colors[0] = P_cloud_color1_GeminiII;
+            atmosphere.cloud_colors[1] = P_cloud_color2_GeminiII;
+            physics.rotation_axis = P_rotation_axis_GeminiII;
+            physics.rotation_speed = P_rotation_speed_GeminiII;
+            physics.radius = P_radius_GeminiII;
+            break;
+        case PLANET_Pirodyne:
+            terrain.seed = P_terrain_seed_Pirodyne;
+            terrain.bumpiness = P_bumpiness_Pirodyne;
+            terrain.water_level = P_water_level_Pirodyne;
+            terrain.high_level = P_high_level_Pirodyne;
+            terrain.water_colors[0] = P_water_color1_Pirodyne;
+            terrain.water_colors[1] = P_water_color2_Pirodyne;
+            terrain.low_ground_colors[0] = P_low_color1_Pirodyne;
+            terrain.low_ground_colors[1] = P_low_color2_Pirodyne;
+            terrain.high_ground_colors[0] = P_high_color1_Pirodyne;
+            terrain.high_ground_colors[1] = P_high_color2_Pirodyne;
+            atmosphere.cloudiness = P_cloudiness_Pirodyne;
+            atmosphere.swishiness = P_swishiness_Pirodyne;
+            atmosphere.height = P_cloud_height_Pirodyne;
+            atmosphere.swirl_speed = P_swirl_speed_Pirodyne;
+            atmosphere.rotation_multiplier = P_cloud_rotation_speed_Pirodyne;
+            atmosphere.cloud_colors[0] = P_cloud_color1_Pirodyne;
+            atmosphere.cloud_colors[1] = P_cloud_color2_Pirodyne;
+            physics.rotation_axis = P_rotation_axis_Pirodyne;
+            physics.rotation_speed = P_rotation_speed_Pirodyne;
+            physics.radius = P_radius_Pirodyne;
+            break;
+        case PLANET_Utopia:
+            terrain.seed = P_terrain_seed_Utopia;
+            terrain.bumpiness = P_bumpiness_Utopia;
+            terrain.water_level = P_water_level_Utopia;
+            terrain.high_level = P_high_level_Utopia;
+            terrain.water_colors[0] = P_water_color1_Utopia;
+            terrain.water_colors[1] = P_water_color2_Utopia;
+            terrain.low_ground_colors[0] = P_low_color1_Utopia;
+            terrain.low_ground_colors[1] = P_low_color2_Utopia;
+            terrain.high_ground_colors[0] = P_high_color1_Utopia;
+            terrain.high_ground_colors[1] = P_high_color2_Utopia;
+            atmosphere.cloudiness = P_cloudiness_Utopia;
+            atmosphere.swishiness = P_swishiness_Utopia;
+            atmosphere.height = P_cloud_height_Utopia;
+            atmosphere.swirl_speed = P_swirl_speed_Utopia;
+            atmosphere.rotation_multiplier = P_cloud_rotation_speed_Utopia;
+            atmosphere.cloud_colors[0] = P_cloud_color1_Utopia;
+            atmosphere.cloud_colors[1] = P_cloud_color2_Utopia;
+            physics.rotation_axis = P_rotation_axis_Utopia;
+            physics.rotation_speed = P_rotation_speed_Utopia;
+            physics.radius = P_radius_Utopia;
+            break;
+        case PLANET_Shudrin:
+            terrain.seed = P_terrain_seed_Shudrin;
+            terrain.bumpiness = P_bumpiness_Shudrin;
+            terrain.water_level = P_water_level_Shudrin;
+            terrain.high_level = P_high_level_Shudrin;
+            terrain.water_colors[0] = P_water_color1_Shudrin;
+            terrain.water_colors[1] = P_water_color2_Shudrin;
+            terrain.low_ground_colors[0] = P_low_color1_Shudrin;
+            terrain.low_ground_colors[1] = P_low_color2_Shudrin;
+            terrain.high_ground_colors[0] = P_high_color1_Shudrin;
+            terrain.high_ground_colors[1] = P_high_color2_Shudrin;
+            atmosphere.cloudiness = P_cloudiness_Shudrin;
+            atmosphere.swishiness = P_swishiness_Shudrin;
+            atmosphere.height = P_cloud_height_Shudrin;
+            atmosphere.swirl_speed = P_swirl_speed_Shudrin;
+            atmosphere.rotation_multiplier = P_cloud_rotation_speed_Shudrin;
+            atmosphere.cloud_colors[0] = P_cloud_color1_Shudrin;
+            atmosphere.cloud_colors[1] = P_cloud_color2_Shudrin;
+            physics.rotation_axis = P_rotation_axis_Shudrin;
+            physics.rotation_speed = P_rotation_speed_Shudrin;
+            physics.radius = P_radius_Shudrin;
+            break;
+    }
+}

@@ -6953,7 +6953,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\n\n --Father"]
+									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,
@@ -9458,38 +9458,6 @@
 							"fieldInstances": [],
 							"__worldX": 656,
 							"__worldY": -1440
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [18,9],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "8a48da60-c210-11ef-b0cb-6784c92de56f",
-							"width": 16,
-							"height": 16,
-							"defUid": 194,
-							"px": [288,144],
-							"fieldInstances": [],
-							"__worldX": 576,
-							"__worldY": -1616
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [11,22],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "8c10f030-c210-11ef-b0cb-c366ff231c26",
-							"width": 16,
-							"height": 16,
-							"defUid": 194,
-							"px": [176,352],
-							"fieldInstances": [],
-							"__worldX": 464,
-							"__worldY": -1408
 						}
 					]
 				},

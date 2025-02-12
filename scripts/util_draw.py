@@ -29,16 +29,16 @@ QUALITY_PRESETS = [
     PRESET_ULTRA,
 ]
 
-FRAMECAP_LOW = 30
-FRAMECAP_MED = 60
-FRAMECAP_HIGH = 120
-FRAMECAP_NONE = None  # nobody will ever hit this number
+FRAMECAP_LOW = 15
+FRAMECAP_MED = 30
+FRAMECAP_HIGH = 60
+FRAMECAP_NONE = None
 
 # physics are not deterministic enough for high FPS gaming RN
 FRAMECAPS = [
     FRAMECAP_LOW,
     FRAMECAP_MED,
-    # FRAMECAP_HIGH,
+    FRAMECAP_HIGH,
     # FRAMECAP_NONE,
 ]
 

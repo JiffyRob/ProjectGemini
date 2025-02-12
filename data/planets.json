@@ -1,0 +1,71 @@
+{
+  "Default": {
+    "loc": [0, 0, 0],
+    "radius": 0.5,
+    "terrain_seed": 100.0,
+    "bumpiness": 5.0,
+    "water_level": 0.4,
+    "high_level": 0.66,
+    "cloudiness": 0.4,
+    "swishiness": 10.0,
+    "cloud_height": 0.02,
+    "swirl_speed": 0.2,
+    "rotation_axis": [0, 1, 0],
+    "rotation_speed": 0.2,
+    "cloud_rotation_speed": 0.13,
+    "water_color1": [79, 153, 186],
+    "water_color2": [79, 153, 186],
+    "low_color1": [46, 87, 85],
+    "low_color2": [41, 65, 64],
+    "high_color1": [99, 171, 64],
+    "high_color2": [59, 125, 79],
+    "cloud_color1": [245, 255, 232],
+    "cloud_color2": [222, 224, 232]
+  },
+  "GeminiI": {
+    "loc": [200, 200, 200],
+    "water_color1": [76, 80, 91],
+    "water_color2": [51, 52, 67],
+    "low_color1": [219, 174, 101],
+    "low_color2": [200, 144, 80],
+    "high_color1": [171, 111, 59],
+    "high_color2": [130, 80, 46],
+    "cloudiness": 0.4,
+    "swishiness": 10.0,
+    "swirl_speed": 1.0,
+    "terrain_seed": 50.0,
+    "bumpiness": 7.0,
+    "water_level": 0.35,
+    "cloud_rotation_speed": 0.5
+  },
+  "GeminiII": {
+    "loc": [200, 200, 200],
+    "water_color1": [52, 197, 163],
+    "water_color2": [64, 137, 142],
+    "low_color1": [102, 42, 113],
+    "low_color2": [51, 26, 59],
+    "high_color1": [199, 86, 190],
+    "high_color2": [102, 42, 113],
+    "cloudiness": 0.5,
+    "swishiness": 8.0,
+    "terrain_seed": 0.0
+  },
+  "<Unknown>": {
+    "loc": null
+  },
+  "Pirodyne": {
+    "loc": [8000, -4000, -4000]
+  },
+  "Utopia": {
+    "loc": [-2000, 0, 4000]
+  },
+  "Coolstroid": {
+    "loc": [-400, -400, -400]
+  },
+  "Shudrin": {
+    "loc": [-5000, 1000, -2500]
+  },
+  "Florason": {
+    "loc": null
+  }
+}
