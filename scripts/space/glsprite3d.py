@@ -29,7 +29,7 @@ class SpaceRendererHW:
         self.compile_shaders()
 
     def load_planet_data(self):
-        planets = self.level.game.loader.get_json("planets")
+        planets = self.level.game.loader.get_json("planets").copy()
         print(planets)
         default_values = planets.pop("Default")
         defines = "#line 0 1\n"
