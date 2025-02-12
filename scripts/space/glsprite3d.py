@@ -30,7 +30,6 @@ class SpaceRendererHW:
 
     def load_planet_data(self):
         planets = self.level.game.loader.get_json("planets").copy()
-        print(planets)
         default_values = planets.pop("Default")
         defines = "#line 0 1\n"
         defines += self.level.game.loader.get_shader_library("planet_struct") + "\n"
@@ -52,8 +51,6 @@ class SpaceRendererHW:
             next_id += 1
 
         defines += self.level.game.loader.get_shader_library("planets") + "\n"
-
-        print(defines)
 
         return defines, locations
 
