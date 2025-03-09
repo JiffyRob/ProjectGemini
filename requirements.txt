@@ -1,4 +1,4 @@
 pygame-ce
 numpy
-pyparsing
 zengl
+git+https://github.com/JiffyRob/SNEK2.git@stable
