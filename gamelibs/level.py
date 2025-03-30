@@ -228,7 +228,8 @@ class Level(game_state.GameState):
         self.shake_axes = 0
         self.speed = 0  # used for hoverboard levels
 
-        self.add_sprite_internal(self.player)
+        self.add_sprite(self.player)
+        self.update(0)
         self.run_cutscene("level_begin")
 
     def shake(self, magnitude=5, delta=8, axes=AXIS_X | AXIS_Y):
@@ -352,8 +353,8 @@ class Level(game_state.GameState):
                 return "black"
         def get_pos():
             if len(args):
-                return args.pop(0), args.pop(0)
-            return self.player.pos
+                return self.world_to_screen((args.pop(0), args.pop(0)))
+            return self.world_to_screen(self.player.pos)
         def get_number():
             if len(args):
                 return args.pop(0)
