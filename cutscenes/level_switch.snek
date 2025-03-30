@@ -1,0 +1,4 @@
+lock();
+fade("fadeout_circle", get_x(), get_y());
+unlock();
+map_switch(NEXT_LEVEL, DIRECTION, POSITION, ENTRANCE);

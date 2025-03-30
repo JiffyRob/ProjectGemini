@@ -1,0 +1,4 @@
+lock();
+if get_save_state("hoverboarded") then write("Out of fuel.");
+else ride_off_into_sunset();
+unlock();

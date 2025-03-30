@@ -1,0 +1,13 @@
+# lock();
+hide();
+
+spawn("DeadPlayer", get_x() - 8, get_y() - 8, 16, 16, get_z());
+# fadeout_circle(get_x(), get_y(), 1, 100);
+# fill(0, 0, 0);
+
+answer = ask("GAME OVER.", "Save & Quit", "Quit Without Saving");
+
+if answer == "Save & Quit" {
+    save();
+}
+quit();

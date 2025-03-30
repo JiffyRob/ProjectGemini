@@ -5995,9 +5995,9 @@
 					"id": "V_String",
 					"params": ["Purple_Flats_Topdown"]
 				}] },
-				{ "__identifier": "Soundtrack", "__type": "String", "__value": "GeminiII", "__tile": null, "defUid": 76, "realEditorValues": [{
+				{ "__identifier": "Soundtrack", "__type": "String", "__value": "Gemini-II", "__tile": null, "defUid": 76, "realEditorValues": [{
 					"id": "V_String",
-					"params": ["GeminiII"]
+					"params": ["Gemini-II"]
 				}] },
 				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
 					"id": "V_String",

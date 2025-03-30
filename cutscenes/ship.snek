@@ -1,0 +1,12 @@
+lock();
+leave = ask(
+    f"Do you wish to leave planet {get_current_planet_name()}?",
+    "yes",
+    "no"
+);
+print(leave);
+unlock();
+if leave == "yes" {
+    fade("fadeout_circle", get_x(), get_y());
+    exit_level();  # always pop state LAST.  Once the level is exited this script will no longer be updated.
+}

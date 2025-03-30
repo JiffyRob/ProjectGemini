@@ -1,0 +1,4 @@
+lock();
+unlock();
+pop_state();
+fade("fadein_circle", get_x(), get_y());

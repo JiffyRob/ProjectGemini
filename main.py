@@ -4,8 +4,9 @@ from collections import deque
 import pygame
 import zengl
 import numpy
+import SNEK2
 
-from scripts import (
+from gamelibs import (
     game_save,
     input_binding,
     level,
@@ -16,6 +17,7 @@ from scripts import (
     util_draw,
     env,
     window,
+    scripting,
 )
 
 pygame.init()
@@ -38,6 +40,26 @@ class Game:
         self.input_queue = input_binding.InputQueue()
         self.timers = []
         self.context = None
+        self.just_ran_cutscene = False
+        self.running_cutscenes = {}
+
+    def pop_state(self):
+        return self.stack.popleft()
+
+    def get_level(self):
+        return self.stack[0]
+
+    def run_cutscene(self, name, api=None):
+        if name not in self.running_cutscenes:  #  can't run multiple instances of the same cutscene
+            self.just_ran_cutscene = True
+            task = asyncio.create_task(scripting.Script(self, self.loader.get_cutscene(name), api=api).run_async())
+            self.running_cutscenes[name] = task
+
+    async def run_sub_cutscene(self, name, api=None):
+        return await scripting.Script(self, self.loader.get_cutscene(name), api=api).run_async()
+
+    def get_current_planet_name(self):
+        return self.get_level().name.split("_")[0]
 
     @property
     def mouse_pos(self):
@@ -50,9 +72,6 @@ class Game:
     @property
     def gl_window_surface(self):
         return self.window.get_gl_surface()
-
-    def pop_state(self):
-        self.stack.popleft()
 
     def set_graphics(self, value):
         print('setting graphics to', value)
@@ -105,7 +124,9 @@ class Game:
     def time_phase(self, mult):
         self.dt_mult = mult
 
-    def play_soundtrack(self, track_name):
+    def play_soundtrack(self, track_name=None):
+        if track_name is None:
+            track_name = self.get_level().soundtrack
         if track_name is None:
             self.sound_manager.stop_track()
         else:
@@ -168,9 +189,15 @@ class Game:
 
         self.stack.appendleft(menu.MainMenu(self))
         # self.stack.appendleft(space.Space(self))
-        dt = 0
         pygame.key.set_repeat(0, 0)
+        dt = 0
         while self.running and len(self.stack):
+            # make sure that a cutscene has a chance to update before the next draw call
+            if self.just_ran_cutscene:
+                await asyncio.sleep(0)
+                self.just_ran_cutscene = False
+            # keep the list of running cutscenes up to date
+            self.running_cutscenes = {key: value for key, value in self.running_cutscenes.items() if not value.done()}
             events = tuple(pygame.event.get())
             self.input_queue.update(events)
             for event in events:
@@ -179,7 +206,6 @@ class Game:
             self.draw()
             dt = self.update(dt)
             await asyncio.sleep(0)
-
         pygame.quit()
 
     def save_to_disk(self):

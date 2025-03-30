@@ -20,7 +20,7 @@
 		"entity_layer": 8,
 		"Background": "saline",
 		"Biome": "Purple_Flats_Topdown",
-		"Soundtrack": "Gemini-II",
+		"Soundtrack": "GeminiII",
 		"Maptype": "TopDown"
 	},
 	"layers": [

@@ -1,0 +1,5 @@
+attempt_map_cutscene();
+fade("fadein_circle", get_x(), get_y());
+lock();
+play_soundtrack();
+unlock();

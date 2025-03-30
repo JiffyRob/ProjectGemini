@@ -1,0 +1,16 @@
+lock();
+answer = ask("", "Resume", "Save", "Quit", "Save & Quit");
+unlock();
+switch answer {
+    case "Save" do save();
+    case "Quit" {
+        lock();
+        if ask("Quit without saving?", "Yes", "No") == "Yes" {
+            quit();
+        } else unlock();
+    }
+    case "Save & Quit" {
+        save();
+        quit();
+    }
+}
