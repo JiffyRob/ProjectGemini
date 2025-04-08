@@ -555,6 +555,9 @@ class MainMenu(game_state.GameState):
         self.knife = KnifeIndicator(self, button_dict=button_dict)
         self.gui.append(self.knife)
 
+        # TODO: better place for this...?
+        self.game.play_soundtrack("CelestialHymn")
+
     def delete_mode_toggle(self):
         self.delete_mode = not self.delete_mode
         if self.delete_mode:
