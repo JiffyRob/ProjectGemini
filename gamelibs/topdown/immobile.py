@@ -1,9 +1,11 @@
+import asyncio
+
 import pygame
 
 from gamelibs import sprite
 from gamelibs.animation import Animation
 
-from SNEK2 import SNEKCallable
+from SNEK2 import AsyncSNEKCallable
 
 class Interactable(sprite.Sprite):
     groups = {"interactable"}
@@ -206,23 +208,25 @@ class Hoverboard(sprite.Sprite):
             level.game.loader.get_spritesheet("hoverboard.png", (32, 32))[4:8]
         )
         self.exiting = False
+        self.exited = asyncio.Event()
         super().__init__(level, self.anim.image, rect, z - 1)
 
     @property
     def collision_rect(self):
         return self.rect.inflate(-16, -8)
 
-    def ride_off_into_sunset(self):
+    async def ride_off_into_sunset(self):
         self.level.player.lock()
         self.level.player.hide()
         self.anim = self.exit_anim
         self.exiting = True
+        await self.exited.wait()
 
     def interact(self):
         self.level.run_cutscene(
             "hoverboard",
             api={
-                "ride_off_into_sunset": SNEKCallable(self.ride_off_into_sunset, 0)
+                "ride_off_into_sunset": AsyncSNEKCallable(self.ride_off_into_sunset, 0)
             },
         )
 
@@ -248,4 +252,5 @@ class Hoverboard(sprite.Sprite):
                 self.level.switch_level(
                     short_name, direction="right", position=self.pos
                 )
+                self.exited.set()
         return super().update(dt)

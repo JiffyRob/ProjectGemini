@@ -1,6 +1,5 @@
 import numpy
 import pygame
-from OpenGL.wrapper import none_or_pass
 
 from gamelibs import sprite, pixelfont, util_draw
 from gamelibs.animation import Animation

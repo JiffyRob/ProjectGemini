@@ -20,7 +20,7 @@
 		"entity_layer": 8,
 		"Background": null,
 		"Biome": "Purple_Flats_Topdown",
-		"Soundtrack": null,
+		"Soundtrack": "Hoverboarding",
 		"Maptype": "Hoverboard"
 	},
 	"layers": [

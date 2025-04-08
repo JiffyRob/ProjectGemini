@@ -1,0 +1,20 @@
+{
+  "Mushroom": {
+    "colors": [
+      [0, 0, 0],
+      [91, 55, 40],
+      [171, 111, 59]
+    ],
+    "decor": {
+      "high": {
+        "mushrooms/red": [0.05, [48, 48]],
+        "mushrooms/brown": [0.05, [48, 48]]
+      },
+      "low": {
+        "mushrooms/red": [0.05, [48, 48]],
+        "mushrooms/brown": [0.05, [48, 48]]
+      },
+      "water": {}
+    }
+  }
+}

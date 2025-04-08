@@ -1,7 +1,7 @@
 import pygame
 import pygame._sdl2.controller as controller
 
-from scripts import timer
+from gamelibs import timer
 
 controller.init()
 
