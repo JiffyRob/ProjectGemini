@@ -174,7 +174,7 @@ class Game:
         self.window = window.WindowOld(
             self,
             "Project Gemini",
-            util_draw.RESOLUTION,
+            (0, 0),  # makes it maximized by default
             self.settings["scale"],
             self.settings["vsync"],
             self.settings["fullscreen"],
