@@ -10,7 +10,7 @@
 	},
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
-	"appBuildId": 473703,
+	"appBuildId": 476545,
 	"nextUid": 227,
 	"identifierStyle": "Capitalize",
 	"toc": [],
@@ -5995,9 +5995,9 @@
 					"id": "V_String",
 					"params": ["Purple_Flats_Topdown"]
 				}] },
-				{ "__identifier": "Soundtrack", "__type": "String", "__value": "Gemini-II", "__tile": null, "defUid": 76, "realEditorValues": [{
+				{ "__identifier": "Soundtrack", "__type": "String", "__value": "GeminiII", "__tile": null, "defUid": 76, "realEditorValues": [{
 					"id": "V_String",
-					"params": ["Gemini-II"]
+					"params": ["GeminiII"]
 				}] },
 				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
 					"id": "V_String",
@@ -6953,7 +6953,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\n\n --Father"]
+									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,
@@ -9081,9 +9081,9 @@
 					"id": "V_String",
 					"params": ["Purple_Flats_Topdown"]
 				}] },
-				{ "__identifier": "Soundtrack", "__type": "String", "__value": "Gemini-II", "__tile": null, "defUid": 76, "realEditorValues": [{
+				{ "__identifier": "Soundtrack", "__type": "String", "__value": "GeminiII", "__tile": null, "defUid": 76, "realEditorValues": [{
 					"id": "V_String",
-					"params": ["Gemini-II"]
+					"params": ["GeminiII"]
 				}] },
 				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
 					"id": "V_String",
@@ -9397,14 +9397,14 @@
 			"worldDepth": 0,
 			"pxWid": 480,
 			"pxHei": 496,
-			"__bgColor": "#000000",
-			"bgColor": "#000000",
+			"__bgColor": "#696A79",
+			"bgColor": null,
 			"useAutoIdentifier": false,
 			"bgRelPath": null,
 			"bgPos": null,
 			"bgPivotX": 0.5,
 			"bgPivotY": 0.5,
-			"__smartColor": "#737373",
+			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
 			"fieldInstances": [

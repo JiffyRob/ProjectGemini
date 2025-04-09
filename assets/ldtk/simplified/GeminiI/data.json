@@ -13,7 +13,7 @@
 			363
 		],
 		"entity_layer": 8,
-		"Background": null,
+		"Background": "water",
 		"Biome": "Sand_Topdown",
 		"Soundtrack": null,
 		"Maptype": "TopDown"

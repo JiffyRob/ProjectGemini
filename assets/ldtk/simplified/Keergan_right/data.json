@@ -1,12 +1,17 @@
 {
 	"identifier": "Keergan_right",
 	"uniqueIdentifer": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
-	"x": 304,
+	"x": 256,
 	"y": -336,
 	"width": 864,
 	"height": 592,
 	"bgColor": "#F8CD7C",
-	"neighbourLevels": [],
+	"neighbourLevels": [
+		{
+			"levelIid": "48f04ad0-d7b0-11ee-a609-c9ca9524fc9e",
+			"dir": "w"
+		}
+	],
 	"customFields": {
 		"start": [
 			8,

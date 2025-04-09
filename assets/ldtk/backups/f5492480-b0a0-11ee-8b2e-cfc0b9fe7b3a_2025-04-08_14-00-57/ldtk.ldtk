@@ -10,7 +10,7 @@
 	},
 	"iid": "f5492480-b0a0-11ee-8b2e-cfc0b9fe7b3a",
 	"jsonVersion": "1.5.3",
-	"appBuildId": 473703,
+	"appBuildId": 476545,
 	"nextUid": 227,
 	"identifierStyle": "Capitalize",
 	"toc": [],
@@ -3729,7 +3729,7 @@
 			"identifier": "Keergan_right",
 			"iid": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a",
 			"uid": 0,
-			"worldX": 304,
+			"worldX": 256,
 			"worldY": -336,
 			"worldDepth": 0,
 			"pxWid": 864,
@@ -3802,7 +3802,7 @@
 							"defUid": 12,
 							"px": [64,352],
 							"fieldInstances": [],
-							"__worldX": 368,
+							"__worldX": 320,
 							"__worldY": 16
 						},
 						{
@@ -3818,7 +3818,7 @@
 							"defUid": 12,
 							"px": [80,352],
 							"fieldInstances": [],
-							"__worldX": 384,
+							"__worldX": 336,
 							"__worldY": 16
 						},
 						{
@@ -3834,7 +3834,7 @@
 							"defUid": 12,
 							"px": [112,352],
 							"fieldInstances": [],
-							"__worldX": 416,
+							"__worldX": 368,
 							"__worldY": 16
 						},
 						{
@@ -3850,7 +3850,7 @@
 							"defUid": 12,
 							"px": [96,352],
 							"fieldInstances": [],
-							"__worldX": 400,
+							"__worldX": 352,
 							"__worldY": 16
 						},
 						{
@@ -3866,7 +3866,7 @@
 							"defUid": 39,
 							"px": [288,560],
 							"fieldInstances": [],
-							"__worldX": 592,
+							"__worldX": 544,
 							"__worldY": 224
 						},
 						{
@@ -3882,7 +3882,7 @@
 							"defUid": 39,
 							"px": [304,560],
 							"fieldInstances": [],
-							"__worldX": 608,
+							"__worldX": 560,
 							"__worldY": 224
 						},
 						{
@@ -3898,7 +3898,7 @@
 							"defUid": 39,
 							"px": [320,560],
 							"fieldInstances": [],
-							"__worldX": 624,
+							"__worldX": 576,
 							"__worldY": 224
 						},
 						{
@@ -3917,7 +3917,7 @@
 								"id": "V_Bool",
 								"params": [ true ]
 							}] }],
-							"__worldX": 720,
+							"__worldX": 672,
 							"__worldY": 224
 						},
 						{
@@ -3936,7 +3936,7 @@
 								"id": "V_Bool",
 								"params": [ true ]
 							}] }],
-							"__worldX": 832,
+							"__worldX": 784,
 							"__worldY": 224
 						},
 						{
@@ -3952,7 +3952,7 @@
 							"defUid": 41,
 							"px": [80,560],
 							"fieldInstances": [],
-							"__worldX": 384,
+							"__worldX": 336,
 							"__worldY": 224
 						},
 						{
@@ -3968,7 +3968,7 @@
 							"defUid": 41,
 							"px": [256,512],
 							"fieldInstances": [],
-							"__worldX": 560,
+							"__worldX": 512,
 							"__worldY": 176
 						},
 						{
@@ -3984,7 +3984,7 @@
 							"defUid": 41,
 							"px": [480,544],
 							"fieldInstances": [],
-							"__worldX": 784,
+							"__worldX": 736,
 							"__worldY": 208
 						},
 						{
@@ -4000,7 +4000,7 @@
 							"defUid": 43,
 							"px": [208,544],
 							"fieldInstances": [],
-							"__worldX": 512,
+							"__worldX": 464,
 							"__worldY": 208
 						},
 						{
@@ -4016,7 +4016,7 @@
 							"defUid": 43,
 							"px": [352,528],
 							"fieldInstances": [],
-							"__worldX": 656,
+							"__worldX": 608,
 							"__worldY": 192
 						},
 						{
@@ -4032,7 +4032,7 @@
 							"defUid": 43,
 							"px": [0,560],
 							"fieldInstances": [],
-							"__worldX": 304,
+							"__worldX": 256,
 							"__worldY": 224
 						},
 						{
@@ -4048,7 +4048,7 @@
 							"defUid": 43,
 							"px": [304,496],
 							"fieldInstances": [],
-							"__worldX": 608,
+							"__worldX": 560,
 							"__worldY": 160
 						},
 						{
@@ -4067,7 +4067,7 @@
 								"id": "V_String",
 								"params": ["battery1"]
 							}] }],
-							"__worldX": 928,
+							"__worldX": 880,
 							"__worldY": 224
 						},
 						{
@@ -4097,7 +4097,7 @@
 									"params": [ true ]
 								}] }
 							],
-							"__worldX": 960,
+							"__worldX": 912,
 							"__worldY": 233
 						},
 						{
@@ -4127,7 +4127,7 @@
 									"params": [ true ]
 								}] }
 							],
-							"__worldX": 960,
+							"__worldX": 912,
 							"__worldY": 226
 						},
 						{
@@ -4157,7 +4157,7 @@
 									"params": [ true ]
 								}] }
 							],
-							"__worldX": 992,
+							"__worldX": 944,
 							"__worldY": 226
 						},
 						{
@@ -4187,7 +4187,7 @@
 									"params": [ true ]
 								}] }
 							],
-							"__worldX": 992,
+							"__worldX": 944,
 							"__worldY": 233
 						},
 						{
@@ -4217,7 +4217,7 @@
 									"params": [ true ]
 								}] }
 							],
-							"__worldX": 1024,
+							"__worldX": 976,
 							"__worldY": 233
 						},
 						{
@@ -4247,7 +4247,7 @@
 									"params": [ true ]
 								}] }
 							],
-							"__worldX": 1024,
+							"__worldX": 976,
 							"__worldY": 226
 						},
 						{
@@ -4263,7 +4263,7 @@
 							"defUid": 43,
 							"px": [528,400],
 							"fieldInstances": [],
-							"__worldX": 832,
+							"__worldX": 784,
 							"__worldY": 64
 						},
 						{
@@ -4279,7 +4279,7 @@
 							"defUid": 41,
 							"px": [496,400],
 							"fieldInstances": [],
-							"__worldX": 800,
+							"__worldX": 752,
 							"__worldY": 64
 						},
 						{
@@ -4295,7 +4295,7 @@
 							"defUid": 41,
 							"px": [432,336],
 							"fieldInstances": [],
-							"__worldX": 736,
+							"__worldX": 688,
 							"__worldY": 0
 						},
 						{
@@ -4311,7 +4311,7 @@
 							"defUid": 43,
 							"px": [368,400],
 							"fieldInstances": [],
-							"__worldX": 672,
+							"__worldX": 624,
 							"__worldY": 64
 						},
 						{
@@ -4327,7 +4327,7 @@
 							"defUid": 43,
 							"px": [384,192],
 							"fieldInstances": [],
-							"__worldX": 688,
+							"__worldX": 640,
 							"__worldY": -144
 						},
 						{
@@ -4343,7 +4343,7 @@
 							"defUid": 43,
 							"px": [288,192],
 							"fieldInstances": [],
-							"__worldX": 592,
+							"__worldX": 544,
 							"__worldY": -144
 						},
 						{
@@ -4359,7 +4359,7 @@
 							"defUid": 43,
 							"px": [224,272],
 							"fieldInstances": [],
-							"__worldX": 528,
+							"__worldX": 480,
 							"__worldY": -64
 						},
 						{
@@ -4378,7 +4378,7 @@
 								"id": "V_Bool",
 								"params": [ false ]
 							}] }],
-							"__worldX": 576,
+							"__worldX": 528,
 							"__worldY": -80
 						},
 						{
@@ -4394,7 +4394,7 @@
 							"defUid": 130,
 							"px": [48,80],
 							"fieldInstances": [],
-							"__worldX": 352,
+							"__worldX": 304,
 							"__worldY": -256
 						},
 						{
@@ -4410,7 +4410,7 @@
 							"defUid": 12,
 							"px": [176,192],
 							"fieldInstances": [],
-							"__worldX": 480,
+							"__worldX": 432,
 							"__worldY": -144
 						},
 						{
@@ -4426,7 +4426,7 @@
 							"defUid": 12,
 							"px": [192,192],
 							"fieldInstances": [],
-							"__worldX": 496,
+							"__worldX": 448,
 							"__worldY": -144
 						},
 						{
@@ -4442,7 +4442,7 @@
 							"defUid": 12,
 							"px": [208,192],
 							"fieldInstances": [],
-							"__worldX": 512,
+							"__worldX": 464,
 							"__worldY": -144
 						},
 						{
@@ -4458,7 +4458,7 @@
 							"defUid": 12,
 							"px": [224,192],
 							"fieldInstances": [],
-							"__worldX": 528,
+							"__worldX": 480,
 							"__worldY": -144
 						},
 						{
@@ -4474,7 +4474,7 @@
 							"defUid": 12,
 							"px": [240,192],
 							"fieldInstances": [],
-							"__worldX": 544,
+							"__worldX": 496,
 							"__worldY": -144
 						},
 						{
@@ -4490,7 +4490,7 @@
 							"defUid": 12,
 							"px": [256,192],
 							"fieldInstances": [],
-							"__worldX": 560,
+							"__worldX": 512,
 							"__worldY": -144
 						},
 						{
@@ -4506,7 +4506,7 @@
 							"defUid": 12,
 							"px": [256,208],
 							"fieldInstances": [],
-							"__worldX": 560,
+							"__worldX": 512,
 							"__worldY": -128
 						},
 						{
@@ -4522,7 +4522,7 @@
 							"defUid": 12,
 							"px": [240,208],
 							"fieldInstances": [],
-							"__worldX": 544,
+							"__worldX": 496,
 							"__worldY": -128
 						},
 						{
@@ -4538,7 +4538,7 @@
 							"defUid": 12,
 							"px": [224,208],
 							"fieldInstances": [],
-							"__worldX": 528,
+							"__worldX": 480,
 							"__worldY": -128
 						},
 						{
@@ -4554,7 +4554,7 @@
 							"defUid": 12,
 							"px": [208,208],
 							"fieldInstances": [],
-							"__worldX": 512,
+							"__worldX": 464,
 							"__worldY": -128
 						},
 						{
@@ -4570,7 +4570,7 @@
 							"defUid": 12,
 							"px": [192,208],
 							"fieldInstances": [],
-							"__worldX": 496,
+							"__worldX": 448,
 							"__worldY": -128
 						},
 						{
@@ -4586,7 +4586,7 @@
 							"defUid": 12,
 							"px": [176,208],
 							"fieldInstances": [],
-							"__worldX": 480,
+							"__worldX": 432,
 							"__worldY": -128
 						},
 						{
@@ -4602,7 +4602,7 @@
 							"defUid": 12,
 							"px": [176,224],
 							"fieldInstances": [],
-							"__worldX": 480,
+							"__worldX": 432,
 							"__worldY": -112
 						},
 						{
@@ -4618,7 +4618,7 @@
 							"defUid": 12,
 							"px": [192,224],
 							"fieldInstances": [],
-							"__worldX": 496,
+							"__worldX": 448,
 							"__worldY": -112
 						},
 						{
@@ -4634,7 +4634,7 @@
 							"defUid": 12,
 							"px": [208,224],
 							"fieldInstances": [],
-							"__worldX": 512,
+							"__worldX": 464,
 							"__worldY": -112
 						},
 						{
@@ -4650,7 +4650,7 @@
 							"defUid": 12,
 							"px": [224,224],
 							"fieldInstances": [],
-							"__worldX": 528,
+							"__worldX": 480,
 							"__worldY": -112
 						},
 						{
@@ -4666,7 +4666,7 @@
 							"defUid": 12,
 							"px": [240,224],
 							"fieldInstances": [],
-							"__worldX": 544,
+							"__worldX": 496,
 							"__worldY": -112
 						},
 						{
@@ -4682,7 +4682,7 @@
 							"defUid": 12,
 							"px": [256,224],
 							"fieldInstances": [],
-							"__worldX": 560,
+							"__worldX": 512,
 							"__worldY": -112
 						},
 						{
@@ -4698,7 +4698,7 @@
 							"defUid": 12,
 							"px": [256,240],
 							"fieldInstances": [],
-							"__worldX": 560,
+							"__worldX": 512,
 							"__worldY": -96
 						},
 						{
@@ -4714,7 +4714,7 @@
 							"defUid": 12,
 							"px": [240,240],
 							"fieldInstances": [],
-							"__worldX": 544,
+							"__worldX": 496,
 							"__worldY": -96
 						},
 						{
@@ -4730,7 +4730,7 @@
 							"defUid": 12,
 							"px": [224,240],
 							"fieldInstances": [],
-							"__worldX": 528,
+							"__worldX": 480,
 							"__worldY": -96
 						},
 						{
@@ -4746,7 +4746,7 @@
 							"defUid": 12,
 							"px": [208,240],
 							"fieldInstances": [],
-							"__worldX": 512,
+							"__worldX": 464,
 							"__worldY": -96
 						},
 						{
@@ -4762,7 +4762,7 @@
 							"defUid": 12,
 							"px": [192,240],
 							"fieldInstances": [],
-							"__worldX": 496,
+							"__worldX": 448,
 							"__worldY": -96
 						},
 						{
@@ -4778,7 +4778,7 @@
 							"defUid": 12,
 							"px": [176,240],
 							"fieldInstances": [],
-							"__worldX": 480,
+							"__worldX": 432,
 							"__worldY": -96
 						}
 					]
@@ -5647,7 +5647,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": []
+			"__neighbours": [{ "levelIid": "48f04ad0-d7b0-11ee-a609-c9ca9524fc9e", "dir": "w" }]
 		},
 		{
 			"identifier": "Keergan",
@@ -5963,7 +5963,7 @@
 					"entityInstances": []
 				}
 			],
-			"__neighbours": []
+			"__neighbours": [{ "levelIid": "f5494b91-b0a0-11ee-8b2e-05dcd59cbe4a", "dir": "e" }]
 		},
 		{
 			"identifier": "GeminiII_left_left",
@@ -5995,9 +5995,9 @@
 					"id": "V_String",
 					"params": ["Purple_Flats_Topdown"]
 				}] },
-				{ "__identifier": "Soundtrack", "__type": "String", "__value": "Gemini-II", "__tile": null, "defUid": 76, "realEditorValues": [{
+				{ "__identifier": "Soundtrack", "__type": "String", "__value": "GeminiII", "__tile": null, "defUid": 76, "realEditorValues": [{
 					"id": "V_String",
-					"params": ["Gemini-II"]
+					"params": ["GeminiII"]
 				}] },
 				{ "__identifier": "Maptype", "__type": "LocalEnum.Maptype", "__value": "TopDown", "__tile": null, "defUid": 195, "realEditorValues": [{
 					"id": "V_String",
@@ -6953,7 +6953,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\n\n --Father"]
+									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,
@@ -9397,20 +9397,23 @@
 			"worldDepth": 0,
 			"pxWid": 480,
 			"pxHei": 496,
-			"__bgColor": "#696A79",
-			"bgColor": null,
+			"__bgColor": "#000000",
+			"bgColor": "#000000",
 			"useAutoIdentifier": false,
 			"bgRelPath": null,
 			"bgPos": null,
 			"bgPivotX": 0.5,
 			"bgPivotY": 0.5,
-			"__smartColor": "#ADADB5",
+			"__smartColor": "#737373",
 			"__bgPos": null,
 			"externalRelPath": null,
 			"fieldInstances": [
 				{ "__identifier": "start", "__type": "Array<Int>", "__value": [393,363], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [393] }, { "id": "V_Int", "params": [363] } ] },
 				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [] },
-				{ "__identifier": "Background", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
+				{ "__identifier": "Background", "__type": "String", "__value": "water", "__tile": null, "defUid": 26, "realEditorValues": [{
+					"id": "V_String",
+					"params": ["water"]
+				}] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "Sand_Topdown", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
 					"params": ["Sand_Topdown"]
