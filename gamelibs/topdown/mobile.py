@@ -3,7 +3,7 @@ import random
 
 import pygame
 
-from gamelibs import sprite, projectile, timer
+from gamelibs import sprite, projectile, timer, visual_fx
 from gamelibs.animation import Animation, SingleAnimation, NoLoopAnimation
 
 WALK_SPEED = 64
@@ -94,7 +94,8 @@ class Player(PhysicsSprite):
             self.state = "idle"
         self.last_facing = "right"
         self.image = self.anim_dict["idle-right"].image
-        self.emeralds = 10
+        self.pain_timer = timer.Timer(1000)
+        self.pain_timer.finish()
 
     @property
     def health(self):
@@ -228,14 +229,18 @@ class Player(PhysicsSprite):
         state = f"{self.state}-{self.facing}"
         self.anim_dict[state].update(dt)
         self.image = self.anim_dict[state].image
-        return super().update(dt) and self.health > 0
+        return super().update(dt)
 
     def hurt(self, amount):
-        self.health = max(0, self.health - amount)
-        if self.health > 0:
-            self.level.game.input_queue.rumble(.75, .75, 500)
-        else:
-            self.level.game.input_queue.rumble(1, 1, 1000)
+        if self.pain_timer.done():
+            self.effects.append(visual_fx.Blink(speed=0.1, count=6))
+            self.health = max(0, self.health - amount)
+            self.pain_timer.reset()
+            if self.health > 0:
+                self.level.game.input_queue.rumble(1, 1, 500)
+            else:
+                self.level.game.input_queue.rumble(1, 1, 1000)
+                self.level.run_cutscene("death")
 
     def heal(self, amount):
         self.health = min(self.health_capacity, self.health + amount)

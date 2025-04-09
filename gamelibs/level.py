@@ -490,7 +490,6 @@ class Level(game_state.GameState):
                     elif value == 0 and map_type in {cls.MAP_HOUSE, cls.MAP_TOPDOWN}:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.collision_rects.append(rect)
-                        print("this should trigger")
                     elif value == 1 and map_type == cls.MAP_PLATFORMER:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.collision_rects.append(rect)
@@ -519,9 +518,6 @@ class Level(game_state.GameState):
             self.player.pos, LERP_SPEED
         )
         self.viewport_rect.clamp_ip(self.map_rect)
-        # if player died, end game
-        if self.player.health <= 0:
-            self.run_cutscene("death")
         # update backgrounds
         for background in self.backgrounds:
             background.update(dt)

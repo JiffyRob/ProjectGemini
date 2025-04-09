@@ -203,7 +203,7 @@ class Player(mobile.PhysicsSprite):
         return True
 
     def hurt(self, amount, deliverer=None, knockback=5):
-        if self.pain_timer.done():
+        if self.pain_timer.done() and self.health > 0:
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
             self.health = max(0, self.health - amount)
             self.pain_timer.reset()
@@ -211,6 +211,7 @@ class Player(mobile.PhysicsSprite):
                 self.level.game.input_queue.rumble(1, 1, 500)
             else:
                 self.level.game.input_queue.rumble(1, 1, 1000)
+                self.level.run_cutscene("death")
             if deliverer is not None:
                 motion = (self.pos - deliverer.pos).scale_to_length(knockback)
                 self.rect.x += motion.x
