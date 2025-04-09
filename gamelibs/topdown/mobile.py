@@ -297,9 +297,7 @@ class Drone(sprite.Sprite):
                 motion = self.dest - self.true_pos
                 motion.clamp_magnitude_ip(self.FALL_SPEED * dt)
                 self.true_pos += motion
-                print(self.true_pos)
                 if self.true_pos.distance_squared_to(self.dest) < 4:
-                    print("idle")
                     self.state = "idle"
             else:
                 self.age += dt

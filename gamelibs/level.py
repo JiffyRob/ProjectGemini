@@ -490,6 +490,7 @@ class Level(game_state.GameState):
                     elif value == 0 and map_type in {cls.MAP_HOUSE, cls.MAP_TOPDOWN}:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.collision_rects.append(rect)
+                        print("this should trigger")
                     elif value == 1 and map_type == cls.MAP_PLATFORMER:
                         rect = pygame.FRect(col * 16, row * 16, 16, 16)
                         level.collision_rects.append(rect)
