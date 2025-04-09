@@ -198,13 +198,13 @@ class WindowOld:
         if fullscreen:
             size = pygame.display.get_desktop_sizes()[0]
             pygame.display.set_mode(
-                size, pygame.OPENGL | pygame.FULLSCREEN, vsync=True
+                size, pygame.OPENGL | pygame.FULLSCREEN | pygame.DOUBLEBUF, vsync=vsync
             )
         else:
             pygame.display.set_mode(
                 resolution,
                 pygame.RESIZABLE * (not env.PYGBAG) | pygame.OPENGL,
-                vsync=True,
+                vsync=vsync,
             )
         pygame.display.set_caption(self.title)
         self.resolution = resolution
