@@ -10093,22 +10093,6 @@
 							"fieldInstances": [],
 							"__worldX": 506,
 							"__worldY": -1734
-						},
-						{
-							"__identifier": "Tumblefish",
-							"__grid": [10,1],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#FEAE34",
-							"iid": "9abd2290-1030-11f0-a5eb-5d577c2bdccf",
-							"width": 16,
-							"height": 16,
-							"defUid": 129,
-							"px": [168,30],
-							"fieldInstances": [],
-							"__worldX": 456,
-							"__worldY": -1730
 						}
 					]
 				},

@@ -17,7 +17,7 @@ from gamelibs import (
     visual_fx,
 )
 
-LERP_SPEED = 1
+CAMERA_SPEED = 128
 
 
 class Parallax:
@@ -136,6 +136,12 @@ class Level(game_state.GameState):
     MAP_HOUSE = "House"
     MAP_HOVERBOARD = "Hoverboard"
 
+    TERRAIN_CLEAR = 0
+    TERRAIN_GROUND = 1
+    TERRAIN_GROUND2 = 2
+
+    TERRAIN_MOUNTAIN = 1
+
     sprite_classes = {
         MAP_TOPDOWN: {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
@@ -148,6 +154,7 @@ class Level(game_state.GameState):
             "Drone": topdown.mobile.Drone,
             "DeadPlayer": topdown.mobile.DeadPlayer,
             "Hoverboard": topdown.immobile.Hoverboard,
+            "Tumblefish": topdown.mobile.TumbleFish,
         },
         MAP_HOUSE: {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
@@ -190,6 +197,7 @@ class Level(game_state.GameState):
         self.name = name
         self.backgrounds = []
         self.groups = defaultdict(set)
+        self.rects = defaultdict(list)
         self.soundtrack = soundtrack
         rect = pygame.FRect(0, 0, 16, 16)
         rect.center = player_pos
@@ -208,8 +216,6 @@ class Level(game_state.GameState):
             self.player.last_facing = player_facing
         self.sprites = set()
         self.to_add = set()
-        self.collision_rects = []
-        self.down_rects = []
         self.gui = [
             gui2d.HeartMeter(self, (2, 2, 16 * 9, 9)),
             gui2d.EmeraldMeter(self, (2, 11, 0, 0)),
@@ -304,14 +310,14 @@ class Level(game_state.GameState):
         self.sprites.add(sprite)
         for group in sprite.groups:
             if group == "static-collision":
-                self.collision_rects.append(sprite.collision_rect)
+                self.rects["collision"].append(sprite.collision_rect)
                 if hasattr(sprite, "extra_collision_rects"):
-                    self.collision_rects.extend(sprite.extra_collision_rects)
+                    self.rects["collision"].extend(sprite.extra_collision_rects)
                 continue
             if group == "vertical-collision":
-                self.down_rects.append(sprite.collision_rect)
+                self.rects["platform"].append(sprite.collision_rect)
                 if hasattr(sprite, "extra_collision_rects"):
-                    self.down_rects.extend(sprite.extra_collision_rects)
+                    self.rects["platform"].extend(sprite.extra_collision_rects)
             self.groups[group].add(sprite)
 
     def finish_dialog(self, answer):
@@ -391,6 +397,12 @@ class Level(game_state.GameState):
     def get_facing(self, group="player"):
         group = self.groups[group]
         return next(iter(group)).pos.y
+
+    def get_group(self, group_name):
+        return self.groups[group_name]
+
+    def get_rects(self, rect_name):
+        return self.rects[rect_name]
 
     def show(self, group="player"):
         group = self.groups[group]
@@ -474,29 +486,35 @@ class Level(game_state.GameState):
                     )
                 )
         # collision data creation
-        # TODO: refactor this disgusting mess of fors and ifs
-        for collision_index, filename in enumerate(
-            ("Collision.csv", "Collision_B.csv")
+        background_type = data["customFields"]["Background"] or "chasm"
+        for row, line in enumerate(
+            game.loader.get_csv(folder / "Ground.csv", for_map=True)
         ):
+            for col, value in enumerate(line):
+                value = int(value)
+                rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                if map_type == cls.MAP_PLATFORMER:
+                    if value == cls.TERRAIN_GROUND:
+                        level.rects["collision"].append(rect)
+                    if value == cls.TERRAIN_GROUND2:
+                        level.rects["platform"].append(rect)
+                elif map_type in {cls.MAP_TOPDOWN, cls.MAP_HOUSE}:
+                    if value == cls.TERRAIN_CLEAR:
+                        level.rects[background_type].append(rect)
+                    if value in {cls.TERRAIN_GROUND, cls.TERRAIN_GROUND2}:
+                        level.rects["ground"].append(rect)
+        if map_type == cls.MAP_TOPDOWN:
             for row, line in enumerate(
-                game.loader.get_csv(folder / filename, for_map=True)
+                    game.loader.get_csv(folder / "Elevation.csv", for_map=True)
             ):
                 for col, value in enumerate(line):
                     value = int(value)
-                    if collision_index and map_type != cls.MAP_HOVERBOARD:
-                        if value == 1:
-                            rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                            level.collision_rects.append(rect)
-                    elif value == 0 and map_type in {cls.MAP_HOUSE, cls.MAP_TOPDOWN}:
-                        rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                        level.collision_rects.append(rect)
-                    elif value == 1 and map_type == cls.MAP_PLATFORMER:
-                        rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                        level.collision_rects.append(rect)
-                    elif value == 2 and map_type == cls.MAP_PLATFORMER:
-                        rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                        level.down_rects.append(rect)
+                    rect = pygame.FRect(col * 16, row * 16, 16, 16)
+                    if value == cls.TERRAIN_MOUNTAIN:
+                        level.rects["mountain"].append(rect)
+
             level.player.z = entity_layer
+        print("rects", level.rects)
         return level
 
     def world_to_screen(self, pos):
@@ -514,9 +532,8 @@ class Level(game_state.GameState):
         self.sprites = {sprite for sprite in self.sprites if sprite.update(dt)}
         for group in self.groups.values():
             group &= self.sprites
-        self.viewport_rect.center = pygame.Vector2(self.viewport_rect.center).lerp(
-            self.player.pos, LERP_SPEED
-        )
+        dest = self.player.pos
+        self.viewport_rect.center = self.viewport_rect.center + pygame.Vector2(dest - self.viewport_rect.center).clamp_magnitude(CAMERA_SPEED)
         self.viewport_rect.clamp_ip(self.map_rect)
         # update backgrounds
         for background in self.backgrounds:

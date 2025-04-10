@@ -24,8 +24,9 @@
 		"Maptype": "TopDown"
 	},
 	"layers": [
-		"Collision.png",
-		"AutoLayer.png",
+		"Ground.png",
+		"GroundTiles.png",
+		"ElevationTiles.png",
 		"Below.png",
 		"Above.png"
 	],

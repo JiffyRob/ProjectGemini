@@ -19,7 +19,7 @@ class Laser(sprite.Sprite):
                 return False
             if (
                 self.level.map_type != self.level.MAP_HOVERBOARD
-                and self.rect.collidelist(self.level.collision_rects) != -1
+                and self.rect.collidelist(self.level.get_rects("collision")) != -1
             ):
                 return False
         return not self.death_timer.done() and super().update(dt)

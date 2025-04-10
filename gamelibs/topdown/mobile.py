@@ -13,7 +13,26 @@ FALL_SPEED = 128
 REVERSE = {"up": "down", "down": "up", "left": "right", "right": "left"}
 
 
+def vector_to_string(vector):
+    if abs(vector.x) < abs(vector.y):
+        if vector.y < 0:
+            return "up"
+        return "down"
+    if vector.x < 0:
+        return "left"
+    return "right"
+
+
 class PhysicsSprite(sprite.Sprite):
+    collision_groups = {
+        "collision",
+        "water",
+        "mountain",
+        "saline",
+        "lava",
+        "purple",
+        "chasm",
+    }
     def __init__(
         self, level, image=None, rect=(0, 0, 16, 16), z=0, weight=10, **custom_fields
     ):
@@ -39,7 +58,10 @@ class PhysicsSprite(sprite.Sprite):
         self.rect.center += vel
         departure_directions = []
         iterator = search(self.pos)
-        while self.collision_rect.collidelist(self.level.collision_rects) >= 0:
+        collision_rects = []
+        for group in self.collision_groups:
+            collision_rects.extend(self.level.get_rects(group))
+        while self.collision_rect.collidelist(collision_rects) >= 0:
             self.rect.center = next(iterator)
         if self.rect.top < self.level.map_rect.top:
             departure_directions.append("up")
@@ -345,6 +367,66 @@ class Drone(sprite.Sprite):
         self.images[self.state].update(dt)
         self.image = self.images[self.state].image
         return super().update(dt)
+
+
+class TumbleFish(sprite.Sprite):
+    ROLL_SPEED = 96
+    MOUNTAIN_ROLL_SPEED = 128
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        frames = level.game.loader.get_spritesheet("topdown-sprites.png", (16, 16))
+        self.eye_frames = {
+            "up": frames[5],
+            "down": frames[4],
+            "left": frames[6],
+            "right": frames[7],
+        }
+        self.base_frames = {
+            "idle": frames[8],
+            "prep": NoLoopAnimation(frames[8:10]),
+            "rolling": Animation(frames[11:14]),
+        }
+        self.state = "idle"
+        self.hit_chasm = False
+        super().__init__(
+            level,
+            None,
+            rect,
+            z
+        )
+
+    def roll(self):
+        self.state = "prep"
+        self.rect.y -= 2
+
+    def update(self, dt):
+        if self.state == "idle":
+            self.image = self.base_frames["idle"].copy()
+            direction = pygame.Vector2(self.level.get_x(), self.level.get_y()) - self.pos
+            self.image.blit(self.eye_frames[vector_to_string(direction)])
+            if abs(direction.x) < 16 and 0 < direction.y < 96:
+                self.roll()
+        elif self.state == "prep":
+            if self.base_frames["prep"].done():
+                self.state = "rolling"
+            self.image = self.base_frames["prep"].image
+            self.base_frames["prep"].update(dt)
+        elif self.state == "rolling":
+            speed = self.ROLL_SPEED
+            if self.rect.collidelist(self.level.get_rects("mountain")) != -1:
+                speed = self.MOUNTAIN_ROLL_SPEED
+            self.rect.y += speed * dt
+            self.image = self.base_frames["rolling"].image
+            self.base_frames["rolling"].update(dt)
+            if self.hit_chasm and self.rect.collidelist(self.level.get_rects("ground")) == -1:
+                return False
+            if not self.hit_chasm and self.rect.collidelist(self.level.get_rects("chasm")) != -1:
+                self.hit_chasm = True
+        if self.rect.colliderect(self.level.player.collision_rect):
+            self.level.player.hurt(2)
+        super().update(dt)
+        return True
+
 
 
 class DeadPlayer(sprite.Sprite):

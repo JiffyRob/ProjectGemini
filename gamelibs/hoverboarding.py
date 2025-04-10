@@ -285,7 +285,7 @@ class Player(sprite.Sprite):
                 if held_input["left"]:
                     self.rect.x = max(self.MIN_Y, self.rect.x - self.ACCEL_SPEED * dt)
                     self.state = "lookback"
-                if self.collision_rect.collidelist(self.level.collision_rects) != -1:
+                if self.collision_rect.collidelist(self.level.get_rects("collision")) != -1:
                     self.hurt(3)
         anim = self.anim_dict[f"{self.state}-{self.facing}"]
         anim.update(dt)

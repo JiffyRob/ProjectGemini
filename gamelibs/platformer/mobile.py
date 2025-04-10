@@ -74,7 +74,7 @@ class PhysicsSprite(sprite.Sprite):
                 return False
             if vel.x < 0:
                 for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: -rect.x
+                    self.level.get_rects("collision"), key=lambda rect: -rect.x
                 ):
                     if self.collision_rect.colliderect(collided):
                         self.on_xy_collision(self.DIRECTION_LEFT)
@@ -84,7 +84,7 @@ class PhysicsSprite(sprite.Sprite):
                         break
             else:
                 for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: rect.x
+                    self.level.get_rects("collision"), key=lambda rect: rect.x
                 ):
                     if self.collision_rect.colliderect(collided):
                         self.on_xy_collision(self.DIRECTION_RIGHT)
@@ -96,7 +96,7 @@ class PhysicsSprite(sprite.Sprite):
             self.update_rects()
             if vel.y < 0:
                 for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: -rect.y
+                    self.level.get_rects("collision"), key=lambda rect: -rect.y
                 ):
                     if self.collision_rect.colliderect(collided):
                         self.on_xy_collision(self.DIRECTION_UP)
@@ -107,7 +107,7 @@ class PhysicsSprite(sprite.Sprite):
             else:
                 if not self.ducking:
                     for collided in sorted(
-                        self.level.down_rects, key=lambda rect: rect.y
+                        self.level.get_rects("platform"), key=lambda rect: rect.y
                     ):
                         if (
                             old_rect.bottom <= collided.top
@@ -125,7 +125,7 @@ class PhysicsSprite(sprite.Sprite):
                             self.update_rects()
                             break
                 for collided in sorted(
-                    self.level.collision_rects, key=lambda rect: rect.y
+                    self.level.get_rects("collision"), key=lambda rect: rect.y
                 ):
                     if self.collision_rect.colliderect(collided):
                         self.on_xy_collision(self.DIRECTION_DOWN)

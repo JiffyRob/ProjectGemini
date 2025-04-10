@@ -5,7 +5,7 @@
 	"y": -1760,
 	"width": 480,
 	"height": 496,
-	"bgColor": "#696A79",
+	"bgColor": "#000000",
 	"neighbourLevels": [],
 	"customFields": {
 		"start": [
@@ -13,14 +13,15 @@
 			363
 		],
 		"entity_layer": 8,
-		"Background": "water",
+		"Background": null,
 		"Biome": "Sand_Topdown",
 		"Soundtrack": null,
 		"Maptype": "TopDown"
 	},
 	"layers": [
-		"Collision.png",
-		"AutoLayer.png",
+		"Ground.png",
+		"GroundTiles.png",
+		"ElevationTiles.png",
 		"Below.png",
 		"Above.png"
 	],
@@ -59,6 +60,41 @@
 				"width": 16,
 				"height": 16,
 				"color": 39387,
+				"customFields" : {}
+			}
+		],
+		"Tumblefish": [
+			{
+				"id": "Tumblefish",
+				"iid": "67129920-1030-11f0-a5eb-5bff34421a48",
+				"layer": "Entities",
+				"x": 193,
+				"y": 26,
+				"width": 16,
+				"height": 16,
+				"color": 16690740,
+				"customFields" : {}
+			},
+			{
+				"id": "Tumblefish",
+				"iid": "67f4e2d0-1030-11f0-a5eb-a5c2e5f9e8d2",
+				"layer": "Entities",
+				"x": 218,
+				"y": 26,
+				"width": 16,
+				"height": 16,
+				"color": 16690740,
+				"customFields" : {}
+			},
+			{
+				"id": "Tumblefish",
+				"iid": "9abd2290-1030-11f0-a5eb-5d577c2bdccf",
+				"layer": "Entities",
+				"x": 168,
+				"y": 30,
+				"width": 16,
+				"height": 16,
+				"color": 16690740,
 				"customFields" : {}
 			}
 		]
