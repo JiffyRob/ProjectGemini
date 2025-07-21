@@ -179,6 +179,18 @@ class PlanetIndicator(sprite.GUISprite):
         self.font.render_to(surface, self.rect, text)
 
 
+class MiniMap(sprite.GUISprite):
+    def __init__(self, level, rect):
+        super().__init__(level)
+        self.rect = rect
+
+    def update(self, dt):
+        super().update(dt)
+
+    def draw(self, surface):
+        ...
+
+
 class GUIRendererHW:
     def __init__(self, level, gui):
         self.level = level
