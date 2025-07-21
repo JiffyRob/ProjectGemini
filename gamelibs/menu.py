@@ -323,7 +323,7 @@ class KnifeIndicator(sprite.GUISprite):
         self.last_x = start_pos[0]
         self.last_y = start_pos[1]
         self.button.select()
-        self.motion_cooldown = timer.Timer(100)
+        self.motion_cooldown = timer.Timer(150)
         super().__init__(
             level,
             None,
@@ -346,9 +346,9 @@ class KnifeIndicator(sprite.GUISprite):
                 return current_coord
             x_only_coord = (current_coord[0], None)
             y_only_coord = (None, current_coord[1])
-            if x_only_coord in self.button_dict and self.button_dict[x_only_coord].state == self.button_dict[current_coord].STATE_NORMAL:
+            if x_only_coord in self.button_dict and self.button_dict[x_only_coord].state == self.button_dict[x_only_coord].STATE_NORMAL:
                 return x_only_coord
-            if y_only_coord in self.button_dict and self.button_dict[y_only_coord].state == self.button_dict[current_coord].STATE_NORMAL:
+            if y_only_coord in self.button_dict and self.button_dict[y_only_coord].state == self.button_dict[y_only_coord].STATE_NORMAL:
                 return y_only_coord
         return None
 
@@ -447,7 +447,6 @@ class TextInput(sprite.GUISprite):
 
 
 class Save(TextButton):
-
     def __init__(self, level, rect, index, name):
         self.name = name
         super().__init__(
