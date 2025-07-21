@@ -370,16 +370,17 @@ class KnifeIndicator(sprite.GUISprite):
         self.motion_cooldown.reset()
 
     def update(self, dt):
-        pressed = self.level.game.input_queue.just_pressed
-        if "up" in pressed:
+        pressed = self.level.game.input_queue.held
+        if pressed["up"]:
             self.move((0, -1))
-        if "down" in pressed:
+        if pressed["down"]:
             self.move((0, 1))
-        if "left" in pressed:
+        if pressed["left"]:
             self.move((-1, 0))
-        if "right" in pressed:
+        if pressed["right"]:
             self.move((1, 0))
-        if "interact" in pressed:
+        
+        if "interact" in self.level.game.input_queue.just_pressed:
             self.button.click()
         self.age += dt
         self.rect.midright = self.button.rect.midleft

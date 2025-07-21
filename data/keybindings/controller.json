@@ -12,5 +12,6 @@
   "quit": ["ControllerButtonDown_6", null],
   "pause": ["ControllerButtonDown_2", null],
   "turbo_ship": ["ControllerButtonDown_0", null],
+  "rear_view": ["ControllerButtonDown_2", null],
   "enter": ["ControllerButtonDown_1", null]
 }

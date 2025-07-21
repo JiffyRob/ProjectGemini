@@ -1,5 +1,6 @@
 import math
 from dataclasses import dataclass
+from copy import copy
 
 import numpy
 import pygame
@@ -95,6 +96,9 @@ class Camera:
     fov: pygame.Vector2
     near_z: int
     far_z: int
+
+    def copy(self):
+        return copy(self)
 
 
 @dataclass

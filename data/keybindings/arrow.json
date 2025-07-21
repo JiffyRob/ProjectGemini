@@ -12,5 +12,6 @@
   "quit": ["KeyDown_escape", null],
   "pause": ["KeyDown_p", null],
   "turbo_ship": ["KeyDown_space", null],
+  "rear_view": ["KeyDown_left ctrl"],
   "enter": ["KeyDown_return", null]
 }

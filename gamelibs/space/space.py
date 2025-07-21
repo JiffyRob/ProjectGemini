@@ -3,7 +3,7 @@ import pygame
 
 from gamelibs import game_state, util_draw
 from gamelibs.space import gui3d, math3d, glsprite3d
-
+from math import pi
 
 class Space(game_state.GameState):
     PLANET_CHECK_TOLERANCE = 100
@@ -61,6 +61,7 @@ class Space(game_state.GameState):
         self.possible_planet_index = None
         self.dest_rotation = None
         self.state = self.STATE_NORMAL
+        self.rear_view = False
 
     @property
     def planet_locations(self):
@@ -80,7 +81,9 @@ class Space(game_state.GameState):
 
     def update(self, dt):
         self.age += dt
+        self.rear_view = False
         pressed = self.game.input_queue.just_pressed
+        held = self.game.input_queue.held
         if "quit" in pressed:
             if self.state == self.STATE_PAUSE:
                 self.state = self.STATE_NORMAL
@@ -96,8 +99,11 @@ class Space(game_state.GameState):
                 self.state = self.STATE_ENTRY
                 self.planet_indicator.enter()
 
+        if held["rear_view"]:
+            print("Rear view")
+            self.rear_view = True
+
         if self.state == self.STATE_NORMAL:
-            held = self.game.input_queue.held
             if held["up"]:
                 self.turn_speeds["up"] += self.turn_delta
                 self.ship.up()
@@ -154,13 +160,14 @@ class Space(game_state.GameState):
             )
 
         elif self.state == self.STATE_ENTRY:
-            print("entering planet...somehow")
             motion = pygame.Vector3(
                 *self.planet_locations[self.possible_planet_index] - self.camera.pos
             )
-            print(motion.length_squared())
             if motion.length_squared() <= self.LANDING_TOLERANCE:
                 self.game.load_map(self.possible_planet)
+                self.camera.rotation *= math3d.Quaternion(pi)
+                self.state = self.STATE_NORMAL
+                self.planet_indicator.reset()
             self.camera.pos += motion.clamp_magnitude(self.min_forward_speed) * dt
 
         if self.state == self.STATE_NORMAL:
@@ -192,7 +199,12 @@ class Space(game_state.GameState):
             motion = pygame.Vector3(0, 0, self.forward_speed * dt)
             self.camera.pos += self.camera.rotation * motion
 
-        self.space_renderer.update(dt, self.camera)
+        camera = self.camera.copy()
+        # TODO: Is there a way to combine these?
+        if self.rear_view:
+            camera.rotation *= math3d.Quaternion(pi, (1, 0, 0))
+            camera.rotation *= math3d.Quaternion(pi, (0, 0, 1))
+        self.space_renderer.update(dt, camera)
 
         for sprite in self.gui:
             sprite.update(dt)
@@ -201,4 +213,5 @@ class Space(game_state.GameState):
 
     def draw(self):
         self.space_renderer.render()
-        self.gui_renderer.render()
+        if not self.rear_view:
+            self.gui_renderer.render()
