@@ -161,3 +161,6 @@ cython_debug/
 
 #pygbag
 *-pygbag.*
+
+.devenv
+.direnv
