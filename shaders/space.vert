@@ -37,7 +37,7 @@ void main() {
     moved.z = (moved.z - near_z) * 2.0 / (far_z - near_z) - 1.0;
     // X, Y scaling
     // moved.x *= 1.0 / 256.0;
-    // moved.y *= 1.0 / 256.0;
+    // moved.y *= 1.0 / 224.0;
     // don't ask why I multiply and divide by 2 here
     // (I don't know)
     gl_Position = vec4(moved.xy + vertex * scaled_radius * 2.0, moved.z, 1.0 + float(planet_id_) * 0.0001);

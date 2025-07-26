@@ -8,6 +8,7 @@ from math import pi
 class Space(game_state.GameState):
     PLANET_CHECK_TOLERANCE = 100
     LANDING_TOLERANCE = 760
+    RADIUS = 2000
 
     STATE_NORMAL = 0
     STATE_PAUSE = 1
@@ -25,23 +26,31 @@ class Space(game_state.GameState):
             pygame.Vector2(util_draw.RESOLUTION) / 2,
             pygame.Vector2(60, 60),  # TODO : FOV
             5,
-            5000,
+            2000,
         )
         ship_rect = pygame.Rect(0, 0, 48, 32)
         ship_rect.center = self.game.screen_rect.center
         self.ship = gui3d.Ship(self, ship_rect)
-        compass_pos = pygame.Vector2(16, -16) + self.game.screen_rect.bottomleft
+
+        compass_pos = pygame.Vector2(-20, -20) + self.game.screen_rect.bottomright
         self.compass = gui3d.Compass(self, compass_pos)
+
+        map_rect = pygame.Rect(16, 0, 32, 32)
+        map_rect.bottom = self.game.screen_rect.bottom
+        self.minimap = gui3d.MiniMap(self, map_rect, self.RADIUS)
+
+        pi_rect = pygame.Rect(50, 0, 200, 16)
+        pi_rect.bottom = self.game.screen_rect.bottom - 20
         self.planet_indicator = gui3d.PlanetIndicator(
-            self, pygame.Rect(compass_pos + (32, -8), (200, 16))
+            self, pi_rect
         )
-        self.gui = [self.ship, self.compass, self.planet_indicator]
+        self.gui = [self.ship, self.planet_indicator, self.minimap]
         self.sprites = []
         self.ship_overlay = self.game.loader.get_surface_scaled_to(
             "ship-inside.png", util_draw.RESOLUTION
         )
 
-        self.space_renderer = glsprite3d.SpaceRendererHW(self)
+        self.space_renderer = glsprite3d.SpaceRendererHW(self, self.RADIUS)
         self.gui_renderer = gui3d.GUIRendererHW(self, self.gui)
 
         self.turn_speeds = {
@@ -100,20 +109,9 @@ class Space(game_state.GameState):
                 self.planet_indicator.enter()
 
         if held["rear_view"]:
-            print("Rear view")
             self.rear_view = True
 
         if self.state == self.STATE_NORMAL:
-            if held["up"]:
-                self.turn_speeds["up"] += self.turn_delta
-                self.ship.up()
-            else:
-                self.turn_speeds["up"] -= self.turn_delta
-            if held["down"]:
-                self.turn_speeds["down"] += self.turn_delta
-                self.ship.down()
-            else:
-                self.turn_speeds["down"] -= self.turn_delta
             if held["left"]:
                 self.turn_speeds["left"] += self.turn_delta
                 self.ship.left()

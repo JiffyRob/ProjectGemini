@@ -10,8 +10,9 @@ class SpaceRendererHW:
 
     CIRCLE_RESOLUTION = 16
 
-    def __init__(self, level):
+    def __init__(self, level, radius):
         self.level = level
+        self.radius = radius
         self.age = 0
 
         self.planet_pipeline = None
@@ -63,8 +64,9 @@ class SpaceRendererHW:
     def compile_shaders(self):
 
         rng = numpy.random.default_rng(1)  # TODO: random seeding?
+        # TODO: only plant stars within bounds of world
         self.star_locations = rng.uniform(
-            low=-2000, high=2000, size=(self.STAR_COUNT, 3)
+            low=-self.radius, high=self.radius, size=(self.STAR_COUNT, 3)
         ).astype("f4")
         self.star_ids = numpy.tile(numpy.array([0, 1]), self.STAR_COUNT // 2 + 1)
         self.star_radii = numpy.zeros(self.STAR_COUNT, "f4") + 1.0

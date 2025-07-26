@@ -180,15 +180,51 @@ class PlanetIndicator(sprite.GUISprite):
 
 
 class MiniMap(sprite.GUISprite):
-    def __init__(self, level, rect):
+    MAP_SIZE = 1500
+    BORDER_WIDTH = 1
+
+    def __init__(self, level, rect, world_radius):
         super().__init__(level)
         self.rect = rect
+        self.world_radius = world_radius
+        self.ship_surface = self.level.game.loader.get_surface("map-ship.png")
+        self.ship_rect = self.ship_surface.get_rect()
+        self.ship_rect.center = self.rect.center
+
+        self.planet_surface = self.level.game.loader.get_surface("map-planet.png")
+        self.planet_rect = self.planet_surface.get_rect()
+
+        self.reposition()
+
+    def reposition(self, rect=None):
+        if rect is not None:
+            self.rect = rect
+        self.map_radius = min(self.rect.width, self.rect.height) // 2
+        usable_radius = self.map_radius - self.BORDER_WIDTH - 1
+        self.scale_factor = self.level.RADIUS * usable_radius / self.MAP_SIZE**2
+        self.ship_rect.center = self.rect.center
 
     def update(self, dt):
         super().update(dt)
 
     def draw(self, surface):
-        ...
+        pygame.draw.circle(surface, (27, 37, 78), self.rect.center, self.map_radius)
+        pygame.draw.circle(surface, (119, 126, 134), self.rect.center, self.map_radius, self.BORDER_WIDTH)
+        surface.blit(self.ship_surface, self.ship_rect)
+        camera_offset = pygame.Vector2(
+            self.level.camera.pos.x,
+            self.level.camera.pos.z,
+        )
+        camera_rotation = pygame.Vector2((self.level.camera.rotation * pygame.Vector3(0, 0, 1)).xz).as_polar()[1]
+        upper_bound = (self.map_radius - 1) ** 2
+        for planet_location in self.level.planet_locations:
+            if numpy.isnan(planet_location).max():
+                continue
+            location = (pygame.Vector2(planet_location[0], planet_location[2]) - camera_offset).rotate(-camera_rotation + 90) * self.scale_factor
+            location.y *= -1
+            if location.length_squared() < upper_bound:
+                location += self.rect.center
+                surface.set_at(location, (199, 86, 190))
 
 
 class GUIRendererHW:
