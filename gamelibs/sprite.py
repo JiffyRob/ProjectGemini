@@ -50,7 +50,7 @@ class Sprite:
                 effect.draw(self.to_draw)
         else:
             self.to_draw = None
-        return True
+        return not self.dead
 
 
 class GUISprite(Sprite):

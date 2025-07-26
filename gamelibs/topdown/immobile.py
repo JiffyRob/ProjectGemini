@@ -1,4 +1,5 @@
 import asyncio
+import random
 
 import pygame
 
@@ -195,6 +196,87 @@ class Bush(sprite.Sprite):
             z,
         )
         self.collision_rect = self.rect.copy()
+
+
+class Spikefruit(sprite.Sprite):
+    groups = {"interactable"}
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        self.frames = level.game.loader.get_spritesheet("spikeberry.png", (8, 8))
+        self.fruit = 2
+        self.collision_rect = pygame.FRect(rect)
+        super().__init__(
+            level,
+            self.frames[2],
+            rect,
+            z - 1,
+        )
+
+    def interact(self):
+        if self.fruit > 0:
+            self.fruit -= 1
+            self.image = self.frames[self.fruit]
+            self.level.player.acquire("spikefruit")
+            return 0
+        else:
+            return None
+
+
+class WaspberryBush(sprite.Sprite):
+    groups = {"static-collision"}
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        super().__init__(
+            level,
+            level.game.loader.get_surface("waspberry-bush.png"),
+            rect,
+            z,
+        )
+        self.collision_rect = self.rect
+        for _ in range(5):
+            rect = pygame.FRect(self.rect.centerx + random.uniform(-6, 5), self.rect.centery + random.uniform(-5, 6), 2, 2)
+            self.level.spawn("Waspberry", rect, z)
+
+
+class Waspberry(sprite.Sprite):
+    groups = {"interactable"}
+
+    def __init__(self, level, rect=(0, 0, 2, 2), z=0, **custom_fields):
+        self.frames = level.game.loader.get_spritesheet("waspberry.png", (2, 2))
+        super().__init__(
+            level,
+            random.choice(self.frames),
+            rect,
+            z + 0.5,
+        )
+        self.collision_rect = self.rect.copy()
+
+    def interact(self):
+        self.dead = True
+        self.level.player.acquire("waspberry")
+        return 0
+
+
+class Spapple(sprite.Sprite):
+    groups = {"interactable"}
+
+    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+        self.frames = level.game.loader.get_spritesheet("spapple.png", (16, 16))
+        self.fruit = 1
+        self.collision_rect = pygame.FRect(rect)
+        super().__init__(
+            level,
+            self.frames[1],
+            rect,
+            z,
+        )
+
+    def interact(self):
+        if self.fruit > 0:
+            self.fruit -= 1
+            self.image = self.frames[self.fruit]
+            self.level.player.acquire("spapple")
+            return 0
 
 
 class Hoverboard(sprite.Sprite):

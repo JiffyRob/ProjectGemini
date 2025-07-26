@@ -1,0 +1,289 @@
+{
+	"identifier": "GeminiII_left_left_left",
+	"uniqueIdentifer": "7e01c150-5e50-11f0-a868-1bf4e4082297",
+	"x": 1024,
+	"y": -736,
+	"width": 256,
+	"height": 256,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"start": [
+			0,
+			0
+		],
+		"entity_layer": 8,
+		"Background": "saline",
+		"Biome": "Purple_Flats_Topdown",
+		"Soundtrack": "GeminiII",
+		"Maptype": "TopDown"
+	},
+	"layers": [
+		"Ground.png",
+		"GroundTiles.png",
+		"ElevationTiles.png",
+		"Below.png",
+		"Above.png"
+	],
+	"entities": {
+		"Spapple": [
+			{
+				"id": "Spapple",
+				"iid": "7893ff40-5e50-11f0-a868-e1cedbf1535c",
+				"layer": "Entities",
+				"x": 64,
+				"y": 128,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Spapple",
+				"iid": "79245860-5e50-11f0-a868-9b2dc30d8d0f",
+				"layer": "Entities",
+				"x": 112,
+				"y": 176,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			},
+			{
+				"id": "Spapple",
+				"iid": "79b8a920-5e50-11f0-a868-2f4e59afa06c",
+				"layer": "Entities",
+				"x": 160,
+				"y": 160,
+				"width": 16,
+				"height": 16,
+				"color": 6539085,
+				"customFields" : {}
+			}
+		],
+		"Spikefruit": [
+			{
+				"id": "Spikefruit",
+				"iid": "7b879cc0-5e50-11f0-a868-b7d02027321c",
+				"layer": "Entities",
+				"x": 176,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7c467ff0-5e50-11f0-a868-895f5a8a2607",
+				"layer": "Entities",
+				"x": 160,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7c90a850-5e50-11f0-a868-b9c8a28497d5",
+				"layer": "Entities",
+				"x": 144,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7cc8f660-5e50-11f0-a868-89246e177410",
+				"layer": "Entities",
+				"x": 128,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7cfab4c0-5e50-11f0-a868-35a2e8e1610f",
+				"layer": "Entities",
+				"x": 112,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7d6361a0-5e50-11f0-a868-65e1aae30409",
+				"layer": "Entities",
+				"x": 96,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7da74870-5e50-11f0-a868-5181c187a533",
+				"layer": "Entities",
+				"x": 80,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "7ded7930-5e50-11f0-a868-03b5615acc60",
+				"layer": "Entities",
+				"x": 64,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "80f959a0-5e50-11f0-a868-2d3bbb2b550a",
+				"layer": "Entities",
+				"x": 64,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "81449370-5e50-11f0-a868-4b39235c3605",
+				"layer": "Entities",
+				"x": 80,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "817abea0-5e50-11f0-a868-e9481bd426ae",
+				"layer": "Entities",
+				"x": 96,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "81ca6540-5e50-11f0-a868-9dbd87dcb99e",
+				"layer": "Entities",
+				"x": 112,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "82006960-5e50-11f0-a868-b7f99320012f",
+				"layer": "Entities",
+				"x": 128,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "822f1a80-5e50-11f0-a868-6beb9c291982",
+				"layer": "Entities",
+				"x": 144,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "82621160-5e50-11f0-a868-a50810b4bd48",
+				"layer": "Entities",
+				"x": 160,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "82b190f0-5e50-11f0-a868-6d6945ed6908",
+				"layer": "Entities",
+				"x": 176,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "8327ab50-5e50-11f0-a868-1dd2c7e71e8c",
+				"layer": "Entities",
+				"x": 192,
+				"y": 48,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			},
+			{
+				"id": "Spikefruit",
+				"iid": "839c1800-5e50-11f0-a868-47d0b3557151",
+				"layer": "Entities",
+				"x": 192,
+				"y": 80,
+				"width": 8,
+				"height": 8,
+				"color": 2018228,
+				"customFields" : {}
+			}
+		],
+		"WaspberryBush": [
+			{
+				"id": "WaspberryBush",
+				"iid": "87864a80-5e50-11f0-a868-bb8d341fbe0d",
+				"layer": "Entities",
+				"x": 112,
+				"y": 128,
+				"width": 16,
+				"height": 16,
+				"color": 6117174,
+				"customFields" : {}
+			},
+			{
+				"id": "WaspberryBush",
+				"iid": "87f5d530-5e50-11f0-a868-ff78888575e0",
+				"layer": "Entities",
+				"x": 80,
+				"y": 160,
+				"width": 16,
+				"height": 16,
+				"color": 6117174,
+				"customFields" : {}
+			}
+		]
+	}
+}

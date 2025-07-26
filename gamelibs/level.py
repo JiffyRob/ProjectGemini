@@ -155,6 +155,10 @@ class Level(game_state.GameState):
             "DeadPlayer": topdown.mobile.DeadPlayer,
             "Hoverboard": topdown.immobile.Hoverboard,
             "Tumblefish": topdown.mobile.TumbleFish,
+            "Spapple": topdown.immobile.Spapple,
+            "Spikefruit": topdown.immobile.Spikefruit,
+            "WaspberryBush": topdown.immobile.WaspberryBush,
+            "Waspberry": topdown.immobile.Waspberry,
         },
         MAP_HOUSE: {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives

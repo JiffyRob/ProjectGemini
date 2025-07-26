@@ -3,8 +3,8 @@
 	"uniqueIdentifer": "45c1b7c0-73f0-11ef-9c8a-a39cbd9c2249",
 	"x": 2000,
 	"y": -736,
-	"width": 256,
-	"height": 256,
+	"width": 384,
+	"height": 384,
 	"bgColor": "#696A79",
 	"neighbourLevels": [
 		{

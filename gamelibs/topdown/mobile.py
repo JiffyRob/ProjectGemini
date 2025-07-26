@@ -143,6 +143,12 @@ class Player(PhysicsSprite):
     def emeralds(self, value):
         self.level.game.save.emeralds = value
 
+    def get_inventory(self, name):
+        return self.level.game.save.inventory.get(name, 0)
+
+    def acquire(self, thing, count=1):
+        self.level.game.save.inventory[thing] = self.get_inventory(thing) + count
+
     @property
     def interaction_rect(self):
         return self.rect.move(
@@ -202,7 +208,8 @@ class Player(PhysicsSprite):
         for sprite in self.level.groups["interactable"]:
             if sprite.collision_rect.colliderect(self.interaction_rect):
                 print("interact w/", sprite)
-                sprite.interact()
+                if sprite.interact() is not None:
+                    return True
 
     def update(self, dt):
         if "entrance" in self.state:
