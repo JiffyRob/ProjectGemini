@@ -204,13 +204,17 @@ class Level(game_state.GameState):
         self.rects = defaultdict(list)
         self.soundtrack = soundtrack
         rect = pygame.FRect(0, 0, 16, 16)
+        small_rect = pygame.FRect(0, 0, 5, 5)
         rect.center = player_pos
         if map_type == self.MAP_PLATFORMER:
             self.player = platformer.player.Player(self, rect)
+            self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type in {self.MAP_HOUSE, self.MAP_TOPDOWN}:
             self.player = topdown.mobile.Player(self, rect, entrance=entrance)
+            self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type == self.MAP_HOVERBOARD:
             self.player = hoverboarding.Player(self, rect)
+            self.iball = topdown.mobile.Iball(self, small_rect)
         else:
             print("AAAAHAHH")
             raise
@@ -239,6 +243,7 @@ class Level(game_state.GameState):
         self.speed = 0  # used for hoverboard levels
 
         self.add_sprite(self.player)
+        self.add_sprite(self.iball)
         self.update(0)
         self.run_cutscene("level_begin")
 
@@ -387,14 +392,21 @@ class Level(game_state.GameState):
         if group not in self.groups:
             print(self.groups)
             exit()
+        print(self.groups[group])
         group = self.groups[group]
         return next(iter(group)).pos.x
 
     def get_y(self, group="player"):
+        if group not in self.groups:
+            print(self.groups)
+            exit()
         group = self.groups[group]
         return next(iter(group)).pos.y
 
     def get_z(self, group="player"):
+        if group not in self.groups:
+            print(self.groups)
+            exit()
         group = self.groups[group]
         return next(iter(group)).z
 
@@ -517,8 +529,8 @@ class Level(game_state.GameState):
                     if value == cls.TERRAIN_MOUNTAIN:
                         level.rects["mountain"].append(rect)
 
-            level.player.z = entity_layer
-        print("rects", level.rects)
+        level.player.z = entity_layer
+        level.iball.z = entity_layer
         return level
 
     def world_to_screen(self, pos):

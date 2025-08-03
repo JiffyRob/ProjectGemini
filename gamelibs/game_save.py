@@ -2,6 +2,7 @@ class GameSave:
     def __init__(self, game):
         self.game = game
         self.data = {}
+        self.tmp_data = {}
         self.loaded_path = None
 
     def __getattr__(self, attr):
@@ -19,6 +20,12 @@ class GameSave:
 
     def set_state(self, key, value):
         self.data[key] = value
+
+    def get_tmp(self, key):
+        return self.tmp_data[key]
+
+    def set_tmp(self, key, value):
+        self.tmp_data[key] = value
 
     def load(self, path):
         self.data = self.game.loader.get_save(path)

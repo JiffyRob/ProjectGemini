@@ -181,7 +181,7 @@ class Player(sprite.Sprite):
             "entering-right": Animation(frames[4:8], 0.1),
             "empty-right": Animation(frames[:4], 0.1),
             "idle-right": Animation(frames[4:8], 0.1),
-            "lookback-right": Animation(frames[8:12], 0.1),
+            "lookback-left": Animation(frames[8:12], 0.1),
             "exiting-right": Animation(frames[4:8], 0.1),
         }
         self.state = "entering"
@@ -223,6 +223,13 @@ class Player(sprite.Sprite):
     def collision_rect(self):
         return pygame.Rect(self.rect.left + 8, self.rect.top + 14, 12, 11)
 
+    @property
+    def head_rect(self):
+        rect = pygame.Rect(12, 9, 8, 8)
+        rect.x += self.rect.x
+        rect.y += self.rect.y
+        return rect
+
     def hurt(self, amount):
         if self.pain_timer.done():
             self.effects.append(visual_fx.Blink(speed=0.1, count=6))
@@ -232,6 +239,7 @@ class Player(sprite.Sprite):
                 self.level.game.input_queue.rumble(1, 1, 500)
             else:
                 self.level.game.input_queue.rumble(1, 1, 1000)
+                self.level.run_cutscene("death")
 
     def exit(self):
         self.state = "exiting"
@@ -274,6 +282,7 @@ class Player(sprite.Sprite):
                 held_input = self.level.game.input_queue.held
                 just_input = self.level.game.input_queue.just_pressed
                 self.state = "idle"
+                self.facing = "right"
                 if "quit" in just_input:
                     self.level.run_cutscene("quit")
                 if held_input["down"]:
@@ -285,8 +294,11 @@ class Player(sprite.Sprite):
                 if held_input["left"]:
                     self.rect.x = max(self.MIN_Y, self.rect.x - self.ACCEL_SPEED * dt)
                     self.state = "lookback"
+                    self.facing = "left"
                 if self.collision_rect.collidelist(self.level.get_rects("collision")) != -1:
                     self.hurt(3)
+        if self.state == "exiting":
+            self.facing = "right"
         anim = self.anim_dict[f"{self.state}-{self.facing}"]
         anim.update(dt)
         self.image = anim.image
@@ -310,10 +322,11 @@ class DeadPlayer(sprite.Sprite):
 
 
 class Drone(sprite.Sprite):
-    groups = {"drones"}
+    groups = {"drones", "hurtable"}
 
     SPEED = 32
     FALL_SPEED = 48
+    MAX_HEALTH = 2
 
     def __init__(self, level, rect=(0, 0, 10, 10), z=0, **custom_fields):
         frames = level.game.loader.get_spritesheet("drone.png", (10, 10))
@@ -334,8 +347,25 @@ class Drone(sprite.Sprite):
         self.distance = 16
         self.offset = 16
         self.new_pos()
+        self.health = self.MAX_HEALTH
+        self.pain_cooldown = timer.Timer(200)
         super().__init__(level, self.images[self.state], rect, z)
         self.true_pos.x = self.dest.x - self.level.map_rect.width
+
+    def hurt(self, amount):
+        if self.pain_cooldown.done():
+            self.pain_cooldown.reset()
+            self.health -= amount
+            if self.health <= 0:
+                self.health = 0
+                self.dead = True
+            else:
+                self.effects.append(visual_fx.Blink(color=(205, 36, 36), speed=0.1, count=1))
+            print("OW!")
+
+    @property
+    def collision_rect(self):
+        return self.rect.inflate(-2, -2)
 
     def message(self, message):
         if message == "leave":
@@ -380,7 +410,7 @@ class Drone(sprite.Sprite):
                     else:
                         self.state = "idle"
                 elif self.shoot_cooldown.done():
-                    direction = pygame.Vector2(100, 0)
+                    direction = pygame.Vector2(1, 0)
                     if self.facing_left:
                         direction.x *= -1
                     self.level.add_sprite(

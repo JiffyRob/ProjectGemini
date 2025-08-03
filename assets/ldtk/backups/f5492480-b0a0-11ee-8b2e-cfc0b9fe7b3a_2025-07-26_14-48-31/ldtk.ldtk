@@ -3806,7 +3806,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waspberry",
+			"identifier": "WaspberryBush",
 			"uid": 338,
 			"tags": [],
 			"exportToToc": false,
@@ -7323,7 +7323,7 @@
 			"externalRelPath": null,
 			"fieldInstances": [
 				{ "__identifier": "start", "__type": "Array<Int>", "__value": [72,82], "__tile": null, "defUid": 10, "realEditorValues": [ { "id": "V_Int", "params": [72] }, { "id": "V_Int", "params": [82] } ] },
-				{ "__identifier": "entity_layer", "__type": "Int", "__value": 8, "__tile": null, "defUid": 11, "realEditorValues": [{ "id": "V_Int", "params": [8] }] },
+				{ "__identifier": "entity_layer", "__type": "Int", "__value": 9, "__tile": null, "defUid": 11, "realEditorValues": [{ "id": "V_Int", "params": [9] }] },
 				{ "__identifier": "Background", "__type": "String", "__value": null, "__tile": null, "defUid": 26, "realEditorValues": [] },
 				{ "__identifier": "Biome", "__type": "LocalEnum.Biome", "__value": "N_A", "__tile": null, "defUid": 50, "realEditorValues": [{
 					"id": "V_String",
@@ -12172,7 +12172,7 @@
 							"__worldY": -656
 						},
 						{
-							"__identifier": "Waspberry",
+							"__identifier": "WaspberryBush",
 							"__grid": [7,8],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -12188,7 +12188,7 @@
 							"__worldY": -608
 						},
 						{
-							"__identifier": "Waspberry",
+							"__identifier": "WaspberryBush",
 							"__grid": [5,10],
 							"__pivot": [0,0],
 							"__tags": [],

@@ -12,5 +12,6 @@
   "quit": ["JoyButtonDown_8", null],
   "pause": ["JoyButtonDown_9", null],
   "turbo_ship": ["JoyButtonDown_2", null],
-  "enter": ["JoyButtonDown_1", null]
+  "enter": ["JoyButtonDown_1", null],
+  "shoot": [null, null]
 }

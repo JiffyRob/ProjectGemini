@@ -12,5 +12,6 @@
   "quit": ["KeyDown_escape", null],
   "pause": ["KeyDown_p", null],
   "turbo_ship": ["KeyDown_space", null],
-  "enter": ["KeyDown_enter", null]
+  "enter": ["KeyDown_enter", null],
+  "shoot": ["KeyDown_e", null]
 }

@@ -3806,7 +3806,7 @@
 			"fieldDefs": []
 		},
 		{
-			"identifier": "Waspberry",
+			"identifier": "WaspberryBush",
 			"uid": 338,
 			"tags": [],
 			"exportToToc": false,
@@ -12172,7 +12172,7 @@
 							"__worldY": -656
 						},
 						{
-							"__identifier": "Waspberry",
+							"__identifier": "WaspberryBush",
 							"__grid": [7,8],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -12188,7 +12188,7 @@
 							"__worldY": -608
 						},
 						{
-							"__identifier": "Waspberry",
+							"__identifier": "WaspberryBush",
 							"__grid": [5,10],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -12202,38 +12202,6 @@
 							"fieldInstances": [],
 							"__worldX": 1104,
 							"__worldY": -576
-						},
-						{
-							"__identifier": "Spikefruit",
-							"__grid": [3,2],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#1ECBB4",
-							"iid": "cf872f40-5e50-11f0-a868-bfa2c5ea24f5",
-							"width": 8,
-							"height": 8,
-							"defUid": 337,
-							"px": [48,32],
-							"fieldInstances": [],
-							"__worldX": 1072,
-							"__worldY": -704
-						},
-						{
-							"__identifier": "Spikefruit",
-							"__grid": [4,4],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#1ECBB4",
-							"iid": "a7fadde0-5e50-11f0-a868-91ffd1622ef3",
-							"width": 8,
-							"height": 8,
-							"defUid": 337,
-							"px": [66,70],
-							"fieldInstances": [],
-							"__worldX": 1090,
-							"__worldY": -666
 						}
 					]
 				},

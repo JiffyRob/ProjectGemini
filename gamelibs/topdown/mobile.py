@@ -23,6 +23,15 @@ def vector_to_string(vector):
     return "right"
 
 
+def string_to_vector(string):
+    return pygame.Vector2({
+        "up": (0, -1),
+        "down": (0, 1),
+        "left": (-1, 0),
+        "right": (1, 0),
+    }[string])
+
+
 class PhysicsSprite(sprite.Sprite):
     collision_groups = {
         "collision",
@@ -161,6 +170,14 @@ class Player(PhysicsSprite):
         )
 
     @property
+    def head_rect(self):
+        rect = pygame.Rect(8, 1, 8, 8)
+        rect.x += self.rect.x
+        rect.y += self.rect.y
+        return rect
+
+
+    @property
     def collision_rect(self):
         rect = pygame.FRect(0, 0, 14, 8)
         rect.midbottom = self.rect.midbottom
@@ -293,9 +310,73 @@ class Player(PhysicsSprite):
         self.desired_velocity.y += WALK_SPEED
 
 
+class Iball(sprite.Sprite):
+    SPEED = 32
+
+    def __init__(self, level, rect=(0, 0, 5, 5), z=0, **custom_fields):
+        frames = level.game.loader.get_spritesheet("iball.png", (5, 5))
+        self.frames = {
+            "down": frames[0],
+            "right": frames[1],
+            "up": frames[2],
+            "left": frames[3],
+        }
+        self.facing = "right"
+        self.age = 0
+        super().__init__(
+            level,
+            self.frames[self.facing],
+            rect,
+            z + 1,
+        )
+        self.true_pos = pygame.Vector2(self.rect.center)
+        self.shoot_cooldown = timer.Timer(300)
+
+    def nearest_in_rect(self, rect):
+        x, y = self.true_pos
+        return pygame.Vector2(
+            pygame.math.clamp(x, rect.left, rect.right),
+            pygame.math.clamp(y, rect.top, rect.bottom),
+        )
+
+    def update(self, dt):
+        if not self.locked:
+            # motion handling
+            self.age += dt
+            desired_motion = self.nearest_in_rect(self.level.player.head_rect) - self.true_pos
+            self.true_pos = pygame.Vector2(self.true_pos) + desired_motion * 4 * dt
+            self.rect.center = self.true_pos
+            self.rect.y += 3 * sin(self.age * 8)
+            print(self.rect.size)
+
+            # image handling
+            self.facing = self.level.player.facing
+            self.image = self.frames[self.facing]
+
+            # input handling
+            pressed = self.level.game.input_queue.just_pressed
+            if "shoot" in pressed and self.shoot_cooldown.done():
+                self.effects.append(visual_fx.Blink(speed=0.1, count=1))
+                self.level.add_sprite(
+                        projectile.MiniLaser(
+                            self.level,
+                            pygame.Rect(self.rect.center, (2, 1)),
+                            self.z,
+                            string_to_vector(self.facing),
+                        )
+                    )
+                self.shoot_cooldown.reset()
+
+        self.shoot_cooldown.update()
+        super().update(dt)
+        return True
+
+
 class Drone(sprite.Sprite):
+    groups = {"hurtable"}
     SPEED = 32
     FALL_SPEED = 256
+    MAX_HEALTH = 2
 
     def __init__(self, level, rect=(0, 0, 10, 10), z=0, **custom_fields):
         frames = level.game.loader.get_spritesheet("drone.png", (10, 10))
@@ -315,8 +396,14 @@ class Drone(sprite.Sprite):
         self.distance = 16
         self.offset = 16
         self.new_pos()
+        self.health = self.MAX_HEALTH
+        self.pain_cooldown = timer.Timer(200)
         super().__init__(level, self.images[self.state], rect, z)
         self.true_pos.y = self.dest.y - self.level.map_rect.height
+
+    @property
+    def collision_rect(self):
+        return self.rect.inflate(-2, -2)
 
     def new_pos(self):
         self.distance = random.randint(16, 96)
@@ -324,6 +411,17 @@ class Drone(sprite.Sprite):
             self.distance *= -1
         self.offset = random.randint(-16, 16)
         self.pos_cycle = timer.Timer(2500)
+
+    def hurt(self, amount):
+        if self.pain_cooldown.done():
+            self.pain_cooldown.reset()
+            self.health -= amount
+            if self.health <= 0:
+                self.health = 0
+                self.dead = True
+            else:
+                self.effects.append(visual_fx.Blink(color=(205, 36, 36), speed=0.1, count=1))
+            print("OW!")
 
     def update(self, dt):
         if not self.locked:
@@ -349,7 +447,7 @@ class Drone(sprite.Sprite):
                     else:
                         self.state = "idle"
                 elif self.shoot_cooldown.done():
-                    direction = pygame.Vector2(100, 0)
+                    direction = pygame.Vector2(1, 0)
                     if self.facing_left:
                         direction.x *= -1
                     self.level.add_sprite(
