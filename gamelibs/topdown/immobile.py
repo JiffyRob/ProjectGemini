@@ -6,7 +6,7 @@ import pygame
 from gamelibs import sprite
 from gamelibs.animation import Animation
 
-from SNEK2 import AsyncSNEKCallable
+from SNEK2 import AsyncSNEKCallable  # type: ignore
 
 class Interactable(sprite.Sprite):
     groups = {"interactable"}

@@ -550,7 +550,7 @@ class DeadPlayer(sprite.Sprite):
 def search(start: tuple | pygame.Vector2):
     """yields positions in a grid of spacing 'dist', in order of rough proximity to 'start'"""
 
-    def neighbors(position: tuple[int]):
+    def neighbors(position: tuple[int, int, int, int]):
         return (
             (position[0], position[1] - 1),
             (position[0] + 1, position[1]),

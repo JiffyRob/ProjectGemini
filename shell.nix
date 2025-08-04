@@ -22,5 +22,5 @@
     udev
     alsa-lib
   ]);
-  runScript = ./wrapped_run.sh;
+  # runScript = ./wrapped_run.sh;
 }).env

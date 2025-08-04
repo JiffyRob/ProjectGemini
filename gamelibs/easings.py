@@ -1,32 +1,34 @@
 import math
+from typing import Callable
 
+type Easing = Callable[[float], float]
 
-def create_exp_easings(exp):
-    def ease_in(time):
-        return time**exp
+def create_exp_easings(exp: float) -> tuple[Easing, Easing, Easing]:
+    def ease_in(time: float) -> float:
+        return time**exp  #type: ignore
 
-    def ease_out(time):
-        return 1 - (1 - time) ** exp
+    def ease_out(time: float) -> float:
+        return 1 - (1 - time) ** exp  #type: ignore
 
-    def ease_in_out(time):
-        return (
+    def ease_in_out(time: float) -> float:
+        return (  #type: ignore
             2 ** (exp - 1) * time**exp if time < 0.5 else 1 - (-2 * time + 2) ** exp / 2
         )
 
     return ease_in, ease_out, ease_in_out
 
 
-def reverse(easer):
-    def reverser(time):
+def reverse(easer: Easing) -> Easing:
+    def reverser(time: float) -> float:
         return 1 - easer(time)
 
     return reverser
 
 
-def combo(*easers):
+def combo(*easers: Easing) -> Easing:
     count = len(easers)
 
-    def callback(time):
+    def callback(time: float) -> float:
         index, time = divmod(time * count, 1)
         if index == count:
             index -= 1
@@ -36,84 +38,84 @@ def combo(*easers):
     return callback
 
 
-# implemnentations translated from easings.net
-def scale(start, end, time):
+# implementations translated from easings.net
+def scale(start: float, end: float, time: float) -> float:
     return start + (end - start) * time
 
 
-def linear(time):
+def linear(time: float) -> float:
     return time
 
 
-def in_sine(time):
+def in_sine(time: float) -> float:
     return 1 - math.cos((time * math.pi) / 2)
 
 
-def out_sine(time):
+def out_sine(time: float) -> float:
     return math.sin(time * math.pi / 2)
 
 
-def in_out_sine(time):
+def in_out_sine(time: float) -> float:
     return -(math.cos(math.pi * time) - 1) / 2
 
 
-def in_quad(time):
+def in_quad(time: float) -> float:
     return time**2
 
 
-def out_quad(time):
+def out_quad(time: float) -> float:
     return 1 - (1 - time) ** 2
 
 
-def in_out_quad(time):
+def in_out_quad(time: float) -> float:
     return 2 * time * time if time < 0.5 else 1 - (-2 * time + 2) ** 2 / 2
 
 
-def in_cubic(time):
+def in_cubic(time: float) -> float:
     return time**3
 
 
-def out_cubic(time):
+def out_cubic(time: float) -> float:
     return 1 - ((1 - time) ** 3)
 
 
-def in_out_cubic(time):
+def in_out_cubic(time: float) -> float:
     return 4 * (time**3) if time < 0.5 else 1 - ((-2 * time + 2) ** 3) / 2
 
 
-def in_quart(time):
+def in_quart(time: float) -> float:
     return time**4
 
 
-def out_quart(time):
+def out_quart(time: float) -> float:
     return 1 - (1 - time) ** 4
 
 
-def in_out_quart(time):
+def in_out_quart(time: float) -> float:
     return 8 * time**4 if time < 0.5 else 1 - (-2 * time + 2) ** 4 / 2
 
 
-def in_quint(time):
+def in_quint(time: float) -> float:
     return time**5
 
 
-def out_quint(time):
+def out_quint(time: float) -> float:
     return 1 - (1 - time) ** 5
 
 
-def in_out_quint(time):
+def in_out_quint(time: float) -> float:
     return 16 * time**5 if time < 0.5 else 1 - (-2 * time + 2) ** 5 / 2
 
 
-def in_expo(time):
+def in_expo(time: float) -> float:
     return 0 if time == 0 else 2 ** (10 * time - 10)
 
 
-def out_expo(time):
+def out_expo(time: float) -> float:
     return 1 if time == 1 else 1 - 2 ** (-10 * time)
 
 
-def in_out_expo(time):
+def in_out_expo(time: float) -> float:
     if time not in {0, 1}:
         if time < 0.5:
             return 2 ** (20 * time - 10) / 2
@@ -122,15 +124,15 @@ def in_out_expo(time):
     return time
 
 
-def in_circ(time):
+def in_circ(time: float) -> float:
     return 1 - math.sqrt(1 - time**2)
 
 
-def out_circ(time):
+def out_circ(time: float) -> float:
     return math.sqrt(1 - (time - 1) ** 2)
 
 
-def in_out_circ(time):
+def in_out_circ(time: float) -> float:
     return (
         (1 - math.sqrt(1 - (2 * time) ** 2)) / 2
         if time < 0.5
@@ -138,15 +140,15 @@ def in_out_circ(time):
     )
 
 
-def in_back(time):
+def in_back(time: float) -> float:
     return 2.70158 * time**3 - 1.70158 * time**2
 
 
-def out_back(time):
+def out_back(time: float) -> float:
     return 1 + 2.70158 * (time - 1) ** 3 + 1.70158 * (time - 1) ** 2
 
 
-def in_out_back(time):
+def in_out_back(time: float) -> float:
     c1 = 1.70158
     c2 = c1 * 1.525
     return (
@@ -156,7 +158,7 @@ def in_out_back(time):
     )
 
 
-def in_elastic(time):
+def in_elastic(time: float) -> float:
     if time not in {0, 1}:
         return -(2 ** (10 * time - 10)) * math.sin(
             (time * 10 - 10.75) * (2 * math.pi / 3)
@@ -164,13 +166,13 @@ def in_elastic(time):
     return time
 
 
-def out_elastic(time):
+def out_elastic(time: float) -> float:
     if time not in {0, 1}:
         return -(2 ** (-10 * time)) * math.sin(time * 10 - 0.75) * (math.pi * 2 / 3) + 1
     return time
 
 
-def in_out_elastic(time):
+def in_out_elastic(time: float) -> float:
     c3 = 2 * math.pi / 4.5
     if time not in {0, 1}:
         if time < 0.5:
@@ -182,7 +184,7 @@ def in_out_elastic(time):
     return time
 
 
-def out_bounce(time):
+def out_bounce(time: float) -> float:
     n1 = 7.5625
     d1 = 2.75
 
@@ -199,11 +201,11 @@ def out_bounce(time):
         return n1 * time**2 + 0.984375
 
 
-def in_bounce(time):
+def in_bounce(time: float) -> float:
     return 1 - out_bounce(1 - time)
 
 
-def in_out_bounce(time):
+def in_out_bounce(time: float) -> float:
     return (
         (1 - out_bounce(1 - 2 * time)) / 2
         if time < 0.5

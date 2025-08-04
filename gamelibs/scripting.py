@@ -1,3 +1,6 @@
+# mypy: ignore-errors
+# TODO: Stub files for SNEK2
+
 import pygame
 
 from SNEK2 import SNEKCallable, AsyncSNEKCallable, SNEKProgram, Arity

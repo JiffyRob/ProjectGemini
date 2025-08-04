@@ -1,6 +1,8 @@
 import sys
 import platform
 import json
+from typing import Any
+from gamelibs import interfaces
 
 PYGBAG = sys.platform == "emscripten"
 HTML_WINDOW = None
@@ -9,16 +11,16 @@ settings = {}
 saves = {}
 
 if PYGBAG:
-    HTML_WINDOW = platform.window
+    HTML_WINDOW = platform.window  #type: ignore
     settings = json.loads(HTML_WINDOW.localStorage.getItem("settings") or "{}")
     saves = json.loads(HTML_WINDOW.localStorage.getItem("saves") or "{}")
 
 
-def get_settings():
+def get_settings() -> dict[str, Any]:
     return settings
 
 
-def update_save(path, data):
+def update_save(path: interfaces.FileID, data: dict[str, Any]):
     global saves
 
     print("SAVING")

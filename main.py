@@ -4,7 +4,7 @@ from collections import deque
 import pygame
 import zengl
 import numpy
-import SNEK2
+import SNEK2  #type: ignore
 
 from gamelibs import (
     game_save,
@@ -18,13 +18,14 @@ from gamelibs import (
     env,
     window,
     scripting,
+    interfaces,
 )
 
 pygame.init()
 pygame.joystick.init()
 
 
-class Game:
+class Game(interfaces.Game):
     def __init__(self, title="Project Gemini", fps=60):
         self.title = title
         self.window = None

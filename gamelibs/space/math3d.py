@@ -1,47 +1,50 @@
+from __future__ import annotations
+
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from copy import copy
 
 import numpy
 import pygame
+from pygame.typing import SequenceLike
 
 
 class Quaternion:
-    def __init__(self, theta=0.0, axis=(0, 0, 1)):
+    def __init__(self, theta: float=0.0, axis: SequenceLike[float]=(0, 0, 1)):
         self.real = math.cos(theta / 2)
         self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
 
-    def magnitude(self):
+    def magnitude(self) -> float:
         return math.sqrt(
             self.real**2 + self.vector.x**2 + self.vector.y**2 + self.vector.z**2
         )
 
     @classmethod
-    def from_standard(cls, r, i, j, k):
+    def from_standard(cls, r: float, i: float, j: float, k: float) -> Quaternion:
         result = cls()
         result.real = r
-        result.vector.xyz = i, j, k
+        result.vector.xyz = i, j, k  #type: ignore
         return result
 
     @classmethod
-    def from_degrees(cls, real=0.0, axis=(0, 0, 1)):
+    def from_degrees(cls, real: float=0.0, axis: SequenceLike[float]=(0, 0, 1)) -> Quaternion:
         return cls(real * math.pi / 180, axis)
 
-    def __neg__(self):
+    def __neg__(self) -> Quaternion:
         return self.invert()
 
-    def copy(self):
+    def copy(self) -> Quaternion:
         return Quaternion.from_standard(self.real, *self.vector)
 
-    def invert(self):
+    def invert(self) -> Quaternion:
         return Quaternion.from_standard(self.real, *-self.vector)
 
-    def dot(self, other):
+    def dot(self, other: Quaternion) -> float:
         return self.real * other.real + sum(
             self.vector.elementwise() * other.vector.elementwise()
         )
 
-    def nlerp(self, other, t):
+    def nlerp(self, other: Quaternion, t: float) -> Quaternion:
         a = self
         if self.dot(other) < 0:
             a = self.invert()
@@ -51,17 +54,17 @@ class Quaternion:
             *a.vector + t * (b.vector - a.vector),
         ).normalize()
 
-    def normalize(self):
+    def normalize(self) -> Quaternion:
         length = math.sqrt(self.real**2 + sum(self.vector.elementwise() ** 2))
         return Quaternion.from_standard(
             self.real / length,
             *self.vector / length,
         )
 
-    def __bool__(self):
+    def __bool__(self) -> bool:
         return bool(self.vector)
 
-    def __mul__(self, other):
+    def __mul__(self, other: Quaternion | pygame.Vector3 | float) -> Quaternion | pygame.Vector3 | float:
         if isinstance(other, Quaternion):
             r1, i1, j1, k1 = self.real, *self.vector
             r2, i2, j2, k2 = other.real, *other.vector
@@ -84,7 +87,7 @@ class Quaternion:
             f"No multiplication between Quaternions and '{type(other)}' allowed"
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}>"
 
 
@@ -97,70 +100,15 @@ class Camera:
     near_z: int
     far_z: int
 
-    def copy(self):
+    def copy(self) -> Camera:
         return copy(self)
 
 
 @dataclass
 class Material:
     # TODO: Use these for lighting?
-    ambient_color: pygame.Color = None
-    diffuse_color: pygame.Color = None
-    specular_color: pygame.Color = None
+    ambient_color: pygame.Color = field(default_factory=lambda: pygame.Color("white"))
+    diffuse_color: pygame.Color = field(default_factory=lambda: pygame.Color("white"))
+    specular_color: pygame.Color = field(default_factory=lambda: pygame.Color("white"))
     # TODO: Use this for transparency?
-    transparency: float = None
-
-
-def translate_points(points, offset):
-    numpy.add(points, offset, points)
-
-
-def rotate_points(points, quaternion):
-    # Equation:
-    # sprite_pos + 2 * rot_real * (rot_vec X sprite_pos) + 2 * (rot_vec X (rot_vec X sprite_pos))
-    # rot_vec X sprite_pos is used twice, so let's grab that and call it "cross"
-    crosses = numpy.cross(quaternion.vector, points)
-
-    # add 2 * rot_real * cross
-    term = numpy.multiply(crosses, 2)
-    numpy.multiply(term, quaternion.real, term)
-    numpy.add(points, term, points)
-
-    # add 2 * (camera_vector x (camera_vector x position))
-    term = numpy.cross(quaternion.vector, crosses)  # dirty double crosser ;)
-    term = numpy.multiply(term, 2, term)
-    numpy.add(points, term, points)
-
-
-def project_points_sizes(points, sizes, near_z):
-    # Note that this is a linear projection using integer multiplication
-    # NOT the curved shape you get with homogenous coordinates and a matmul
-    scale_factors = numpy.divide(near_z, points[:, 2]).reshape(len(points), 1)
-    numpy.multiply(sizes, scale_factors, sizes)
-    numpy.multiply(points[:, :2], scale_factors, points[:, :2])
-
-
-def inverse_camera_transform_points_sizes(points, sizes, camera):
-    # translate
-    numpy.add(points, -camera.pos, points)
-    # rotate
-    quaternion = camera.rotation.invert()
-    crosses = numpy.cross(quaternion.vector, points)
-    term = numpy.multiply(crosses, 2)
-    numpy.multiply(term, quaternion.real, term)
-    numpy.add(points, term, points)
-    term = numpy.cross(quaternion.vector, crosses)  # dirty double crosser ;)
-    term = numpy.multiply(term, 2, term)
-    numpy.add(points, term, points)
-    # scale
-    scale_factors = numpy.divide(camera.near_z, points[:, 2]).reshape(len(points), 1)
-    numpy.multiply(sizes, scale_factors, sizes)
-    numpy.multiply(points[:, :2], scale_factors, points[:, :2])
-    # project
-    scale_factors = numpy.divide(camera.near_z, points[:, 2]).reshape(len(points), 1)
-    numpy.multiply(sizes, scale_factors, sizes)
-    numpy.multiply(points[:, :2], scale_factors, points[:, :2])
-
-
-def denormalize_color(r, g, b):
-    return pygame.Color(r * 255, g * 255, b * 255)
+    transparency: float = 0

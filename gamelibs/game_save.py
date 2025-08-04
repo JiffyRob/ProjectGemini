@@ -1,16 +1,20 @@
+from typing import Any
+
+from gamelibs import interfaces
+
 class GameSave:
-    def __init__(self, game):
+    def __init__(self, game: interfaces.Game):
         self.game = game
         self.data = {}
         self.tmp_data = {}
         self.loaded_path = None
 
-    def __getattr__(self, attr):
+    def __getattr__(self, attr: str):
         if attr in {"data", "game"} or attr[:2] == attr[-2:] == "__":
             return super().__getattribute__(attr)
         return self.data[attr]
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any):
         if name in {"data", "game"}:
             return super().__setattr__(name, value)
         self.data[name] = value

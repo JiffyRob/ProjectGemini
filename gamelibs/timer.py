@@ -1,7 +1,8 @@
 import pygame
 
+from gamelibs import interfaces
 
-class Timer:
+class Timer(interfaces.Timer):
     def __init__(self, amount=1000, on_finish=lambda: None, repeat=False):
         self.wait = amount
         self.start = pygame.time.get_ticks()

@@ -1,10 +1,12 @@
 import functools
+from typing import Sequence
 
 import pygame
 
+from gamelibs import interfaces
 
 @functools.cache
-def flip_surface(surface, flip_x, flip_y):
+def flip_surface(surface: pygame.Surface, flip_x: bool, flip_y: bool):
     if flip_x:
         surface = pygame.transform.flip(surface, True, False)
     if flip_y:
@@ -12,8 +14,8 @@ def flip_surface(surface, flip_x, flip_y):
     return surface
 
 
-class Animation:
-    def __init__(self, frames, speed=0.2, flip_x=False, flip_y=False):
+class Animation(interfaces.Animation):
+    def __init__(self, frames: Sequence[pygame.Surface], speed=0.2, flip_x=False, flip_y=False) -> None:
         self.frames = list(frames)
         self.time = 0
         self.speed = speed
@@ -32,7 +34,7 @@ class Animation:
         return flip_surface(image, self.flip_x, self.flip_y)
 
 
-class NoLoopAnimation:
+class NoLoopAnimation(interfaces.Animation):
     def __init__(self, frames, speed=0.2, flip_x=False, flip_y=False):
         self.frames = list(frames)
         self.time = 0
@@ -58,7 +60,7 @@ class NoLoopAnimation:
         return flip_surface(self.frames[frame_index], self.flip_x, self.flip_y)
 
 
-class SingleAnimation:
+class SingleAnimation(interfaces.Animation):
     def __init__(self, surface, flip_x=False, flip_y=False):
         self.surface = surface
         self.flip_x = flip_x

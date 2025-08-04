@@ -1,0 +1,3 @@
+gamelibs/game_save.py:8: error: Need type annotation for "data" (hint: "data: dict[<type>, <type>] = ...")  [var-annotated]
+gamelibs/game_save.py:9: error: Need type annotation for "tmp_data" (hint: "tmp_data: dict[<type>, <type>] = ...")  [var-annotated]
+Found 2 errors in 1 file (checked 1 source file)

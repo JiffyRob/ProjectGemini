@@ -1,6 +1,7 @@
 from collections import namedtuple
 from functools import cache
-
+from typing import Sequence, Iterator
+from pygame.typing import Point, RectLike
 import pygame
 
 WORD = 0
@@ -11,12 +12,12 @@ Chunk = namedtuple("Chunk", ("type", "data", "size"))
 
 
 class PixelFont:
-    def __init__(self, char_surfs, encoding="ascii"):
-        self.chars = char_surfs
+    def __init__(self, char_surfs: Sequence[pygame.Surface], encoding: str="ascii"):
+        self.chars = list(char_surfs)
         self.encoding = encoding
 
     @cache
-    def get_word_size(self, word):
+    def get_word_size(self, word: str) -> Point:
         width = 0
         height = 0
         for char in word.encode(self.encoding):
@@ -25,10 +26,10 @@ class PixelFont:
         return width, height
 
     @cache
-    def get_surface(self, char):
+    def get_surface(self, char: str) -> pygame.Surface:
         return self.chars[char.encode(self.encoding)[0]]
 
-    def chunkify(self, text):
+    def chunkify(self, text: str) -> Iterator[Chunk]:
         current = ""
         for char in text:
             whitespace_type = {" ": SPACE, "\n": NEWLINE, "\r": NEWLINE}.get(char)
@@ -43,7 +44,7 @@ class PixelFont:
             yield Chunk(WORD, current, self.get_word_size(current))
 
     @cache
-    def positions(self, chunks, width=0):
+    def positions(self, chunks: tuple[Chunk], width: int=0) -> Iterator[tuple[tuple[int, int], Chunk]]:
         row_width = 0
         row_height = 0
         height = 0
@@ -56,17 +57,18 @@ class PixelFont:
             yield (max(row_width - chunk.size[0], 0), height), chunk
 
     @cache
-    def size(self, text, width=0):
+    def size(self, text: str, width: int=0) -> Point:
         (last_x, last_y), last_chunk = tuple(
-            self.positions(self.chunkify(text), width)
+            self.positions(tuple(self.chunkify(text)), width)
         )[-1]
         width = width or (last_x + last_chunk.size[0])
         height = last_y + last_chunk.size[1]
         return width, height
 
-    def render_to(self, surface, rect, text):
-        position = pygame.Vector2(rect.topleft)
-        for offset, chunk in self.positions(self.chunkify(text), rect.width):
+    def render_to(self, surface: pygame.Surface, rect: RectLike, text: str) -> None:
+        position = pygame.Vector2(pygame.Rect(rect)[:2])
+        rect = pygame.Rect(rect)
+        for offset, chunk in self.positions(tuple(self.chunkify(text)), rect.width):
             if chunk.type == WORD:
                 letter_position = position + offset
                 for char in chunk.data:
@@ -75,7 +77,7 @@ class PixelFont:
                     letter_position.x += char_surface.get_width()
 
     @cache
-    def render(self, text, width=0):
+    def render(self, text: str, width: int=0) -> pygame.Surface:
         # TODO: Optimize?
         surface = pygame.Surface(self.size(text, width)).convert_alpha()
         surface.fill((0, 0, 0, 0))

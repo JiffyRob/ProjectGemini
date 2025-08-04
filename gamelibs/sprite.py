@@ -4,7 +4,7 @@ from gamelibs import visual_fx
 
 
 class Sprite:
-    groups = set()
+    groups: set[str] = set()
 
     def __init__(self, level, image=None, rect=(0, 0, 16, 16), z=0):
         self.level = level

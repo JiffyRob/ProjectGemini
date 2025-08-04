@@ -2,48 +2,17 @@ import functools
 
 import pygame
 import pygame._sdl2 as sdl2
-import pygame._sdl2.video as sdl2  # needed for WASM compat
+# needed for WASM
+import pygame._sdl2.video as sdl2  #type:ignore
+from pygame.typing import Point
 
 RESOLUTION = (256, 224)
 ASPECT_RATIO = RESOLUTION[0] / RESOLUTION[1]
 
 COLORKEY = (255, 0, 255)
 
-SCALEMODE_INTEGER = "integer"
-SCALEMODE_STRETCH = "stretch"
-SCALEMODE_ASPECT = "aspect"
 
-SCALEMODES = [SCALEMODE_INTEGER, SCALEMODE_STRETCH, SCALEMODE_ASPECT]
-
-PRESET_LOWEST = "budget potato"
-PRESET_LOW = "average potato"
-PRESET_MEDIUM = "snazzy potato"
-PRESET_HIGH = "expensive potato"
-PRESET_ULTRA = "ludicrous potato"
-
-QUALITY_PRESETS = [
-    PRESET_LOWEST,
-    PRESET_LOW,
-    PRESET_MEDIUM,
-    PRESET_HIGH,
-    PRESET_ULTRA,
-]
-
-FRAMECAP_LOW = 15
-FRAMECAP_MED = 30
-FRAMECAP_HIGH = 60
-FRAMECAP_NONE = None
-
-# physics are not deterministic enough for high FPS gaming RN
-FRAMECAPS = [
-    FRAMECAP_LOW,
-    FRAMECAP_MED,
-    FRAMECAP_HIGH,
-    # FRAMECAP_NONE,
-]
-
-
-def debug_show(surface):
+def debug_show(surface: pygame.Surface) -> None:
     window = sdl2.Window("debug", pygame.Vector2(surface.get_size()) * 4)
     window.get_surface().fill("black")
     window.get_surface().blit(pygame.transform.scale_by(surface, (4, 4)), (0, 0))
@@ -52,7 +21,7 @@ def debug_show(surface):
     window.hide()
 
 
-def surface_with_same_transparency_format(surface, size):
+def surface_with_same_transparency_format(surface: pygame.Surface, size: Point):
     new_surface = pygame.Surface(size, pygame.SRCALPHA).convert(surface)
     if colorkey := surface.get_colorkey():
         new_surface.set_colorkey(colorkey)
