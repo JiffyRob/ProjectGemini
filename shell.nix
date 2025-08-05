@@ -12,6 +12,7 @@
     python312Packages.virtualenv
     libglvnd
     glib
+    vscode
 
   ]) ++ (with pkgs.xorg; [
     libX11

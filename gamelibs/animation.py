@@ -28,6 +28,9 @@ class Animation(interfaces.Animation):
     def restart(self) -> None:
         self.time = 0
 
+    def done(self) -> bool:
+        return False
+
     @property
     def image(self) -> pygame.Surface:
         image = self.frames[round(self.time / self.speed) % len(self.frames)]

@@ -1,35 +1,37 @@
 import random
 from math import sin
 from collections import deque
+from typing import cast
 
 import pygame
+from pygame.typing import RectLike, Point
 
-from gamelibs import sprite, util_draw, timer, projectile, visual_fx, easings
+from gamelibs import sprite, util_draw, timer, projectile, visual_fx, easings, interfaces
 from gamelibs.animation import Animation, SingleAnimation, NoLoopAnimation
 
 
-class ScrollingBackground(sprite.Sprite):
+class ScrollingBackground(sprite.Sprite, interfaces.Player):
     STATE_GROUND = 0
     STATE_WATER = 1
     STATE_SLOWDOWN = 2
 
     def __init__(
         self,
-        level,
-        rect=(
+        level: interfaces.HoverboardLevel,
+        rect: RectLike=(
             (
                 0,
                 0,
             ),
             util_draw.RESOLUTION,
         ),
-        z=0,
-    ):
-        tileset = level.game.loader.get_surface("tileset.png")
+        z: int=0,
+    ) -> None:
+        tileset = level.get_loader().get_surface("tileset.png")
         self.land_tile = tileset.subsurface((112, 176, 16, 16))
         self.land_sea_transition = tileset.subsurface((128, 176, 16, 16))
         self.sea_land_transition = tileset.subsurface((96, 176, 16, 16))
-        self.sea_tile = level.game.loader.get_spritesheet("liquid.png")[4]
+        self.sea_tile = level.get_loader().get_spritesheet("liquid.png")[4]
         self.state = self.STATE_WATER
         self.swap_cooldown = timer.Timer(10000)
         self.spawn_cooldown = timer.Timer(100)
@@ -37,8 +39,8 @@ class ScrollingBackground(sprite.Sprite):
         self.speedup_timer = timer.Timer(5000)
         self.slowdown_timer = timer.Timer(70000)
         self.stop_timer = timer.Timer(75000)
-        self.x_offset = 0
-        self.images = deque()
+        self.x_offset: float = 0
+        self.images: deque[pygame.Surface] = deque()
         self.rect = pygame.FRect(rect)
         self.land_rock_chance = 150 // 6
         self.sea_rock_chance = 100 // 6
@@ -46,15 +48,22 @@ class ScrollingBackground(sprite.Sprite):
         self.locked = False
         self.finished = False
         self.age = 0
+
         super().__init__(level, self.get_next_image(), rect, z)
 
-    def lock(self):
+    def get_level(self) -> interfaces.HoverboardLevel:
+        return cast(interfaces.HoverboardLevel, self.level)
+    
+    def get_player(self) -> interfaces.HoverboardPlayer:
+        return cast(interfaces.HoverboardPlayer, self.level.get_player())
+
+    def lock(self) -> None:
         self.locked = True
 
-    def unlock(self):
+    def unlock(self) -> None:
         self.locked = False
 
-    def get_next_image(self):
+    def get_next_image(self) -> pygame.Surface:
         if self.state == self.STATE_SLOWDOWN:
             return util_draw.repeat_surface(self.sea_tile, (16, self.rect.height))
         if self.swap_cooldown.done():
@@ -74,10 +83,10 @@ class ScrollingBackground(sprite.Sprite):
         else:
             return util_draw.repeat_surface(self.sea_tile, (16, self.rect.height))
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         if not self.locked:
             self.age += dt
-            self.x_offset -= self.level.speed * dt
+            self.x_offset -= self.get_level().speed * dt
             self.swap_cooldown.update()
             self.spawn_cooldown.update()
             self.slowdown_timer.update()
@@ -128,11 +137,11 @@ class ScrollingBackground(sprite.Sprite):
                     )
                 self.spawn_cooldown.reset()
             if not self.speedup_timer.done():
-                self.level.speed = 200 * easings.in_out_quad(
+                self.get_level().speed = 200 * easings.in_out_quad(
                     self.age / self.speedup_time * 1000
                 )
             if self.slowdown_timer.done():
-                self.level.speed = 200 * (
+                self.get_level().speed = 200 * (
                     1
                     - easings.in_out_quad(
                         (self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time
@@ -141,12 +150,13 @@ class ScrollingBackground(sprite.Sprite):
                 self.state = self.STATE_SLOWDOWN
                 self.level.message("drones", "leave")
             if self.stop_timer.done():
-                self.level.speed = 0
+                self.get_level().speed = 0
                 if not self.finished:
-                    self.level.player.exit()
+                    self.get_player().exit()
                     self.finished = True
+        return True
 
-    def draw(self, surface, offset):
+    def draw(self, surface: pygame.Surface, offset: Point) -> None:
         if self.x_offset < 0:
             for _ in range(int(self.x_offset / 16)):
                 self.images.popleft()
@@ -164,7 +174,7 @@ class ScrollingBackground(sprite.Sprite):
             x += image.get_width()
 
 
-class Player(sprite.Sprite):
+class Player(sprite.Sprite, interfaces.HoverboardPlayer):
     groups = {"interactable", "player"}
 
     BANK_SPEED = 82
@@ -175,8 +185,8 @@ class Player(sprite.Sprite):
     MIN_X = 32
     MAX_X = util_draw.RESOLUTION[0] - 32
 
-    def __init__(self, level, rect=(0, 0, 32, 32), z=0):
-        frames = level.game.loader.get_spritesheet("hoverboard.png", (32, 32))
+    def __init__(self, level: interfaces.HoverboardLevel, rect: RectLike=(0, 0, 32, 32), z: int=0) -> None:
+        frames = level.get_loader().get_spritesheet("hoverboard.png", (32, 32))
         self.anim_dict = {
             "entering-right": Animation(frames[4:8], 0.1),
             "empty-right": Animation(frames[:4], 0.1),
@@ -185,19 +195,19 @@ class Player(sprite.Sprite):
             "exiting-right": Animation(frames[4:8], 0.1),
         }
         self.state = "entering"
-        self.facing = "right"
+        self._facing = interfaces.Direction.RIGHT
         self.pain_timer = timer.Timer(1000)
         super().__init__(
             level, self.anim_dict[f"{self.state}-{self.facing}"].image, rect, z
         )
         self.rect.right = 0
 
-    def interact(self):
-        pass
+    def interact(self) -> bool:
+        return False
 
     @property
-    def health(self):
-        return self.level.game.save.health
+    def health(self) -> int:
+        return self.get_level().get_game().get_save().health  # type: ignore
 
     @health.setter
     def health(self, value):

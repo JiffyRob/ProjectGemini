@@ -1,1 +1,1 @@
-from . import immobile, mobile, player, puzzle
+from . import immobile, mobile, player, puzzle  # type: ignore

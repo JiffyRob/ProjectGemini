@@ -1,5 +1,5 @@
 from enum import Enum, IntFlag, StrEnum, IntEnum, auto
-from typing import Callable, Any, override, Protocol
+from typing import Callable, Any, Protocol
 from pygame.typing import RectLike, Point
 from pygame.math import Vector2
 from deprecated import deprecated
@@ -10,6 +10,7 @@ import pygame
 
 type SnekAPI = dict[str, Callable[..., Any]]  # TODO: this could be more specific
 type FileID = str  # TODO: could this be more specific?
+type MiscRect = pygame.Rect | pygame.FRect
 
 class Axis(IntFlag):
     X = auto()
@@ -84,11 +85,101 @@ class GameSettings:
     graphics: GraphicsSetting = GraphicsSetting.MEDIUM
 
 
-class Sprite(Protocol):
+class GameSave(Protocol):
     ...
+
+
+class Sprite(Protocol):
+    groups: set[str]
+
+    def message(self, message: str) -> None: ...
+
+    def hide(self) -> None: ...
+
+    def show(self) -> None: ...
+
+    def lock(self) -> None: ...
+
+    def unlock(self) -> None: ...
+
+    @property
+    def pos(self) -> pygame.Vector2: ...
+
+    def update(self, dt: float) -> bool: ...
+
+    def add_effect(self, effect: "SpriteEffect") -> None: ...
+
+    def get_player(self) -> "Player": ...
+
+    def get_level(self) -> "Level": ...
+
+
+class Healthy(Protocol):
+    @property
+    def health(self) -> int: ...
+
+    @health.setter
+    def health(self, value: int) -> None: ...
+
+    @property
+    def max_health(self) -> int: ...
+
+    @max_health.setter
+    def max_health(self, value: int) -> None: ...
+
+    def hurt(self, amount: int) -> None: ...
+
+    def heal(self, amount: int) -> None: ...
+
+
+class Interactor(Protocol):
+    @property
+    def interaction_rect(self) -> MiscRect: ...
+
+    def interact(self) -> bool: ...
+
+
+class Collider(Protocol):
+    @property
+    def collision_rect(self) -> MiscRect: ...
+
+
+class Turner(Protocol):
+    @property
+    def facing(self) -> Direction: ...
+
+
+class Player(Sprite, Healthy, Interactor, Collider, Turner, Protocol):
+    @property
+    def emeralds(self) -> int: ...
+
+    @emeralds.setter
+    def emeralds(self, value: int) -> None: ...
+
+    def pay(self, emeralds: int) -> None: ...
+
+    def charge(self, emeralds: int) -> None: ...
+
+    @property
+    def head_rect(self) -> MiscRect: ...
+
+    def get_inventory(self, name: str) -> int: ...
+
+    def acquire(self, thing: str, count: int) -> bool: ...
+
+
+class HoverboardPlayer(Player, Protocol):
+    def exit(self) -> None: ...
+
 
 class GlobalEffect(Protocol):
     ...
+
+
+class SpriteEffect(Protocol):
+    def update(self, dt: float) -> bool: ...
+
+    def draw(self, surface: pygame.Surface) -> None: ...
 
 
 class Animation(Protocol):
@@ -187,6 +278,8 @@ class Game(Protocol):
     def get_level(self) -> "Level": ...
 
     def get_loader(self) -> "Loader": ...
+
+    def get_save(self) -> GameSave: ...
 
     def run_cutscene(self, name: FileID, api: SnekAPI | None = None) -> None: ...
 
@@ -304,3 +397,16 @@ class Level(GameState, Protocol):
     def get_game(self) -> Game: ...
 
     def get_loader(self) -> Loader: ...
+
+    def get_player(self) -> Player: ...
+
+    def get_pressed(self) -> set[str]: ...
+
+    def get_just_pressed(self) -> set[str]: ...
+
+class HoverboardLevel(Level, Protocol):
+    @property
+    def speed(self) -> float: ...
+
+    @speed.setter
+    def speed(self, value: float) -> None: ...

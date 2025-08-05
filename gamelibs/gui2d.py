@@ -1,26 +1,24 @@
 import math
+from typing import Callable, Any
 
 import pygame
+from pygame.typing import RectLike
 
-from gamelibs import pixelfont, sprite, timer, util_draw
+from gamelibs import pixelfont, sprite, timer, util_draw, interfaces
 
 
 class HeartMeter(sprite.GUISprite):
-    def __init__(self, level, rect=(0, 0, 16, 16)):
+    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16)):
         super().__init__(level, None, rect)
-        self.heart_frames = self.level.game.loader.get_spritesheet("heart.png", (8, 8))
+        self.heart_frames = self.level.get_loader().get_spritesheet("heart.png", (8, 8))
 
-    def update(self, dt):
-        # TODO: Animations and effects?
-        pass
-
-    def draw(self, surface):
-        heart_count = math.ceil(
-            self.level.player.health_capacity / (len(self.heart_frames) - 1)
-        )
+    def draw(self, surface: pygame.Surface) -> None:
+        heart_count: int = math.ceil(
+            self.level.get_player().max_health / (len(self.heart_frames) - 1)
+        )  # type: ignore
         columns = self.rect.width // 9
         position = pygame.Vector2()
-        health_left = self.level.player.health
+        health_left = self.level.get_player().health
         for i in range(heart_count):
             if health_left > len(self.heart_frames) - 1:
                 index = len(self.heart_frames) - 1
@@ -38,18 +36,18 @@ class EmeraldMeter(sprite.GUISprite):
     X = 10
     EMERALD = 11
 
-    def __init__(self, level, rect=(0, 0, 16, 16)):
+    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16)) -> None:
         rect = pygame.Rect(rect)
         rect.size = (22, 7)
         super().__init__(level, None, rect)
         self.surface = pygame.Surface(rect.size).convert()
-        self.font_frames = self.level.game.loader.get_spritesheet(
+        self.font_frames = self.level.get_loader().get_spritesheet(
             "digifont.png", (3, 5)
         )
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         numbers = [self.EMERALD, self.X] + [
-            int(i) for i in str(self.level.player.emeralds).zfill(3)
+            int(i) for i in str(self.get_player().emeralds).zfill(3)
         ]
         position = pygame.Vector2(1, 1)
         self.surface.fill("black")
@@ -64,8 +62,9 @@ class Dialog(sprite.GUISprite):
     STATE_GETTING_ANSWER = 2
     STATE_COMPLETE = 3
 
-    def __init__(self, level, rect, text, answers, on_kill):
-        super().__init__(level, level.game.loader.create_surface(rect.size), rect)
+    def __init__(self, level: interfaces.Level, rect: RectLike, text: str, answers: list[str], on_kill: Callable[[str | None], Any]) -> None:
+        rect = pygame.FRect(rect)
+        super().__init__(level, level.get_loader().create_surface(rect.size), rect)
         self.live = True
         self.text = text
         self.displayed_text = ""
@@ -78,7 +77,7 @@ class Dialog(sprite.GUISprite):
         self.state = self.STATE_WRITING_PROMPT
         self.pad = 3
         self.font = pixelfont.PixelFont(
-            self.level.game.loader.get_spritesheet("font.png", (7, 8))
+            self.level.get_loader().get_spritesheet("font.png", (7, 8))
         )
         self.motion_cooldown = timer.Timer(100)
         self.rebuild()
@@ -122,22 +121,22 @@ class Dialog(sprite.GUISprite):
         )
         pygame.draw.rect(self.image, "black", ((0, 0), self.rect.size), 1)
 
-    def choose(self):
+    def choose(self) -> None:
         self.chosen_index = self.answer_index
         self.state = self.STATE_COMPLETE
         self.on_kill(self.get_answer())
         self.live = False
 
-    def get_answer(self):
+    def get_answer(self) -> None | str:
         if not self.answers or self.chosen_index is None:
             return None
         return self.answers[self.chosen_index]
 
-    def update(self, time_delta: float):
-        super().update(time_delta)
+    def update(self, dt: float) -> bool:
+        super().update(dt)
         self.motion_cooldown.update()
-        self.add_letter_timer.update(time_delta)
-        pressed = self.level.game.input_queue.just_pressed
+        self.add_letter_timer.update(dt)
+        pressed = self.level.get_just_pressed()
         if self.state == self.STATE_GETTING_ANSWER:
             if "up" in pressed and self.motion_cooldown.done():
                 self.answer_index = max(self.answer_index - 1, 0)
@@ -158,7 +157,7 @@ class Dialog(sprite.GUISprite):
         return self.live
 
 
-def dialog_rect(with_face=False):
+def dialog_rect(with_face: bool=False) -> pygame.Rect:
     rect = pygame.Rect(8, 0, util_draw.RESOLUTION[0] - 16, 100)
     rect.bottom = util_draw.RESOLUTION[1] - 8
     if with_face:

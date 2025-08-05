@@ -1,17 +1,19 @@
 import random
 from math import sin
+from typing import Any
 
 import pygame
+from pygame.typing import RectLike
 
-from gamelibs import sprite
+from gamelibs import sprite, interfaces
 from gamelibs.animation import Animation
 
 
 class Emerald(sprite.Sprite):
-    def __init__(self, level, rect=(0, 0, 16, 16), z=0, **custom_fields):
+    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16), z: int=0, **_: dict[str, Any]) -> None:
         super().__init__(level, image=None, rect=rect, z=z)
         self.anim = Animation(
-            self.level.game.loader.get_spritesheet("platformer-sprites.png")[0:5], 0.08
+            self.level.get_loader().get_spritesheet("platformer-sprites.png")[0:5], 0.08
         )
         self.age = random.randint(0, 10)
         self.y = self.rect.top

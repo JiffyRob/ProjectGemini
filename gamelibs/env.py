@@ -7,13 +7,13 @@ from gamelibs import interfaces
 PYGBAG = sys.platform == "emscripten"
 HTML_WINDOW = None
 
-settings = {}
+settings: dict[str, Any] = {}
 saves = {}
 
 if PYGBAG:
     HTML_WINDOW = platform.window  #type: ignore
-    settings = json.loads(HTML_WINDOW.localStorage.getItem("settings") or "{}")
-    saves = json.loads(HTML_WINDOW.localStorage.getItem("saves") or "{}")
+    settings = json.loads(HTML_WINDOW.localStorage.getItem("settings") or "{}")  # type: ignore
+    saves = json.loads(HTML_WINDOW.localStorage.getItem("saves") or "{}")  # type: ignore
 
 
 def get_settings() -> dict[str, Any]:
@@ -31,7 +31,7 @@ def update_save(path: interfaces.FileID, data: dict[str, Any]) -> None:
 def delete_save(path: interfaces.FileID) -> None:
     global saves
 
-    saves.pop(str(path))
+    saves.pop(str(path))  # type: ignore
 
 
 def get_save(path: interfaces.FileID) -> dict[str, Any]:
