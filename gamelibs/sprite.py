@@ -7,13 +7,19 @@ from gamelibs import interfaces
 class Sprite(interfaces.Sprite):
     groups: set[str] = set()
 
-    def __init__(self, level: interfaces.Level, image: pygame.Surface | None=None, rect:RectLike=(0, 0, 16, 16), z: int=0) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        image: pygame.Surface | None = None,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+    ) -> None:
         if image is None:
             image = pygame.Surface((0, 0))
-        self.level: interfaces.Level = level
+        self._level: interfaces.Level = level
         self.image: pygame.Surface = image
         self.to_draw: pygame.Surface = image
-        self.rect = pygame.FRect(rect)
+        self._rect: interfaces.MiscRect = pygame.FRect(rect)
         self.z = z
         self.velocity = pygame.Vector2()
         self.dead = False
@@ -39,9 +45,29 @@ class Sprite(interfaces.Sprite):
     def unlock(self) -> None:
         self.locked = False
 
+    def add_effect(self, effect: interfaces.SpriteEffect) -> None:
+        self.effects.append(effect)
+
+    def get_level(self) -> interfaces.Level:
+        return self._level
+
+    def get_player(self) -> interfaces.Player:
+        return self.get_level().get_player()
+
+    def get_game(self) -> interfaces.Game:
+        return self.get_level().get_game()
+
     @property
     def pos(self) -> pygame.Vector2:
         return pygame.Vector2(self.rect.center)
+
+    @property
+    def rect(self) -> interfaces.MiscRect:
+        return self._rect
+
+    @rect.setter
+    def rect(self, value: RectLike) -> None:
+        self.rect = pygame.FRect(value)
 
     def update(self, dt: float) -> bool:
         if self.hidden:

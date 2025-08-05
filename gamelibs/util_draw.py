@@ -2,11 +2,13 @@ import functools
 
 import pygame
 import pygame._sdl2 as sdl2
+
 # needed for WASM
-import pygame._sdl2.video as sdl2  #type:ignore
+import pygame._sdl2.video as sdl2  # type:ignore
 from pygame.typing import Point
 
 RESOLUTION = (256, 224)
+SCREEN_RECT = pygame.Rect((0, 0), RESOLUTION)
 ASPECT_RATIO = RESOLUTION[0] / RESOLUTION[1]
 
 COLORKEY = (255, 0, 255)
@@ -21,7 +23,9 @@ def debug_show(surface: pygame.Surface) -> None:
     window.hide()
 
 
-def surface_with_same_transparency_format(surface: pygame.Surface, size: Point) -> pygame.Surface:
+def surface_with_same_transparency_format(
+    surface: pygame.Surface, size: Point
+) -> pygame.Surface:
     new_surface = pygame.Surface(size, pygame.SRCALPHA).convert(surface)
     if colorkey := surface.get_colorkey():
         new_surface.set_colorkey(colorkey)
@@ -30,9 +34,13 @@ def surface_with_same_transparency_format(surface: pygame.Surface, size: Point) 
     return new_surface
 
 
-def repeat_surface(surface: pygame.Surface, size: Point, offset: Point=(0, 0)) -> pygame.Surface:
+def repeat_surface(
+    surface: pygame.Surface, size: Point, offset: Point = (0, 0)
+) -> pygame.Surface:
     @functools.cache
-    def cached_repeat(surface: pygame.Surface, size: tuple[int, int], offset: tuple[int, int]) -> pygame.Surface:
+    def cached_repeat(
+        surface: pygame.Surface, size: tuple[int, int], offset: tuple[int, int]
+    ) -> pygame.Surface:
         size = round(size[0]), round(size[1])
         new_surface = surface_with_same_transparency_format(surface, size)
         surface_size = surface.get_size()

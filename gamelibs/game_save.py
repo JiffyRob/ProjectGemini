@@ -1,13 +1,14 @@
 from typing import Any
 
-from gamelibs import interfaces
+from gamelibs import interfaces, hardware
+
 
 class GameSave:
     def __init__(self, game: interfaces.Game) -> None:
         self.game = game
         self.data: dict[str, Any] = {}
         self.tmp_data: dict[str, Any] = {}
-        self.loaded_path: str | None = None
+        self.loaded_path: str
 
     def __getattr__(self, attr: str) -> Any:
         if attr in {"data", "game"} or attr[:2] == attr[-2:] == "__":
@@ -32,22 +33,18 @@ class GameSave:
         self.tmp_data[key] = value
 
     def load(self, path: interfaces.FileID) -> None:
-        self.data = self.game.get_loader().get_save(path)
+        self.data = hardware.loader.get_save(path)
         self.loaded_path = path
 
-    def save(self, path: interfaces.FileID | None=None) -> None:
+    def save(self, path: interfaces.FileID | None = None) -> None:
         if path is None:
             path = self.loaded_path
-        if path is None:
-            raise ValueError("Cannot use loaded path if there is not one loaded")
         old_health: int = self.health
         self.health: int = self.health_capacity
-        self.game.get_loader().save_data(path, self.data)
+        hardware.loader.save_data(path, self.data)
         self.health = old_health
 
-    def delete(self, path: interfaces.FileID | None=None) -> None:
+    def delete(self, path: interfaces.FileID | None = None) -> None:
         if path is None:
             path = self.loaded_path
-        if path is None:
-            raise ValueError("Cannot use loaded path if there is not one loaded")
-        self.game.get_loader().delete_save(path)
+        hardware.loader.delete_save(path)

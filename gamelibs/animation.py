@@ -5,6 +5,7 @@ import pygame
 
 from gamelibs import interfaces
 
+
 @functools.cache
 def flip_surface(surface: pygame.Surface, flip_x: bool, flip_y: bool) -> pygame.Surface:
     if flip_x:
@@ -15,7 +16,13 @@ def flip_surface(surface: pygame.Surface, flip_x: bool, flip_y: bool) -> pygame.
 
 
 class Animation(interfaces.Animation):
-    def __init__(self, frames: Sequence[pygame.Surface], speed: float=0.2, flip_x: bool=False, flip_y: bool=False) -> None:
+    def __init__(
+        self,
+        frames: Sequence[pygame.Surface],
+        speed: float = 0.2,
+        flip_x: bool = False,
+        flip_y: bool = False,
+    ) -> None:
         self.frames = list(frames)
         self.time = 0.0
         self.speed = speed
@@ -38,7 +45,13 @@ class Animation(interfaces.Animation):
 
 
 class NoLoopAnimation(interfaces.Animation):
-    def __init__(self, frames: list[pygame.Surface], speed: float=0.2, flip_x: bool=False, flip_y: bool=False):
+    def __init__(
+        self,
+        frames: list[pygame.Surface],
+        speed: float = 0.2,
+        flip_x: bool = False,
+        flip_y: bool = False,
+    ):
         self.frames = list(frames)
         self.time = 0.0
         self.speed = speed
@@ -64,7 +77,9 @@ class NoLoopAnimation(interfaces.Animation):
 
 
 class SingleAnimation(interfaces.Animation):
-    def __init__(self, surface: pygame.Surface, flip_x: bool=False, flip_y: bool=False):
+    def __init__(
+        self, surface: pygame.Surface, flip_x: bool = False, flip_y: bool = False
+    ) -> None:
         self.surface = surface
         self.flip_x = flip_x
         self.flip_y = flip_y
@@ -75,13 +90,22 @@ class SingleAnimation(interfaces.Animation):
     def restart(self) -> None:
         pass
 
+    def done(self) -> bool:
+        return True
+
     @property
     def image(self) -> pygame.Surface:
         return flip_surface(self.surface, self.flip_x, self.flip_y)
 
 
 class AnimatedSurface(pygame.Surface):
-    def __init__(self, frames: list[pygame.Surface], speed: float=0.2, flip_x: bool=False, flip_y: bool=False):
+    def __init__(
+        self,
+        frames: list[pygame.Surface],
+        speed: float = 0.2,
+        flip_x: bool = False,
+        flip_y: bool = False,
+    ):
         self.frames = list(frames)
         self.time = 0.0
         self.speed = speed

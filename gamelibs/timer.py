@@ -4,8 +4,14 @@ import pygame
 
 from gamelibs import interfaces
 
+
 class Timer(interfaces.Timer):
-    def __init__(self, amount: int=1000, on_finish: Callable[[], Any]=lambda: None, repeat: bool=False) -> None:
+    def __init__(
+        self,
+        amount: int = 1000,
+        on_finish: Callable[[], Any] = lambda: None,
+        repeat: bool = False,
+    ) -> None:
         self.wait = amount
         self.start = pygame.time.get_ticks()
         self.on_finish = on_finish
@@ -42,7 +48,12 @@ class Timer(interfaces.Timer):
 
 
 class DTimer(interfaces.DTimer):
-    def __init__(self, amount: float=1000, on_finish: Callable[[], Any]=lambda: None, repeat: bool=False):
+    def __init__(
+        self,
+        amount: float = 1000,
+        on_finish: Callable[[], Any] = lambda: None,
+        repeat: bool = False,
+    ):
         self.wait = amount
         self.remaining = self.wait
         self.on_finish = on_finish

@@ -1,11 +1,15 @@
+# type: ignore
+# Too much bother to typecheck this file what with all the numpy and zengl craziness
+
 from typing import no_type_check
 
 import pygame
 import numpy
 import zengl
 
-from gamelibs import util_draw, interfaces
+from gamelibs import util_draw, interfaces, hardware
 from gamelibs.space import math3d
+
 
 class SpaceRendererHW:
     STAR_COUNT = 200_000
@@ -17,25 +21,16 @@ class SpaceRendererHW:
         self.radius = radius
         self.age = 0
 
-        self.planet_pipeline = None
-        self.star_pipeline = None
-        self.uniform_buffer = None
-        self.depth_buffer = None
-        self.planet_names = None
-        self.planet_radii = None
-        self.planet_ids = None
-        self.planet_locations = None
-        self.star_radii = None
-        self.star_ids = None
-        self.star_locations = None
+        self.id_to_name: dict[int, str]
+        self.name_to_id: dict[str, int]
 
-        self.compile_shaders()  # type: ignore
+        self.compile_shaders()
 
-    def _load_planet_data(self):  # type: ignore
-        planets = self.level.get_loader().get_json("planets").copy()
+    def _load_planet_data(self):
+        planets = hardware.loader.get_json("planets").copy()
         default_values = planets.pop("Default")
         defines = "#line 0 1\n"
-        defines += self.level.get_loader().get_shader_library("planet_struct") + "\n"
+        defines += hardware.loader.get_shader_library("planet_struct") + "\n"
         defines += "#line 0 1000\n"
         locations = {}
         self.id_to_name = {}
@@ -53,7 +48,7 @@ class SpaceRendererHW:
                 defines += f"#define P_{param_name}_{planet_name} {param_value}\n"
             next_id += 1
 
-        defines += self.level.get_loader().get_shader_library("planets") + "\n"
+        defines += hardware.loader.get_shader_library("planets") + "\n"
 
         return defines, locations
 
@@ -133,7 +128,9 @@ class SpaceRendererHW:
             includes={
                 "cnoise": self.level.game.loader.get_shader_library("cnoise"),
                 "planets": planet_lib,
-                "planet_struct": self.level.game.loader.get_shader_library("planet_struct"),
+                "planet_struct": self.level.game.loader.get_shader_library(
+                    "planet_struct"
+                ),
             },
             vertex_shader=self.level.game.loader.get_vertex_shader("space"),
             fragment_shader=self.level.game.loader.get_fragment_shader("planet"),
@@ -168,7 +165,7 @@ class SpaceRendererHW:
             instance_count=planet_count,
         )
 
-    def update(self, dt: float, camera: math3d.Camera):
+    def update(self, dt: float, camera: interfaces.Camera3d):
         self.age += dt
         uniforms = numpy.array(
             [

@@ -3,15 +3,16 @@ from typing import Callable
 
 type Easing = Callable[[float], float]
 
+
 def create_exp_easings(exp: float) -> tuple[Easing, Easing, Easing]:
     def ease_in(time: float) -> float:
-        return time**exp  #type: ignore
+        return time**exp  # type: ignore
 
     def ease_out(time: float) -> float:
-        return 1 - (1 - time) ** exp  #type: ignore
+        return 1 - (1 - time) ** exp  # type: ignore
 
     def ease_in_out(time: float) -> float:
-        return (  #type: ignore
+        return (  # type: ignore
             2 ** (exp - 1) * time**exp if time < 0.5 else 1 - (-2 * time + 2) ** exp / 2
         )
 

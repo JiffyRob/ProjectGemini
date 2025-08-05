@@ -3,8 +3,11 @@ from pygame.typing import ColorLike
 
 from gamelibs import util_draw, interfaces
 
+
 class GameState(interfaces.GameState):
-    def __init__(self, game: interfaces.Game, color: ColorLike="gray", opengl: bool=False) -> None:
+    def __init__(
+        self, game: interfaces.Game, color: ColorLike = "gray", opengl: bool = False
+    ) -> None:
         self.game = game
         self.bgcolor = color
         self.screen_rect = pygame.Rect((0, 0), util_draw.RESOLUTION)

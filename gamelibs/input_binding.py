@@ -1,3 +1,4 @@
+from typing import Generator, Iterable, Literal
 import pygame
 import pygame._sdl2.controller as controller
 
@@ -9,24 +10,29 @@ HAT_AXIS_MOTION = pygame.event.custom_type()
 CONTROLLER_AXIS_SIZE = 32768
 
 
-def axis_direction(num, deadzone):
+def axis_direction(
+    num: float, deadzone: float
+) -> Literal["center"] | Literal["back"] | Literal["forward"]:
     if abs(num) < deadzone:
         return "center"
-    if num < 0:
+    elif num < 0:
         return "back"
-    if num > 0:
+    else:
         return "forward"
 
 
-def event_magnitude(event):
+def event_magnitude(event: pygame.Event) -> int:
     if event.type == pygame.JOYAXISMOTION:
-        return abs(event.value)
+        return abs(event.value)  # type: ignore
     return 1
 
 
 def event_to_strings(
-    event, joystick_deadzone=0.3, controller_unique=False, split_hats=False
-):
+    event: pygame.Event,
+    joystick_deadzone: float = 0.3,
+    controller_unique: bool = False,
+    split_hats: bool = False,
+) -> Generator[str]:
     event = pygame.Event(event.type, event.dict)
     if event.type == HAT_AXIS_MOTION:
         identifiers = ["HatAxisMotion"]
@@ -90,7 +96,7 @@ def event_to_strings(
     yield "_".join([str(i) for i in identifiers])
 
 
-def releaser_string(event_string):
+def releaser_string(event_string: str) -> str:
     event_string = event_string.replace("KeyDown", "KeyUp")
     event_string = event_string.replace("MouseButtonDown", "MouseButtonUp")
     event_string = event_string.replace("JoyButtonDown", "JoyButtonUp")
@@ -106,15 +112,14 @@ def releaser_string(event_string):
     return event_string
 
 
-def init_joysticks():
+def init_joysticks() -> Generator[tuple[int, pygame.joystick.JoystickType]]:
     pygame.joystick.init()
     for i in range(pygame.joystick.get_count()):
         joy = pygame.joystick.Joystick(i)
-        joy.init()
         yield i, joy
 
 
-def init_controllers():
+def init_controllers() -> Generator[tuple[int, controller.Controller]]:
     controller.init()
     for i in range(controller.get_count()):
         if controller.is_controller(i):
@@ -123,7 +128,7 @@ def init_controllers():
             yield i, gamepad
 
 
-def interactive_id_printer():
+def interactive_id_printer() -> None:
     pygame.init()
     controller.init()
     pygame.font.init()
@@ -144,7 +149,6 @@ def interactive_id_printer():
                 print(string)
             if event.type == pygame.JOYDEVICEADDED:
                 joy = pygame.joystick.Joystick(event.device_index)
-                joy.init()
                 joys[event.device_index] = joy
             if event.type == pygame.JOYDEVICEREMOVED:
                 joys[event.instance_id].quit()
@@ -169,28 +173,28 @@ class InputQueue:
     CONTROLLER_UNIQUE = False
     SPLIT_HATS = True
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.joysticks = dict(init_joysticks())
         self.controllers = dict(init_controllers())
-        self.press_bindings = {}
-        self.release_bindings = {}
-        self.held = {}
+        self.press_bindings: dict[str, set[str]] = {}
+        self.release_bindings: dict[str, set[str]] = {}
         self.magnitudes = {}
-        self.just_pressed = set()
-        self.no_hold = set()
+        self.held: set[str] = set()
+        self.just_pressed: set[str] = set()
+        self.no_hold: set[str] = set()
         self.rumble_timer = timer.Timer()
 
-    def rumble(self, left=1, right=1, time=500):
+    def rumble(self, left: float = 1, right: float = 1, time: int = 500) -> None:
         for gamepad in self.controllers.values():
             gamepad.rumble(left, right, 0)
         self.rumble_timer = timer.Timer(time, self.stop_rumble)
 
-    def stop_rumble(self):
+    def stop_rumble(self) -> None:
         for gamepad in self.controllers.values():
             gamepad.stop_rumble()
         self.rumble_timer = timer.Timer()
 
-    def update(self, events=None):
+    def update(self, events: Iterable[pygame.Event] | None = None) -> None:
         self.just_pressed.clear()
         self.rumble_timer.update()
         if events is None:
@@ -218,13 +222,15 @@ class InputQueue:
                 if action_id in self.press_bindings:
                     for bound_identifier in self.press_bindings[action_id]:
                         if action_id not in self.no_hold:
-                            self.held[bound_identifier] = True
+                            self.held.add(bound_identifier)
                         self.just_pressed.add(bound_identifier)
                 if action_id in self.release_bindings:
                     for bound_identifier in self.release_bindings[action_id]:
-                        self.held[bound_identifier] = False
+                        self.held.discard(bound_identifier)
 
-    def load_bindings(self, bindings, delete_old=True):
+    def load_bindings(
+        self, bindings: dict[str, set[str | None]], delete_old: bool = True
+    ) -> None:
         if delete_old:
             self.press_bindings = {
                 # These input bindings are non-configurable
@@ -244,7 +250,7 @@ class InputQueue:
                     self.release_bindings.setdefault(release_action, set()).add(
                         identifier
                     )
-                    self.held[identifier] = False
+                    self.held.discard(identifier)
                 else:
                     print(user_action, "Not releasable")
                     self.no_hold.add(user_action)

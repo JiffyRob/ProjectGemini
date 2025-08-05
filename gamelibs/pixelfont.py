@@ -12,7 +12,7 @@ Chunk = namedtuple("Chunk", ("type", "data", "size"))
 
 
 class PixelFont:
-    def __init__(self, char_surfs: Sequence[pygame.Surface], encoding: str="ascii"):
+    def __init__(self, char_surfs: Sequence[pygame.Surface], encoding: str = "ascii"):
         self.chars = list(char_surfs)
         self.encoding = encoding
 
@@ -44,7 +44,9 @@ class PixelFont:
             yield Chunk(WORD, current, self.get_word_size(current))
 
     @cache
-    def positions(self, chunks: tuple[Chunk], width: int=0) -> Iterator[tuple[tuple[int, int], Chunk]]:
+    def positions(
+        self, chunks: tuple[Chunk], width: int = 0
+    ) -> Iterator[tuple[tuple[int, int], Chunk]]:
         row_width = 0
         row_height = 0
         height = 0
@@ -57,7 +59,7 @@ class PixelFont:
             yield (max(row_width - chunk.size[0], 0), height), chunk
 
     @cache
-    def size(self, text: str, width: int=0) -> Point:
+    def size(self, text: str, width: int = 0) -> Point:
         (last_x, last_y), last_chunk = tuple(
             self.positions(tuple(self.chunkify(text)), width)
         )[-1]
@@ -77,7 +79,7 @@ class PixelFont:
                     letter_position.x += char_surface.get_width()
 
     @cache
-    def render(self, text: str, width: int=0) -> pygame.Surface:
+    def render(self, text: str, width: int = 0) -> pygame.Surface:
         # TODO: Optimize?
         surface = pygame.Surface(self.size(text, width)).convert_alpha()
         surface.fill((0, 0, 0, 0))

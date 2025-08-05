@@ -1,16 +1,13 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass, field
-from copy import copy
 
-import numpy
 import pygame
 from pygame.typing import SequenceLike
 
 
 class Quaternion:
-    def __init__(self, theta: float=0.0, axis: SequenceLike[float]=(0, 0, 1)):
+    def __init__(self, theta: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)):
         self.real = math.cos(theta / 2)
         self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
 
@@ -23,11 +20,13 @@ class Quaternion:
     def from_standard(cls, r: float, i: float, j: float, k: float) -> Quaternion:
         result = cls()
         result.real = r
-        result.vector.xyz = i, j, k  #type: ignore
+        result.vector.xyz = i, j, k  # type: ignore
         return result
 
     @classmethod
-    def from_degrees(cls, real: float=0.0, axis: SequenceLike[float]=(0, 0, 1)) -> Quaternion:
+    def from_degrees(
+        cls, real: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)
+    ) -> Quaternion:
         return cls(real * math.pi / 180, axis)
 
     def __neg__(self) -> Quaternion:
@@ -64,7 +63,9 @@ class Quaternion:
     def __bool__(self) -> bool:
         return bool(self.vector)
 
-    def __mul__(self, other: Quaternion | pygame.Vector3 | float) -> Quaternion | pygame.Vector3 | float:
+    def __mul__(
+        self, other: Quaternion | pygame.Vector3 | float
+    ) -> Quaternion | pygame.Vector3 | float:
         if isinstance(other, Quaternion):
             r1, i1, j1, k1 = self.real, *self.vector
             r2, i2, j2, k2 = other.real, *other.vector
@@ -89,26 +90,3 @@ class Quaternion:
 
     def __repr__(self) -> str:
         return f"<{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}>"
-
-
-@dataclass
-class Camera:
-    pos: pygame.Vector3
-    rotation: Quaternion
-    center: pygame.Vector2
-    fov: pygame.Vector2
-    near_z: int
-    far_z: int
-
-    def copy(self) -> Camera:
-        return copy(self)
-
-
-@dataclass
-class Material:
-    # TODO: Use these for lighting?
-    ambient_color: pygame.Color = field(default_factory=lambda: pygame.Color("white"))
-    diffuse_color: pygame.Color = field(default_factory=lambda: pygame.Color("white"))
-    specular_color: pygame.Color = field(default_factory=lambda: pygame.Color("white"))
-    # TODO: Use this for transparency?
-    transparency: float = 0

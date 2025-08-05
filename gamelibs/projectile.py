@@ -12,7 +12,7 @@ class Laser(sprite.Sprite):
         super().__init__(level, surface, rect, z + 1)
         self.velocity = direction
 
-    def update(self, dt):
+    def update(self, dt) -> bool:
         if not self.locked:
             self.rect.center += self.velocity * dt * self.SPEED
             if self.rect.colliderect(self.level.player.collision_rect):

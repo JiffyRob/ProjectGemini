@@ -6,7 +6,7 @@ from gamelibs import loader
 
 
 class VisualEffect:
-    def __init__(self, on_done = lambda: None):
+    def __init__(self, on_done=lambda: None):
         self.done = False
         self.on_done = on_done
         self.called_done = False

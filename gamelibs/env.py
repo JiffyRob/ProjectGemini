@@ -11,7 +11,7 @@ settings: dict[str, Any] = {}
 saves = {}
 
 if PYGBAG:
-    HTML_WINDOW = platform.window  #type: ignore
+    HTML_WINDOW = platform.window  # type: ignore
     settings = json.loads(HTML_WINDOW.localStorage.getItem("settings") or "{}")  # type: ignore
     saves = json.loads(HTML_WINDOW.localStorage.getItem("saves") or "{}")  # type: ignore
 

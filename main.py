@@ -4,7 +4,7 @@ from collections import deque
 import pygame
 import zengl
 import numpy
-import SNEK2  #type: ignore
+import SNEK2  # type: ignore
 
 from gamelibs import (
     game_save,
@@ -30,9 +30,8 @@ class Game(interfaces.Game):
         self.title = title
         self.window = None
         self.clock = pygame.time.Clock()
-        self.screen_rect = pygame.Rect((0, 0), util_draw.RESOLUTION)
         self.fps = fps
-        self.stack = deque()
+        self.stack: deque[interfaces.GameState] = deque()
         self.dt_mult = 1
         self.running = False
         self.loader = None
@@ -51,13 +50,21 @@ class Game(interfaces.Game):
         return self.stack[0]
 
     def run_cutscene(self, name, api=None):
-        if name not in self.running_cutscenes:  #  can't run multiple instances of the same cutscene
+        if (
+            name not in self.running_cutscenes
+        ):  #  can't run multiple instances of the same cutscene
             self.just_ran_cutscene = True
-            task = asyncio.create_task(scripting.Script(self, self.loader.get_cutscene(name), api=api).run_async())
+            task = asyncio.create_task(
+                scripting.Script(
+                    self, self.loader.get_cutscene(name), api=api
+                ).run_async()
+            )
             self.running_cutscenes[name] = task
 
     async def run_sub_cutscene(self, name, api=None):
-        return await scripting.Script(self, self.loader.get_cutscene(name), api=api).run_async()
+        return await scripting.Script(
+            self, self.loader.get_cutscene(name), api=api
+        ).run_async()
 
     def get_current_planet_name(self):
         return self.get_level().name.split("_")[0]
@@ -75,7 +82,7 @@ class Game(interfaces.Game):
         return self.window.get_gl_surface()
 
     def set_graphics(self, value):
-        print('setting graphics to', value)
+        print("setting graphics to", value)
 
     def switch_setting(self, name, value):
         if name == "vsync":
@@ -122,9 +129,6 @@ class Game(interfaces.Game):
             self.loader.get_json(f"keybindings/{name}"), delete_old=False
         )
 
-    def time_phase(self, mult):
-        self.dt_mult = mult
-
     def play_soundtrack(self, track_name=None):
         if track_name is None:
             track_name = self.get_level().soundtrack
@@ -132,6 +136,17 @@ class Game(interfaces.Game):
             self.sound_manager.stop_track()
         else:
             self.sound_manager.switch_track(f"music/{track_name}.ogg")
+
+    def switch_level(self, dest, direction=None, position=None, entrance="normal"):
+        self.run_cutscene(
+            "level_switch",
+            api={
+                "NEXT_LEVEL": dest,
+                "DIRECTION": direction,
+                "POSITION": position,
+                "ENTRANCE": entrance,
+            },
+        )
 
     def update(self, dt):
         kill_state = False
@@ -198,7 +213,11 @@ class Game(interfaces.Game):
                 await asyncio.sleep(0)
                 self.just_ran_cutscene = False
             # keep the list of running cutscenes up to date
-            self.running_cutscenes = {key: value for key, value in self.running_cutscenes.items() if not value.done()}
+            self.running_cutscenes = {
+                key: value
+                for key, value in self.running_cutscenes.items()
+                if not value.done()
+            }
             events = tuple(pygame.event.get())
             self.input_queue.update(events)
             for event in events:

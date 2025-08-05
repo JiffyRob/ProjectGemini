@@ -14,8 +14,8 @@ class WindowNew:
         title: str,
         resolution: Point,
         scalemode: interfaces.ScaleMode = interfaces.ScaleMode.ASPECT,
-        vsync: bool=True,
-        fullscreen: bool=False,
+        vsync: bool = True,
+        fullscreen: bool = False,
     ) -> None:
         self.game: interfaces.Game = game
         self.title: str = title
@@ -174,9 +174,9 @@ class WindowOld:
         game: interfaces.Game,
         title: str,
         resolution: Point,
-        scalemode: interfaces.ScaleMode=interfaces.ScaleMode.ASPECT,
-        vsync: bool=True,
-        fullscreen: bool=False,
+        scalemode: interfaces.ScaleMode = interfaces.ScaleMode.ASPECT,
+        vsync: bool = True,
+        fullscreen: bool = False,
     ) -> None:
         self.game: interfaces.Game = game
         self.title: str = title
@@ -244,7 +244,7 @@ class WindowOld:
         window_size = pygame.display.get_window_size()
         if self.scalemode == interfaces.ScaleMode.STRETCH:
             self.pipeline.viewport = (0, 0, *window_size)
-        
+
         if self.scalemode == interfaces.ScaleMode.ASPECT:
             width_scale = window_size[0] / util_draw.RESOLUTION[0]
             height_scale = window_size[1] / util_draw.RESOLUTION[1]
@@ -257,7 +257,7 @@ class WindowOld:
             )
             rect.center = window_size[0] // 2, window_size[1] // 2
             self.pipeline.viewport = tuple(rect)  # type: ignore
-        
+
         if self.scalemode == interfaces.ScaleMode.INTEGER:
             factor = min(
                 window_size[0] // util_draw.RESOLUTION[0],
@@ -320,7 +320,7 @@ class WindowOld:
                 util_draw.RESOLUTION[0] / pygame.display.get_size()[0],  # type: ignore
                 util_draw.RESOLUTION[1] / pygame.display.get_size()[1],  # type: ignore
             )  # type: ignore
-        else: # self.scalemode == interfaces.ScaleMode.ASPECT:
+        else:  # self.scalemode == interfaces.ScaleMode.ASPECT:
             width_scale = self.window.size[0] / util_draw.RESOLUTION[0]
             height_scale = self.window.size[1] / util_draw.RESOLUTION[1]
             scale = min(width_scale, height_scale)
@@ -333,7 +333,7 @@ class WindowOld:
             rect.center = self.window.size[0] // 2, self.window.size[1] // 2
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / scale
 
-    def render(self, software: bool=True) -> None:
+    def render(self, software: bool = True) -> None:
         if software:
             self.gl_surface.write(
                 pygame.image.tobytes(self.software_surface, "RGBA", flipped=False)
