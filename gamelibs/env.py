@@ -20,7 +20,7 @@ def get_settings() -> dict[str, Any]:
     return settings
 
 
-def update_save(path: interfaces.FileID, data: dict[str, Any]):
+def update_save(path: interfaces.FileID, data: dict[str, Any]) -> None:
     global saves
 
     print("SAVING")
@@ -28,29 +28,29 @@ def update_save(path: interfaces.FileID, data: dict[str, Any]):
     saves[str(path)] = json.dumps(data)
 
 
-def delete_save(path):
+def delete_save(path: interfaces.FileID) -> None:
     global saves
 
     saves.pop(str(path))
 
 
-def get_save(path):
-    return json.loads(saves[str(path)])
+def get_save(path: interfaces.FileID) -> dict[str, Any]:
+    return json.loads(saves[str(path)])  # type: ignore
 
 
-def update_settings(updated_settings):
+def update_settings(updated_settings: dict[str, Any]) -> None:
     global settings
 
     settings = {**settings, **updated_settings}
 
 
-def write_settings():
+def write_settings() -> None:
     if not PYGBAG:
         return
-    HTML_WINDOW.localStorage.setItem("settings", json.dumps(settings))
+    HTML_WINDOW.localStorage.setItem("settings", json.dumps(settings))  # type: ignore
 
 
-def write_saves():
+def write_saves() -> None:
     if not PYGBAG:
         return
-    HTML_WINDOW.localStorage.setItem("saves", json.dumps(saves))
+    HTML_WINDOW.localStorage.setItem("saves", json.dumps(saves))  # type: ignore

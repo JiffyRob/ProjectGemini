@@ -1,8 +1,10 @@
-from abc import ABC, abstractmethod
 from enum import Enum, IntFlag, StrEnum, IntEnum, auto
-from typing import Callable, Any, override
+from typing import Callable, Any, override, Protocol
 from pygame.typing import RectLike, Point
 from pygame.math import Vector2
+from deprecated import deprecated
+from dataclasses import dataclass
+
 import zengl
 import pygame
 
@@ -73,223 +75,198 @@ class FrameCap(IntEnum):
     # NONE = 0
 
 
-class Sprite(ABC):
+@dataclass
+class GameSettings:
+    vsync: bool = True
+    fullscreen: bool = False
+    scale: ScaleMode = ScaleMode.ASPECT
+    framecap: FrameCap = FrameCap.HIGH
+    graphics: GraphicsSetting = GraphicsSetting.MEDIUM
+
+
+class Sprite(Protocol):
     ...
 
-class GlobalEffect(ABC):
+class GlobalEffect(Protocol):
     ...
 
 
-class Animation(ABC):
-    @abstractmethod
-    def update(self, dt: float) -> None:
-        raise NotImplementedError
+class Animation(Protocol):
+    def update(self, dt: float) -> None: ...
 
-    @abstractmethod
-    def restart(self, dt: float) -> None:
-        raise NotImplementedError
+    def restart(self) -> None: ...
+
+    def done(self) -> bool: ...
 
     @property
-    @abstractmethod
-    def image(self) -> pygame.Surface:
-        raise NotImplementedError
+    def image(self) -> pygame.Surface: ...
 
 
-class _Timer(ABC):
-    @abstractmethod
-    def time_left(self) -> float:
-        raise NotImplementedError
+class _Timer(Protocol):
+    def time_left(self) -> float: ...
 
-    @abstractmethod
-    def percent_complete(self) -> float:
-        raise NotImplementedError
+    def percent_complete(self) -> float: ...
 
-    @abstractmethod
-    def done(self) -> bool:
-        raise NotImplementedError
+    def done(self) -> bool: ...
 
-    @abstractmethod
-    def reset(self) -> None:
-        raise NotImplementedError
+    def reset(self) -> None: ...
 
-    @abstractmethod
-    def finish(self) -> None:
-        raise NotImplementedError
+    def finish(self) -> None: ...
 
 
 class Timer(_Timer):
-    @abstractmethod
-    def update(self) -> None:
-        raise NotImplementedError
+    def update(self) -> None: ...
 
 
 class DTimer(_Timer):
-    @abstractmethod
-    def update(self, dt: float) -> None:
-        raise NotImplementedError
+    def update(self, dt: float) -> None: ...
 
 
-class Game(ABC):
-    @abstractmethod
-    def pop_state(self) -> None:
-        raise NotImplementedError
+class Loader(Protocol):
+    def postwindow_init(self) -> None: ...
 
-    @abstractmethod
-    def get_level(self) -> "Level":
-        raise NotImplementedError
+    def join(self, path: FileID, for_map: bool=False) -> str: ...
 
-    @abstractmethod
-    def run_cutscene(self, name: FileID, api: SnekAPI | None = None) -> None:
-        raise NotImplementedError
+    def get_text(self, path: FileID, for_map: bool=False) -> str: ...
 
-    @abstractmethod
-    async def run_sub_cutscene(self, name: FileID, api: SnekAPI) -> None:
-        raise NotImplementedError
+    def get_json(self, path: FileID, for_map: bool=False) -> dict[str, Any]: ...
 
-    @abstractmethod
-    async def get_current_planet_name(self) -> str:
-        raise NotImplementedError
+    def save_json(self, path: FileID, data: dict[str, Any]) -> None: ...
+
+    def get_settings(self) -> GameSettings: ...
+
+    def save_settings(self) -> None: ...
+
+    def get_csv(self, path: FileID, item_delimiter: str=",", line_delimiter: str="\n", for_map: bool=False) -> list[str]: ...
+
+    @staticmethod
+    def convert(surface: pygame.Surface) -> pygame.Surface: ...
+
+    @classmethod
+    def create_surface(cls, size: Point) -> pygame.Surface: ...
+
+    def get_surface(self, path: FileID, rect: RectLike | None=None) -> pygame.Surface: ...
+
+    @deprecated("Manually scale instead")
+    def get_surface_scaled_by(self, path: FileID, factor: Point=(2, 2)) -> pygame.Surface: ...
+
+    @deprecated("Manually scale instead")
+    def get_surface_scaled_to(self, path: FileID, size: Point=(16, 16)) -> pygame.Surface: ...
+
+    def get_spritesheet(self, path: FileID, size: Point=(16, 16)) -> list[pygame.Surface]: ...
+
+    @deprecated("Old file format that we shouldn't use anymore")
+    def get_image(self, path: FileID, area: str | RectLike | None=None) -> pygame.Surface: ...
+
+    def get_sound(self, path: FileID) -> pygame.mixer.Sound: ...
+
+    def get_script(self, path: FileID) -> str: ...
+
+    def get_cutscene(self, path: FileID) -> str: ...
+
+    def get_vertex_shader(self, path: FileID) -> str: ...
+
+    def get_fragment_shader(self, path: FileID) -> str: ...
+
+    def get_shader_library(self, path: FileID) -> str: ...
+
+    def get_save(self, path: FileID) -> dict[str, Any]: ...
+
+    def save_data(self, path: FileID, data: dict[str, Any]) -> None: ...
+
+    def delete_save(self, path: FileID) -> None: ...
+
+    def get_save_names(self, amount: int=5) -> list[FileID]: ...
+
+    def flush(self) -> None: ...
+
+
+class Game(Protocol):
+    def pop_state(self) -> None: ...
+
+    def get_level(self) -> "Level": ...
+
+    def get_loader(self) -> "Loader": ...
+
+    def run_cutscene(self, name: FileID, api: SnekAPI | None = None) -> None: ...
+
+    async def run_sub_cutscene(self, name: FileID, api: SnekAPI) -> None: ...
+
+    async def get_current_planet_name(self) -> str: ...
 
     @property
-    @abstractmethod
-    def mouse_pos(self) -> Point:
-        raise NotImplementedError
+    def mouse_pos(self) -> Point: ...
 
     @property
-    @abstractmethod
-    def window_surface(self) -> pygame.Surface:
-        raise NotImplementedError
+    def window_surface(self) -> pygame.Surface: ...
 
     @property
-    @abstractmethod
-    def gl_window_surface(self) -> zengl.Image:
-        raise NotImplementedError
+    def gl_window_surface(self) -> zengl.Image: ...
 
-    @abstractmethod
-    def set_graphics(self, value: GraphicsSetting) -> None:
-        raise NotImplementedError
+    def set_graphics(self, value: GraphicsSetting) -> None: ...
 
-    @abstractmethod
-    def switch_setting(self, name: str, value: Any) -> None:
-        raise NotImplementedError
+    def switch_setting(self, name: str, value: Any) -> None: ...
 
-    @abstractmethod
-    def load_map(self, map_name: FileID, direction: Direction, position: Point, entrance: MapEntranceType) -> None:
-        raise NotImplementedError
+    def load_map(self, map_name: FileID, direction: Direction, position: Point, entrance: MapEntranceType) -> None: ...
 
-    @abstractmethod
-    def load_save(self, save_name: FileID) -> None:
-        raise NotImplementedError
+    def load_save(self, save_name: FileID) -> None: ...
 
-    @abstractmethod
-    def delayed_callback(self, dt: float, callback: Callable[[], Any]) -> None:
-        raise NotImplementedError
+    def delayed_callback(self, dt: float, callback: Callable[[], Any]) -> None: ...
 
-    @abstractmethod
-    def load_input_binding(self, name: FileID) -> None:
-        raise NotImplementedError
+    def load_input_binding(self, name: FileID) -> None: ...
 
-    @abstractmethod
-    def add_input_binding(self, name: FileID) -> None:
-        raise NotImplementedError
+    def add_input_binding(self, name: FileID) -> None: ...
 
-    @abstractmethod
-    def time_phase(self, mult: float) -> None:
-        raise NotImplementedError
+    def time_phase(self, mult: float) -> None: ...
 
-    @abstractmethod
-    def play_soundtrack(self, track_name: FileID) -> None:
-        raise NotImplementedError
+    def play_soundtrack(self, track_name: FileID) -> None: ...
 
-    @abstractmethod
-    async def run(self) -> None:
-        raise NotImplementedError
+    async def run(self) -> None: ...
 
-    @abstractmethod
-    def save_to_disk(self) -> None:
-        raise NotImplementedError
+    def save_to_disk(self) -> None: ...
 
-    @abstractmethod
-    def quit(self) -> None:
-        raise NotImplementedError
+    def quit(self) -> None: ...
 
-    @abstractmethod
-    def exit(self) -> None:
-        raise NotImplementedError
+    def exit(self) -> None: ...
 
 
-class GameState(ABC):
-    @abstractmethod
-    def pop(self) -> None:
-        raise NotImplementedError
+class GameState(Protocol):
+    def pop(self) -> None: ...
 
-    @abstractmethod
-    def update(self, dt: float) -> None:
-        raise NotImplementedError
+    def update(self, dt: float) -> bool: ...
 
-    @abstractmethod
-    def draw(self) -> None:
-        raise NotImplementedError
+    def draw(self) -> None: ...
 
 
-class Level(GameState):
-    @abstractmethod
-    def shake(self, magnitude: float = 5.0, delta: float = 8, axis: Axis = Axis.X | Axis.Y) -> None:
-        raise NotImplementedError
+class Level(GameState, Protocol):
+    def shake(self, magnitude: float = 5.0, delta: float = 8, axis: Axis = Axis.X | Axis.Y) -> None: ...
 
-    @abstractmethod
-    def run_cutscene(self, cutscene_id: str, api: SnekAPI | None = None) -> None:
-        raise NotImplementedError
+    def run_cutscene(self, cutscene_id: str, api: SnekAPI | None = None) -> None: ...
 
-    @abstractmethod
-    async def attempt_map_cutscene(self) -> None:
-        raise NotImplementedError
+    async def attempt_map_cutscene(self) -> None: ...
 
-    @abstractmethod
-    def exit_level(self) -> None:
-        raise NotImplementedError
+    def exit_level(self) -> None: ...
 
-    @abstractmethod
-    def switch_level(self) -> None:
-        raise NotImplementedError
+    def switch_level(self) -> None: ...
 
-    @abstractmethod
-    def lock(self) -> None:
-        raise NotImplementedError
+    def lock(self) -> None: ...
 
-    @abstractmethod
-    def unlock(self) -> None:
-        raise NotImplementedError
+    def unlock(self) -> None: ...
 
-    @abstractmethod
-    def message(self, group: str, message: str) -> None:
-        raise NotImplementedError
+    def message(self, group: str, message: str) -> None: ...
 
-    @abstractmethod
-    def add_effect(self, effect: GlobalEffect) -> None:
-        raise NotImplementedError
+    def add_effect(self, effect: GlobalEffect) -> None: ...
 
-    @abstractmethod
-    def clear_effects(self) -> None:
-        raise NotImplementedError
+    def clear_effects(self) -> None: ...
 
-    @abstractmethod
-    def spawn(self, sprite_name: str, rect: RectLike, z: float | None = None, **custom_fields: Any) -> None:
-        raise NotImplementedError
+    def spawn(self, sprite_name: str, rect: RectLike, z: float | None = None, **custom_fields: Any) -> None: ...
 
-    @abstractmethod
-    def add_sprite(self, sprite: Sprite) -> None:
-        raise NotImplementedError
+    def add_sprite(self, sprite: Sprite) -> None: ...
 
-    @abstractmethod
-    def finish_dialog(self, answer: str) -> None:
-        raise NotImplementedError
+    def finish_dialog(self, answer: str) -> None: ...
 
-    @abstractmethod
-    async def run_dialog(self, *terms: str) -> str:
-        raise NotImplementedError
+    async def run_dialog(self, *terms: str) -> str: ...
 
-    @abstractmethod
     async def fade(self, effect_type: str, *args: float) -> GlobalEffect:
         """"
         Args:
@@ -299,49 +276,31 @@ class Level(GameState):
         "fadein_paint", r, g, b
         "paint", r, g, b[, duration]
         """
-        raise NotImplementedError()
+        ...
 
-    @abstractmethod
-    def get_x(self, group: str="player") -> float:
-        raise NotImplementedError()
+    def get_x(self, group: str="player") -> float: ...
 
-    @abstractmethod
-    def get_y(self, group: str="player") -> float:
-        raise NotImplementedError()
+    def get_y(self, group: str="player") -> float: ...
 
-    @abstractmethod
-    def get_z(self, group: str="player") -> float:
-        raise NotImplementedError()
+    def get_z(self, group: str="player") -> float: ...
 
-    @abstractmethod
-    def get_facing(self, group: str="player") -> float:
-        raise NotImplementedError()
+    def get_facing(self, group: str="player") -> float: ...
 
-    @abstractmethod
-    def get_group(self, group_name: str) -> set[Sprite]:
-        raise NotImplementedError()
+    def get_group(self, group_name: str) -> set[Sprite]: ...
 
-    @abstractmethod
-    def get_rects(self, rect_name: str) -> list[RectLike]:
-        raise NotImplementedError()
+    def get_rects(self, rect_name: str) -> list[RectLike]: ...
 
-    @abstractmethod
-    def show(self, group: str="player") -> None:
-        raise NotImplementedError()
+    def show(self, group: str="player") -> None: ...
 
-    @abstractmethod
-    def hide(self, group: str="player") -> None:
-        raise NotImplementedError()
+    def hide(self, group: str="player") -> None: ...
 
     @classmethod
-    @abstractmethod
-    def load(cls, game: Game, name: str, direction: Direction | None=None, position: Point | None = None, entrance: MapEntranceType = MapEntranceType.NORMAL) -> "Level":
-        raise NotImplementedError()
+    def load(cls, game: Game, name: str, direction: Direction | None=None, position: Point | None = None, entrance: MapEntranceType = MapEntranceType.NORMAL) -> "Level": ...
 
-    @abstractmethod
-    def world_to_screen(self, pos: Point) -> Vector2:
-        raise NotImplementedError()
+    def world_to_screen(self, pos: Point) -> Vector2: ...
 
-    @abstractmethod
-    def screen_to_world(self, pos: Point) -> Vector2:
-        raise NotImplementedError()
+    def screen_to_world(self, pos: Point) -> Vector2: ...
+
+    def get_game(self) -> Game: ...
+
+    def get_loader(self) -> Loader: ...

@@ -5,11 +5,11 @@ import pathlib
 
 import pygame
 
-from gamelibs import pixelfont, env
+from gamelibs import pixelfont, env, interfaces
 from gamelibs.util_draw import COLORKEY
 
 
-class Loader:
+class Loader(interfaces.Loader):
     def __init__(self):
         self.base_path = pathlib.Path(".")
         self.asset_path = self.base_path / "assets"

@@ -1,16 +1,18 @@
+from typing import no_type_check
+
 import pygame
 import numpy
 import zengl
 
-from gamelibs import util_draw
-
+from gamelibs import util_draw, interfaces
+from gamelibs.space import math3d
 
 class SpaceRendererHW:
     STAR_COUNT = 200_000
 
     CIRCLE_RESOLUTION = 16
 
-    def __init__(self, level, radius):
+    def __init__(self, level: interfaces.Level, radius: int) -> None:
         self.level = level
         self.radius = radius
         self.age = 0
@@ -27,13 +29,13 @@ class SpaceRendererHW:
         self.star_ids = None
         self.star_locations = None
 
-        self.compile_shaders()
+        self.compile_shaders()  # type: ignore
 
-    def load_planet_data(self):
-        planets = self.level.game.loader.get_json("planets").copy()
+    def _load_planet_data(self):  # type: ignore
+        planets = self.level.get_loader().get_json("planets").copy()
         default_values = planets.pop("Default")
         defines = "#line 0 1\n"
-        defines += self.level.game.loader.get_shader_library("planet_struct") + "\n"
+        defines += self.level.get_loader().get_shader_library("planet_struct") + "\n"
         defines += "#line 0 1000\n"
         locations = {}
         self.id_to_name = {}
@@ -51,18 +53,18 @@ class SpaceRendererHW:
                 defines += f"#define P_{param_name}_{planet_name} {param_value}\n"
             next_id += 1
 
-        defines += self.level.game.loader.get_shader_library("planets") + "\n"
+        defines += self.level.get_loader().get_shader_library("planets") + "\n"
 
         return defines, locations
 
-    def get_planet_id_from_name(self, name):
+    def get_planet_id_from_name(self, name: str) -> int:
         return self.name_to_id[name]
 
-    def get_planet_name_from_id(self, id):
+    def get_planet_name_from_id(self, id: int) -> str:
         return self.id_to_name[id]
 
-    def compile_shaders(self):
-
+    @no_type_check
+    def compile_shaders(self) -> None:
         rng = numpy.random.default_rng(1)  # TODO: random seeding?
         # TODO: only plant stars within bounds of world
         self.star_locations = rng.uniform(
@@ -71,7 +73,7 @@ class SpaceRendererHW:
         self.star_ids = numpy.tile(numpy.array([0, 1]), self.STAR_COUNT // 2 + 1)
         self.star_radii = numpy.zeros(self.STAR_COUNT, "f4") + 1.0
 
-        planet_lib, locations = self.load_planet_data()
+        planet_lib, locations = self._load_planet_data()
         planet_count = len(locations)
         self.planet_locations = numpy.zeros((planet_count, 3), "f4")
         self.planet_ids = numpy.zeros(planet_count, "i4")
@@ -166,7 +168,7 @@ class SpaceRendererHW:
             instance_count=planet_count,
         )
 
-    def update(self, dt, camera):
+    def update(self, dt: float, camera: math3d.Camera):
         self.age += dt
         uniforms = numpy.array(
             [
