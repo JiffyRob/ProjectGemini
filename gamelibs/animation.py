@@ -47,7 +47,7 @@ class Animation(interfaces.Animation):
 class NoLoopAnimation(interfaces.Animation):
     def __init__(
         self,
-        frames: list[pygame.Surface],
+        frames: Sequence[pygame.Surface],
         speed: float = 0.2,
         flip_x: bool = False,
         flip_y: bool = False,
@@ -101,7 +101,7 @@ class SingleAnimation(interfaces.Animation):
 class AnimatedSurface(pygame.Surface):
     def __init__(
         self,
-        frames: list[pygame.Surface],
+        frames: Sequence[pygame.Surface],
         speed: float = 0.2,
         flip_x: bool = False,
         flip_y: bool = False,

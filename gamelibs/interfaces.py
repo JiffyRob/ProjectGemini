@@ -15,7 +15,7 @@ from SNEK2 import SNEKCallable, AsyncSNEKCallable  # type: ignore
 type SnekAPI = dict[
     str, SNEKCallable | AsyncSNEKCallable
 ]  # TODO: this could be more specific
-type FileID = str # TODO: could this be more specific?
+type FileID = str  # TODO: could this be more specific?
 type MiscRect = pygame.Rect | pygame.FRect
 
 

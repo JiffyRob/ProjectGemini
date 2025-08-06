@@ -30,7 +30,7 @@ class Sprite(interfaces.Sprite):
     @property
     def to_draw(self) -> pygame.Surface:
         return self._to_draw
-    
+
     @to_draw.setter
     def to_draw(self, value: pygame.Surface) -> None:
         self._to_draw = value
@@ -38,7 +38,7 @@ class Sprite(interfaces.Sprite):
     @property
     def z(self) -> int:
         return self._z
-    
+
     @z.setter
     def z(self, value: int) -> None:
         self._z = value

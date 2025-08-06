@@ -319,9 +319,7 @@ class Level(game_state.GameState, interfaces.Level):
             z = self.entity_layer
         sprite_cls = self.sprite_classes[self.map_type].get(sprite_name, None)
         if sprite_cls is not None:
-            new_sprite = sprite_cls(
-                self, rect, z, **custom_fields
-            )
+            new_sprite = sprite_cls(self, rect, z, **custom_fields)
             self.add_sprite(new_sprite)
             return new_sprite
 
@@ -461,7 +459,7 @@ class Level(game_state.GameState, interfaces.Level):
         for sprite in self.get_group(group):
             sprite.show()
 
-    def hide(self, group: str="player") -> None:
+    def hide(self, group: str = "player") -> None:
         for sprite in self.get_group(group):
             sprite.hide()
 
@@ -483,7 +481,9 @@ class Level(game_state.GameState, interfaces.Level):
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
         player_position: list[int] = data["customFields"]["start"]
-        position = [int(position[0]), int(position[1])] if position else player_position.copy()
+        position = (
+            [int(position[0]), int(position[1])] if position else player_position.copy()
+        )
         if map_type == interfaces.MapType.PLATFORMER:
             if direction == "left":
                 player_position = [size[0] - 8, player_position[1]]
@@ -517,7 +517,11 @@ class Level(game_state.GameState, interfaces.Level):
             Parallax.load(level, data["customFields"]["Background"])
         )
         if map_type == interfaces.MapType.HOVERBOARD:
-            level.backgrounds.append(hoverboarding.ScrollingBackground(cast(interfaces.HoverboardLevel, level)))
+            level.backgrounds.append(
+                hoverboarding.ScrollingBackground(
+                    cast(interfaces.HoverboardLevel, level)
+                )
+            )
         # tile layers
         entity_layer = data["customFields"]["entity_layer"]
         level.entity_layer = entity_layer

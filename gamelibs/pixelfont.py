@@ -11,6 +11,7 @@ class ChunkType(Enum):
     SPACE = 1
     NEWLINE = 2
 
+
 @dataclass(frozen=True)
 class Chunk:
     type: ChunkType
@@ -39,7 +40,11 @@ class PixelFont:
     def chunkify(self, text: str) -> Iterator[Chunk]:
         current = ""
         for char in text:
-            whitespace_type = {" ": ChunkType.SPACE, "\n": ChunkType.NEWLINE, "\r": ChunkType.NEWLINE}.get(char)
+            whitespace_type = {
+                " ": ChunkType.SPACE,
+                "\n": ChunkType.NEWLINE,
+                "\r": ChunkType.NEWLINE,
+            }.get(char)
             if whitespace_type is None:
                 current += char
             else:

@@ -45,7 +45,7 @@ class Loader(interfaces.Loader):
     def join_music(self, path: FileID) -> pathlib.Path:
         return self.music_path / path
 
-    def join_data(self, path: FileID, for_map: bool=False) -> pathlib.Path:
+    def join_data(self, path: FileID, for_map: bool = False) -> pathlib.Path:
         if for_map:
             # Map data in the asset folder bc that's where ldtk saves it
             return self.join_asset(path)
@@ -64,12 +64,12 @@ class Loader(interfaces.Loader):
         return self.shader_path / path
 
     @functools.cache
-    def get_text(self, path: FileID, for_map: bool=False) -> str:  # type: ignore
+    def get_text(self, path: FileID, for_map: bool = False) -> str:  # type: ignore
         with self.join_data(path, for_map).open() as file:
             return file.read()
 
     @functools.cache
-    def get_json(self, path: FileID, for_map: bool=False) -> Any:  # type: ignore
+    def get_json(self, path: FileID, for_map: bool = False) -> Any:  # type: ignore
         return json.load(self.join_data(path, for_map).with_suffix(".json").open())
 
     def save_json(self, path: FileID, data: Any) -> None:
@@ -78,10 +78,12 @@ class Loader(interfaces.Loader):
             file.write(json.dumps(data))
 
     def get_settings(self) -> interfaces.GameSettings:
-        return interfaces.GameSettings(**{
-            **self.get_json("settings"),
-            **env.get_settings(),
-        })
+        return interfaces.GameSettings(
+            **{
+                **self.get_json("settings"),
+                **env.get_settings(),
+            }
+        )
 
     def save_settings(self, settings: interfaces.GameSettings) -> None:
         settings_dict = settings.as_dict()
@@ -90,7 +92,7 @@ class Loader(interfaces.Loader):
         env.write_settings()
 
     @functools.cache
-    def get_csv(self, path: FileID, item_delimiter: str=",", line_delimiter: str="\n", for_map: bool=False) -> tuple[tuple[str, ...], ...]:  # type: ignore
+    def get_csv(self, path: FileID, item_delimiter: str = ",", line_delimiter: str = "\n", for_map: bool = False) -> tuple[tuple[str, ...], ...]:  # type: ignore
         text = self.get_text(path, for_map)
         lines: list[tuple[str, ...]] = []
         for line in text.split(line_delimiter):
@@ -114,7 +116,7 @@ class Loader(interfaces.Loader):
         return surface
 
     @functools.cache
-    def get_surface(self, path: FileID, rect: RectLike | None=None) -> pygame.Surface:  # type: ignore
+    def get_surface(self, path: FileID, rect: RectLike | None = None) -> pygame.Surface:  # type: ignore
         if rect:
             return self.convert(
                 pygame.image.load(self.join_asset(path).with_suffix(".png")).subsurface(
@@ -127,7 +129,7 @@ class Loader(interfaces.Loader):
             )
 
     @functools.cache
-    def get_spritesheet(self, path: FileID, size: Point=(16, 16)) -> tuple[pygame.Surface, ...]:  # type: ignore
+    def get_spritesheet(self, path: FileID, size: Point = (16, 16)) -> tuple[pygame.Surface, ...]:  # type: ignore
         surface = self.get_surface(path)
         rect = pygame.Rect(0, 0, size[0], size[1])
         size_rect = surface.get_rect()
@@ -174,7 +176,9 @@ class Loader(interfaces.Loader):
     # not cached because save files change
     def get_save(self, path: FileID) -> dict[str, Any]:
         pathlib_path = self.join_save(path).with_suffix(".sav")
-        if env.PYGBAG and "1" not in str(pathlib_path):  # this path is the "new game" save
+        if env.PYGBAG and "1" not in str(
+            pathlib_path
+        ):  # this path is the "new game" save
             return env.get_save(path)
         return json.load(pathlib_path.open())
         # compress save files later - leave for debug
@@ -196,7 +200,7 @@ class Loader(interfaces.Loader):
         else:
             self.join_save(path).unlink()
 
-    def get_save_names(self, amount: int=5) -> list[FileID]:
+    def get_save_names(self, amount: int = 5) -> list[FileID]:
         names: list[FileID] = []
         i = 0
         if env.PYGBAG:
