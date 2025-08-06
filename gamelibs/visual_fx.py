@@ -9,9 +9,17 @@ from gamelibs import interfaces, hardware
 
 class VisualEffect:
     def __init__(self, on_done: Callable[[], Any] = lambda: None) -> None:
-        self.done = False
+        self._done = False
         self.on_done = on_done
         self.called_done = False
+
+    @property
+    def done(self) -> bool:
+        return self._done
+    
+    @done.setter
+    def done(self, value: bool) -> None:
+        self._done = value
 
     def update(self, dt: float) -> bool:
         if not self.called_done and self.done:
@@ -121,6 +129,9 @@ class CircleTransitionOut(VisualEffect, interfaces.GlobalEffect):
     def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
 
+    def draw_over(self, dest_surface: pygame.Surface, dest_rect: pygame.Rect | pygame.FRect) -> None:
+        dest_surface.blit(self.surface, dest_rect, None, pygame.BLEND_RGB_MULT)
+
 
 class ColorTransitionOut(VisualEffect, interfaces.GlobalEffect):
     def __init__(self, color: ColorLike="black", duration: float=1, on_done: Callable[[], Any]=lambda: None) -> None:
@@ -158,7 +169,7 @@ class ColorTransitionIn(ColorTransitionOut, interfaces.GlobalEffect):
 
 
 class Fill(VisualEffect):
-    def __init__(self, color: ColorLike, duration: float=0, on_done: Callable[[], Any]=lambda: None):
+    def __init__(self, color: ColorLike, duration: float=0, on_done: Callable[[], Any]=lambda: None) -> None:
         super().__init__(on_done)
         self.color = color
         self.duration = duration
@@ -169,7 +180,7 @@ class Fill(VisualEffect):
 
     def update(self, dt: float) -> bool:
         self.age += dt
-        self.done = (self.age >= self.duration) and self.duration
+        self.done = bool((self.age >= self.duration) and self.duration)
         return super().update(dt)
 
     def draw(self, surface: pygame.Surface) -> None:

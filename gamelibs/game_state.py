@@ -9,10 +9,26 @@ class GameState(interfaces.GameState):
         self, game: interfaces.Game, color: ColorLike = "gray", opengl: bool = False
     ) -> None:
         self.game = game
-        self.bgcolor = color
+        self._bgcolor = color
         self.screen_rect = pygame.Rect((0, 0), util_draw.RESOLUTION)
         self.live = True
-        self.opengl = opengl
+        self._opengl = opengl
+
+    @property
+    def opengl(self) -> bool:
+        return self._opengl
+    
+    @opengl.setter
+    def opengl(self, value: bool) -> None:
+        self._opengl = value
+
+    @property
+    def bgcolor(self) -> ColorLike:
+        return self._bgcolor
+    
+    @bgcolor.setter
+    def bgcolor(self, value: ColorLike) -> None:
+        self._bgcolor = value
 
     def pop(self) -> None:
         self.live = False

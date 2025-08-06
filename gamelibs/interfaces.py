@@ -1,6 +1,6 @@
 from enum import Enum, IntFlag, StrEnum, IntEnum, auto
-from typing import Callable, Any, Generator, Iterable, Protocol
-from pygame.typing import RectLike, Point, SequenceLike
+from typing import Callable, Any, Generator, Iterable, Protocol, runtime_checkable
+from pygame.typing import ColorLike, RectLike, Point, SequenceLike
 from pygame.math import Vector2
 from dataclasses import dataclass
 from copy import copy
@@ -12,10 +12,12 @@ import pygame
 from SNEK2 import SNEKCallable, AsyncSNEKCallable  # type: ignore
 
 type SnekAPI = dict[
-    str, SNEKCallable | AsyncSNEKCallable
-]  # TODO: this could be more specific
-type FileID = str  # TODO: could this be more specific?
+    str, SNEKCallable | AsyncSNEKCallable | Any
+] | None  # TODO: this could be more specific
+
 type MiscRect = pygame.Rect | pygame.FRect
+
+type FileID = "str"
 
 
 class Axis(IntFlag):
@@ -29,6 +31,7 @@ class MapType(StrEnum):
     PLATFORMER = "Platformer"
     HOUSE = "House"
     HOVERBOARD = "Hoverboard"
+    SPACE = "Space"
 
 
 class Direction(StrEnum):
@@ -146,7 +149,7 @@ class GameSettings:
         for field in {"vsync", "fullscreen", "scale", "framecap", "graphics,"}:
             yield field, getattr(self, field)
 
-
+@runtime_checkable
 class Quaternion(Protocol):
     def magnitude(self) -> float: ...
 
@@ -190,7 +193,7 @@ class Quaternion(Protocol):
     @vector.setter
     def vector(self, value: pygame.Vector3) -> None: ...
 
-
+@runtime_checkable
 class GameSave(Protocol):
     def get_state(self, key: str) -> Any: ...
 
@@ -213,6 +216,7 @@ class GameSave(Protocol):
     def loaded_path(self, value: FileID): ...
 
 
+@runtime_checkable
 class SoundManager(Protocol):
     def play_sound(
         self,
@@ -244,6 +248,7 @@ class SoundManager(Protocol):
     def stop_track(self) -> None: ...
 
 
+@runtime_checkable
 class InputQueue(Protocol):
     def rumble(self, left: float = 1, right: float = 1, time: int = 500) -> None: ...
 
@@ -262,6 +267,7 @@ class InputQueue(Protocol):
     def just_pressed(self) -> set[str]: ...
 
 
+@runtime_checkable
 class PixelFont(Protocol):
     def size(self, text: str, width: int = 0) -> tuple[int, int]: ...
 
@@ -270,6 +276,7 @@ class PixelFont(Protocol):
     def render(self, text: str, width: int = 0) -> pygame.Surface: ...
 
 
+@runtime_checkable
 class Sprite(Protocol):
     groups: set[str]
 
@@ -312,16 +319,19 @@ class Sprite(Protocol):
     def get_game(self) -> "Game": ...
 
 
+@runtime_checkable
 class GUISprite(Sprite, Protocol):
     def draw(self, surface: pygame.Surface) -> None: ...
 
 
+@runtime_checkable
 class PlatformerSprite(Sprite, Protocol):
     def get_player(self) -> "PlatformerPlayer": ...
 
     def get_level(self) -> "PlatformerLevel": ...
 
 
+@runtime_checkable
 class Healthy(Protocol):
     @property
     def health(self) -> int: ...
@@ -340,6 +350,7 @@ class Healthy(Protocol):
     def heal(self, amount: int) -> None: ...
 
 
+@runtime_checkable
 class Interactor(Protocol):
     @property
     def interaction_rect(self) -> MiscRect: ...
@@ -347,6 +358,7 @@ class Interactor(Protocol):
     def interact(self) -> InteractionResult: ...
 
 
+@runtime_checkable
 class PuzzleTrigger(Protocol):
     def triggered(self) -> bool: ...
 
@@ -354,21 +366,25 @@ class PuzzleTrigger(Protocol):
     def collision_rect(self) -> MiscRect: ...
 
 
+@runtime_checkable
 class Collider(Protocol):
     @property
     def collision_rect(self) -> MiscRect: ...
 
 
+@runtime_checkable
 class Pickup(Protocol):
     @property
     def collision_rect(self) -> MiscRect: ...
 
 
+@runtime_checkable
 class Turner(Protocol):
     @property
     def facing(self) -> Direction: ...
 
 
+@runtime_checkable
 class Player(Sprite, Healthy, Collider, Turner, Protocol):
     @property
     def emeralds(self) -> int: ...
@@ -388,14 +404,17 @@ class Player(Sprite, Healthy, Collider, Turner, Protocol):
     def acquire(self, thing: str, count: int) -> bool: ...
 
 
+@runtime_checkable
 class HoverboardPlayer(Player, Protocol):
     def exit(self) -> None: ...
 
 
+@runtime_checkable
 class PlatformerPlayer(Player, Protocol):
     def jump(self, cause: JumpCause, just: bool = False) -> None: ...
 
 
+@runtime_checkable
 class GlobalEffect(Protocol):
     def update(self, dt: float) -> bool: ...
 
@@ -410,12 +429,14 @@ class GlobalEffect(Protocol):
     def done(self, value: bool) -> None: ...
 
 
+@runtime_checkable
 class SpriteEffect(Protocol):
     def update(self, dt: float) -> bool: ...
 
     def draw(self, surface: pygame.Surface) -> None: ...
 
 
+@runtime_checkable
 class Animation(Protocol):
     def update(self, dt: float) -> None: ...
 
@@ -439,6 +460,7 @@ class Animation(Protocol):
     def flip_y(self, value: bool) -> None: ...
 
 
+@runtime_checkable
 class _Timer(Protocol):
     def time_left(self) -> float: ...
 
@@ -451,14 +473,17 @@ class _Timer(Protocol):
     def finish(self) -> None: ...
 
 
+@runtime_checkable
 class Timer(_Timer):
     def update(self) -> None: ...
 
 
+@runtime_checkable
 class DTimer(_Timer):
     def update(self, dt: float) -> None: ...
 
 
+@runtime_checkable
 class Loader(Protocol):
     def postwindow_init(self) -> None: ...
 
@@ -522,12 +547,13 @@ class Loader(Protocol):
     def flush(self) -> None: ...
 
 
+@runtime_checkable
 class Game(Protocol):
     def push_state(self, state: "GameState") -> None: ...
 
     def pop_state(self) -> None: ...
 
-    def get_level(self) -> "Level": ...
+    def get_state(self) -> "GameState": ...
 
     def get_save(self) -> GameSave: ...
 
@@ -536,8 +562,6 @@ class Game(Protocol):
     def run_cutscene(self, name: FileID, api: SnekAPI | None = None) -> None: ...
 
     async def run_sub_cutscene(self, name: FileID, api: SnekAPI) -> None: ...
-
-    async def get_current_planet_name(self) -> str: ...
 
     @property
     def mouse_pos(self) -> Point: ...
@@ -557,7 +581,7 @@ class Game(Protocol):
         map_name: FileID,
         direction: Direction | None = None,
         position: Point | None = None,
-        entrance: MapEntranceType | None = None,
+        entrance: MapEntranceType = MapEntranceType.NORMAL,
     ) -> None: ...
 
     def switch_level(
@@ -578,8 +602,6 @@ class Game(Protocol):
 
     def add_input_binding(self, name: FileID) -> None: ...
 
-    def time_phase(self, mult: float) -> None: ...
-
     def play_soundtrack(self, track_name: FileID) -> None: ...
 
     async def run(self) -> None: ...
@@ -591,6 +613,7 @@ class Game(Protocol):
     def exit(self) -> None: ...
 
 
+@runtime_checkable
 class GameState(Protocol):
     def pop(self) -> None: ...
 
@@ -600,7 +623,17 @@ class GameState(Protocol):
 
     def get_game(self) -> Game: ...
 
+    @property
+    def opengl(self) -> bool: ...
 
+    @property
+    def bgcolor(self) -> ColorLike: ...
+
+    @bgcolor.setter
+    def bgcolor(self, value: ColorLike) -> None: ...
+
+
+@runtime_checkable
 class Background(Protocol):
     def update(self, dt: float) -> None: ...
 
@@ -614,12 +647,11 @@ class Background(Protocol):
     def unlock(self) -> None: ...
 
 
+@runtime_checkable
 class Level(GameState, Protocol):
     def shake(
         self, magnitude: float = 5.0, delta: float = 8, axis: Axis = Axis.X | Axis.Y
     ) -> None: ...
-
-    def run_cutscene(self, cutscene_id: str, api: SnekAPI | None = None) -> None: ...
 
     async def attempt_map_cutscene(self) -> None: ...
 
@@ -706,10 +738,12 @@ class Level(GameState, Protocol):
     def time_phase(self, mult: float) -> None: ...
 
 
+@runtime_checkable
 class PlatformerLevel(Level, Protocol):
     def get_player(self) -> PlatformerPlayer: ...
 
 
+@runtime_checkable
 class HoverboardLevel(Level, Protocol):
     def get_player(self) -> HoverboardPlayer: ...
 
@@ -720,6 +754,7 @@ class HoverboardLevel(Level, Protocol):
     def speed(self, value: float) -> None: ...
 
 
+@runtime_checkable
 class SpaceLevel(Level, Protocol):
     RADIUS: int
 

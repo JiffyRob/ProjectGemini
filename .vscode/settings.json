@@ -1,4 +1,7 @@
 {
     "python.analysis.autoImportCompletions": true,
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "python.analysis.typeCheckingMode": "strict",
+    "python.languageServer": "Pylance",
+    "python.analysis.languageServerMode": "full"
 }

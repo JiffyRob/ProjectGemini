@@ -1,7 +1,4 @@
 pygame-ce
 numpy
 zengl
-deprecated
-types-Deprecated
-mypy
 git+https://github.com/JiffyRob/SNEK2.git@main

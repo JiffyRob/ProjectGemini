@@ -253,7 +253,7 @@ class Level(game_state.GameState, interfaces.Level):
         self.add_sprite(self.player)
         self.add_sprite(self.iball)
         self.update(0)
-        self.run_cutscene("level_begin")
+        self.get_game().run_cutscene("level_begin")
 
     @property
     def map_rect(self) -> pygame.Rect:
