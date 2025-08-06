@@ -2,7 +2,7 @@ import pygame
 from pygame.typing import Point
 import zengl
 
-from gamelibs import util_draw, env, interfaces
+from gamelibs import util_draw, env, interfaces, hardware
 
 
 class WindowNew:
@@ -50,8 +50,8 @@ class WindowNew:
 
     def compile_shaders(self) -> None:
         self.pipeline = self.context.pipeline(
-            vertex_shader=self.game.get_loader().get_vertex_shader("scale"),
-            fragment_shader=self.game.get_loader().get_fragment_shader("scale"),
+            vertex_shader=hardware.loader.get_vertex_shader("scale"),
+            fragment_shader=hardware.loader.get_fragment_shader("scale"),
             framebuffer=None,
             viewport=(0, 0, *self.window.size),
             topology="triangle_strip",
@@ -75,7 +75,7 @@ class WindowNew:
             ],
         )
 
-    def reset_viewport(self):
+    def reset_viewport(self) -> None:
         if self.scalemode == interfaces.ScaleMode.STRETCH:
             self.pipeline.viewport = (0, 0, *self.window.size)
         if self.scalemode == interfaces.ScaleMode.ASPECT:
@@ -158,13 +158,13 @@ class WindowNew:
             rect.center = self.window.size[0] // 2, self.window.size[1] // 2
             return (pygame.Vector2(pygame.mouse.get_pos()) - rect.topleft) / scale
 
-    def render(self):
+    def render(self) -> None:
         self.gl_surface.write(
             pygame.image.tobytes(self.software_surface, "RGBA", flipped=False)
         )
         self.pipeline.render()
 
-    def flip(self):
+    def flip(self) -> None:
         self.window.flip()
 
 
@@ -215,8 +215,8 @@ class WindowOld:
 
     def compile_shaders(self) -> None:
         self.pipeline = self.context.pipeline(
-            vertex_shader=self.game.get_loader().get_vertex_shader("scale"),
-            fragment_shader=self.game.get_loader().get_fragment_shader("scale"),
+            vertex_shader=hardware.loader.get_vertex_shader("scale"),
+            fragment_shader=hardware.loader.get_fragment_shader("scale"),
             framebuffer=None,
             viewport=(0, 0, *util_draw.RESOLUTION),
             topology="triangle_strip",
@@ -240,7 +240,7 @@ class WindowOld:
             ],
         )
 
-    def reset_viewport(self):
+    def reset_viewport(self) -> None:
         window_size = pygame.display.get_window_size()
         if self.scalemode == interfaces.ScaleMode.STRETCH:
             self.pipeline.viewport = (0, 0, *window_size)

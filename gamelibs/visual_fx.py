@@ -1,42 +1,44 @@
 from math import sqrt
+from typing import Any, Callable
 
 import pygame
+from pygame.typing import ColorLike, Point, RectLike
 
-from gamelibs import loader
+from gamelibs import interfaces, hardware
 
 
 class VisualEffect:
-    def __init__(self, on_done=lambda: None):
+    def __init__(self, on_done: Callable[[], Any] = lambda: None) -> None:
         self.done = False
         self.on_done = on_done
         self.called_done = False
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         if not self.called_done and self.done:
             self.on_done()
             self.called_done = True
             return False
         return True
 
-    def draw(self, surface):
-        return None
 
-    def draw_over(self, dest_surface, dest_rect):
-        return None
-
-
-class CircleTransitionIn(VisualEffect):
-    def __init__(self, size, position, speed=64, on_done=lambda: None):
+class CircleTransitionIn(VisualEffect, interfaces.GlobalEffect):
+    def __init__(
+        self,
+        size: tuple[int, int],
+        position: Point | Callable[[], pygame.Vector2],
+        speed: float = 64,
+        on_done: Callable[[], Any] = lambda: None,
+    ) -> None:
         super().__init__(on_done)
         self.size = pygame.Vector2(size)
-        self.surface = loader.Loader.create_surface(size)
+        self.surface = hardware.loader.create_surface(size)
         self.surface.fill("black")
         self.radius = 0
+        self.position_getter: Callable[[], pygame.Vector2]
         if callable(position):
             self.position_getter = position
         else:
-            position = pygame.Vector2(position)
-            self.position_getter = lambda: position
+            self.position_getter = lambda: pygame.Vector2(position)
         self.speed = speed
         self.age = 0
         self.max_radius = sqrt(
@@ -54,28 +56,34 @@ class CircleTransitionIn(VisualEffect):
         )
 
     @property
-    def position(self):
+    def position(self) -> pygame.Vector2:
         return self.position_getter()
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.age += dt
         self.radius = self.age * self.speed
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
         self.done = self.radius >= self.max_radius
         return super().update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
 
-    def draw_over(self, dest_surface, dest_rect):
+    def draw_over(self, dest_surface: pygame.Surface, dest_rect: RectLike) -> None:
         dest_surface.blit(self.surface, dest_rect, None, pygame.BLEND_RGB_MULT)
 
 
-class CircleTransitionOut(VisualEffect):
-    def __init__(self, size, position, speed=64, on_done=lambda: None):
+class CircleTransitionOut(VisualEffect, interfaces.GlobalEffect):
+    def __init__(
+        self,
+        size: tuple[int, int],
+        position: Point | Callable[[], pygame.Vector2],
+        speed: float = 64,
+        on_done: Callable[[], Any] = lambda: None,
+    ) -> None:
         super().__init__(on_done)
         self.size = pygame.Vector2(size)
-        self.surface = loader.Loader.create_surface(self.size)
+        self.surface = hardware.loader.create_surface(self.size)
         self.surface.fill("white")
         if callable(position):
             self.position_getter = position
@@ -99,10 +107,10 @@ class CircleTransitionOut(VisualEffect):
         )
 
     @property
-    def position(self):
+    def position(self) -> pygame.Vector2:
         return self.position_getter()
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.age += dt
         self.radius = self.max_radius - self.age * self.speed
         self.surface.fill("black")
@@ -110,46 +118,47 @@ class CircleTransitionOut(VisualEffect):
         pygame.draw.circle(self.surface, "white", self.position, self.radius)
         return super().update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.surface, (0, 0), None, pygame.BLEND_RGB_MULT)
 
 
-class ColorTransitionOut(VisualEffect):
-    def __init__(self, color="black", duration=1, on_done=lambda: None):
+class ColorTransitionOut(VisualEffect, interfaces.GlobalEffect):
+    def __init__(self, color: ColorLike="black", duration: float=1, on_done: Callable[[], Any]=lambda: None) -> None:
         super().__init__(on_done)
         self.age = 0
         self.duration = duration
         self.color = pygame.Color(color)
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.age += dt
         self.done = self.age >= self.duration
-        self.color.a = pygame.math.clamp(round(self.age * 255 / self.duration), 0, 255)
+        self.color.a = int(pygame.math.clamp(round(self.age * 255 / self.duration), 0, 255))
         return super().update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         color_surface = pygame.Surface(surface.get_size(), pygame.SRCALPHA)
         color_surface.fill(self.color)
         surface.blit(color_surface, (0, 0))
 
-    def draw_over(self, dest_surface, dest_rect):
+    def draw_over(self, dest_surface: pygame.Surface, dest_rect: RectLike) -> None:
+        dest_rect = pygame.Rect(dest_rect)
         surface = pygame.Surface(dest_rect.size, pygame.SRCALPHA)
         surface.fill(self.color)
         surface.blit(surface, dest_rect)
 
 
-class ColorTransitionIn(ColorTransitionOut):
-    def update(self, dt):
+class ColorTransitionIn(ColorTransitionOut, interfaces.GlobalEffect):
+    def update(self, dt: float) -> bool:
         self.age += dt
         self.done = self.age >= self.duration
-        self.color.a = pygame.math.clamp(
+        self.color.a = int(pygame.math.clamp(
             255 - round(self.age * 255 / self.duration), 0, 255
-        )
+        ))
         return VisualEffect.update(self, dt)
 
 
 class Fill(VisualEffect):
-    def __init__(self, color, duration=0, on_done=lambda: None):
+    def __init__(self, color: ColorLike, duration: float=0, on_done: Callable[[], Any]=lambda: None):
         super().__init__(on_done)
         self.color = color
         self.duration = duration
@@ -158,52 +167,47 @@ class Fill(VisualEffect):
             self.on_done()
             self.called_done = True
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.age += dt
         self.done = (self.age >= self.duration) and self.duration
         return super().update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         surface.fill(self.color)
 
-    def draw_over(self, dest_surface, dest_rect):
+    def draw_over(self, dest_surface: pygame.Surface, dest_rect: RectLike) -> None:
         dest_surface.fill(self.color, dest_rect)
 
 
-class Blink(VisualEffect):
-    def __init__(self, color="white", speed=0.2, count=3, on_done=lambda: None):
+class Blink(VisualEffect, interfaces.SpriteEffect):
+    def __init__(self, color: ColorLike="white", speed: float=0.2, count: int=3, on_done: Callable[[], Any]=lambda: None) -> None:
         super().__init__(on_done)
         self.color = pygame.Color(color)
         self.speed = speed
         self.age = 0
         self.count = count
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.age += dt
         return super().update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         index = self.age // self.speed
         if index % 2:
             new_surface = pygame.Surface(surface.get_size())
-            new_surface.fill(surface.get_colorkey())
-            new_surface.set_colorkey(surface.get_colorkey())
+            colorkey = surface.get_colorkey()
+            if colorkey is None:
+                colorkey = (0, 0, 0, 0)
+            new_surface.fill(colorkey)
+            new_surface.set_colorkey(colorkey)
             pygame.transform.threshold(
-                new_surface, surface, surface.get_colorkey(), set_color=self.color
+                new_surface, surface, colorkey, set_color=self.color
             )
             surface.blit(new_surface, (0, 0))
         if index >= self.count * 2:
             self.done = True
 
-    def draw_over(self, dest_surface, dest_rect):
-        raise TypeError(
-            f"{self.__class__} cannot be drawn over other surfaces due to no transparency info"
-        )
 
-
-class Hide(VisualEffect):
-    def draw(self, surface):
-        surface.fill(surface.get_colorkey())
-
-    def draw_over(self, dest_surface, dest_rect):
-        pass
+class Hide(VisualEffect, interfaces.SpriteEffect):
+    def draw(self, surface: pygame.Surface) -> None:
+        surface.fill(surface.get_colorkey() or (0, 0, 0, 0))

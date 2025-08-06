@@ -1,5 +1,5 @@
-# mypy: ignore-errors
-# TODO: Stub files for SNEK2
+# type: ignore
+# TODO: Stub files for SNEK2, then typing can happen
 
 import pygame
 

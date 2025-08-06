@@ -5,9 +5,11 @@ import math
 import pygame
 from pygame.typing import SequenceLike
 
+from gamelibs import interfaces
 
-class Quaternion:
-    def __init__(self, theta: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)):
+
+class Quaternion(interfaces.Quaternion):
+    def __init__(self, theta: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)) -> None:
         self.real = math.cos(theta / 2)
         self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
 
@@ -17,7 +19,7 @@ class Quaternion:
         )
 
     @classmethod
-    def from_standard(cls, r: float, i: float, j: float, k: float) -> Quaternion:
+    def from_standard(cls, r: float, i: float, j: float, k: float) -> interfaces.Quaternion:
         result = cls()
         result.real = r
         result.vector.xyz = i, j, k  # type: ignore
@@ -26,24 +28,24 @@ class Quaternion:
     @classmethod
     def from_degrees(
         cls, real: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)
-    ) -> Quaternion:
+    ) -> interfaces.Quaternion:
         return cls(real * math.pi / 180, axis)
 
-    def __neg__(self) -> Quaternion:
+    def __neg__(self) -> interfaces.Quaternion:
         return self.invert()
 
-    def copy(self) -> Quaternion:
+    def copy(self) -> interfaces.Quaternion:
         return Quaternion.from_standard(self.real, *self.vector)
 
-    def invert(self) -> Quaternion:
+    def invert(self) -> interfaces.Quaternion:
         return Quaternion.from_standard(self.real, *-self.vector)
 
-    def dot(self, other: Quaternion) -> float:
+    def dot(self, other: interfaces.Quaternion) -> float:
         return self.real * other.real + sum(
-            self.vector.elementwise() * other.vector.elementwise()
+            self.vector.elementwise() * other.vector.elementwise()  # type: ignore
         )
 
-    def nlerp(self, other: Quaternion, t: float) -> Quaternion:
+    def nlerp(self, other: interfaces.Quaternion, t: float) -> interfaces.Quaternion:
         a = self
         if self.dot(other) < 0:
             a = self.invert()
@@ -53,7 +55,7 @@ class Quaternion:
             *a.vector + t * (b.vector - a.vector),
         ).normalize()
 
-    def normalize(self) -> Quaternion:
+    def normalize(self) -> interfaces.Quaternion:
         length = math.sqrt(self.real**2 + sum(self.vector.elementwise() ** 2))
         return Quaternion.from_standard(
             self.real / length,
@@ -64,8 +66,8 @@ class Quaternion:
         return bool(self.vector)
 
     def __mul__(
-        self, other: Quaternion | pygame.Vector3 | float
-    ) -> Quaternion | pygame.Vector3 | float:
+        self, other: interfaces.Quaternion | pygame.Vector3 | float
+    ) -> interfaces.Quaternion | pygame.Vector3:
         if isinstance(other, Quaternion):
             r1, i1, j1, k1 = self.real, *self.vector
             r2, i2, j2, k2 = other.real, *other.vector

@@ -350,7 +350,7 @@ class Iball(sprite.Sprite):
                         self.get_level(),
                         pygame.Rect(self.rect.center, (2, 1)),
                         self.z,
-                        self.facing.to_vector(),
+                        self.facing,
                     )
                 )
                 self.shoot_cooldown.reset()
@@ -443,9 +443,9 @@ class Drone(sprite.Sprite):
                     else:
                         self.state = "idle"
                 elif self.shoot_cooldown.done():
-                    direction = pygame.Vector2(1, 0)
+                    direction = interfaces.Direction.RIGHT
                     if self.facing_left:
-                        direction.x *= -1
+                        direction = interfaces.Direction.LEFT
                     self.get_level().add_sprite(
                         projectile.Laser(
                             self.get_level(),

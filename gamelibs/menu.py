@@ -1,17 +1,17 @@
-from curses.textpad import rectangle
+# TODO: This type hinting is terrible.
+# Why did I even bother with this...?
+
 from functools import partial
 from math import ceil, sin
-from tkinter import DISABLED
 from typing import Any, Callable, Sequence
 from enum import Enum, auto
 
 import pygame
-from pygame.typing import Point, RectLike
+from pygame.typing import RectLike
 
 from gamelibs import (
     animation,
     game_state,
-    loader,
     sprite,
     timer,
     env,
@@ -24,7 +24,7 @@ from gamelibs import (
 def nine_slice(
     images: Sequence[pygame.Surface], size: tuple[int, int]
 ) -> pygame.Surface:
-    image = loader.Loader.create_surface(size)
+    image = hardware.loader.create_surface(size)
     rect = pygame.Rect(0, 0, *size)
     rects = [image.get_rect() for image in images]
     middle_rect = rect.copy()
@@ -58,7 +58,7 @@ def nine_slice(
 def three_slice(images: Sequence[pygame.Surface], width: int) -> pygame.Surface:
     if width < images[0].get_width() + images[2].get_width():
         return images[1]
-    image = loader.Loader.create_surface((width, images[0].get_height()))
+    image = hardware.loader.create_surface((width, images[0].get_height()))
     image.blit(images[0], (0, 0))
     image.blit(
         pygame.transform.scale(
@@ -318,7 +318,6 @@ class Setting(sprite.GUISprite):
         level: interfaces.Level,
         rect: RectLike,
         name: str,
-        setting_type: type,
         start_value: Any = None,
         on_switch: Callable[[Any], Any] = lambda value: print(value),
         z: int = 0,
@@ -328,7 +327,7 @@ class Setting(sprite.GUISprite):
         label_rect = rect.copy()
         label_rect.width //= 2
         self.label = Label(level, label_rect, name)
-        self.type = setting_type
+        self.type: type = type(start_value)
         if self.type == bool:
             switch_rect = rect.copy()
             switch_rect.size = (16, 8)
@@ -337,7 +336,7 @@ class Setting(sprite.GUISprite):
             self.toggler = ToggleSwitch(
                 level, switch_rect, z, on_switch, not start_value
             )
-        if self.type == interfaces.ScaleMode:
+        elif self.type == interfaces.ScaleMode:
             switch_rect = rect.copy()
             switch_rect.size = (128, self.rect.height)
             switch_rect.right = rect.right
@@ -349,7 +348,7 @@ class Setting(sprite.GUISprite):
                 on_switch,
                 start_value,
             )
-        if self.type == interfaces.GraphicsSetting:
+        elif self.type == interfaces.GraphicsSetting:
             switch_rect = rect.copy()
             switch_rect.size = (128, self.rect.height)
             switch_rect.right = rect.right
@@ -361,12 +360,16 @@ class Setting(sprite.GUISprite):
                 on_switch,
                 start_value,
             )
-        if self.type == interfaces.FrameCap:
+        elif self.type == interfaces.FrameCap:
             switch_rect = rect.copy()
             switch_rect.size = (128, self.rect.height)
             switch_rect.right = rect.right
             self.toggler = Selector(
                 level, switch_rect, list(interfaces.FrameCap), z, on_switch, start_value
+            )
+        else:
+            raise TypeError(
+                "Setting is of unsupported type.  See interfaces.GameSetting fields for up-to-date list."
             )
 
         self.state = self.State.NORMAL
@@ -404,7 +407,13 @@ class KnifeIndicator(sprite.GUISprite):
     STATE_GREEN = 0
     STATE_RED = 1
 
-    def __init__(self, level: interfaces.Level, button_dict: dict[tuple[int | None, int | None], Button], start_pos: Point=(0, 0), z: int=0) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        button_dict: dict[tuple[int | None, int | None], Button],
+        start_pos: tuple[int, int] = (0, 0),
+        z: int = 0,
+    ) -> None:
         button_coords = list(button_dict.keys())
         button_xs = [i[0] for i in button_coords if i[0] is not None]
         button_ys = [i[1] for i in button_coords if i[1] is not None]
@@ -413,17 +422,33 @@ class KnifeIndicator(sprite.GUISprite):
             min(button_xs), min(button_ys), max(button_xs), max(button_ys)
         ).inflate(5, 5)
         self.anim = animation.Animation(
-            [hardware.loader.get_surface("gui.png", f"Knife{i}") for i in range(4)]
+            [
+                hardware.loader.get_surface("gui.png", i)
+                for i in [
+                    [0, 48, 16, 16],
+                    [0, 64, 16, 16],
+                    [0, 80, 16, 16],
+                    [0, 96, 16, 16],
+                ]
+            ]
         )
         self.red_anim = animation.Animation(
-            [hardware.loader.get_surface("gui.png", f"RedKnife{i}") for i in range(4)]
+            [
+                hardware.loader.get_surface("gui.png", i)
+                for i in [
+                    [16, 96, 16, 16],
+                    [32, 96, 16, 16],
+                    [48, 96, 16, 16],
+                    [64, 96, 16, 16],
+                ]
+            ]
         )
         self.state = self.STATE_GREEN
         self.age = 0
-        self.button_coord = start_pos
-        self.last_coord = start_pos
-        self.last_x = start_pos[0]
-        self.last_y = start_pos[1]
+        self.button_coord: tuple[int | None, int | None] = (start_pos[0], start_pos[1])
+        self.last_coord: tuple[int | None, int | None] = (start_pos[0], start_pos[1])
+        self.last_x: int = start_pos[0]
+        self.last_y: int = start_pos[1]
         self.button.select()
         self.motion_cooldown = timer.Timer(150)
         super().__init__(
@@ -433,13 +458,15 @@ class KnifeIndicator(sprite.GUISprite):
         )
 
     @property
-    def button(self):
+    def button(self) -> Button:
         return self.button_dict[self.button_coord]
 
-    def search(self, direction):
+    def search(
+        self, direction: interfaces.Direction
+    ) -> tuple[int, int] | tuple[int, None] | tuple[None, int] | None:
         current_x = self.last_x
         current_y = self.last_y
-        delta_x, delta_y = direction
+        delta_x, delta_y = direction.to_tuple()
         while self.button_bounds.collidepoint(current_x, current_y):
             current_x += delta_x
             current_y += delta_y
@@ -466,12 +493,12 @@ class KnifeIndicator(sprite.GUISprite):
                 return y_only_coord
         return None
 
-    def move(self, direction):
+    def move(self, direction: interfaces.Direction) -> None:
         if not self.motion_cooldown.done():
             return
         new_coord = self.search(direction)
         if new_coord is None:
-            return None
+            return
         self.last_coord = self.button_coord
         self.button_coord = new_coord
         if new_coord[0] is not None:
@@ -483,18 +510,18 @@ class KnifeIndicator(sprite.GUISprite):
         self.button.select()
         self.motion_cooldown.reset()
 
-    def update(self, dt):
-        pressed = self.level.game.input_queue.held
-        if pressed["up"]:
-            self.move((0, -1))
-        if pressed["down"]:
-            self.move((0, 1))
-        if pressed["left"]:
-            self.move((-1, 0))
-        if pressed["right"]:
-            self.move((1, 0))
+    def update(self, dt: float) -> bool:
+        pressed = hardware.input_queue.held
+        if "up" in pressed:
+            self.move(interfaces.Direction.UP)
+        if "down" in pressed:
+            self.move(interfaces.Direction.DOWN)
+        if "left" in pressed:
+            self.move(interfaces.Direction.LEFT)
+        if "right" in pressed:
+            self.move(interfaces.Direction.RIGHT)
 
-        if "interact" in self.level.game.input_queue.just_pressed:
+        if "interact" in hardware.input_queue.just_pressed:
             self.button.click()
         self.age += dt
         self.rect.midright = self.button.rect.midleft
@@ -503,21 +530,27 @@ class KnifeIndicator(sprite.GUISprite):
         self.motion_cooldown.update()
         return True
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         anim = self.anim
         if self.state == self.STATE_RED:
             anim = self.red_anim
         surface.blit(anim.image, self.rect.move(sin(self.age * 5) * 2, 0))
 
-    def make_red(self):
+    def make_red(self) -> None:
         self.state = self.STATE_RED
 
-    def make_green(self):
+    def make_green(self) -> None:
         self.state = self.STATE_GREEN
 
 
 class TextButton(Button):
-    def __init__(self, level, rect, text, on_click=lambda: None):
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike,
+        text: str,
+        on_click: Callable[[], Any] = lambda: None,
+    ) -> None:
         super().__init__(
             level,
             rect,
@@ -526,29 +559,31 @@ class TextButton(Button):
         )
         self.text = text
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         surface.blit(self.top_image, self.top_image.get_rect(midleft=self.rect.midleft))
 
 
 class TextInput(sprite.GUISprite):
-    def __init__(self, level, rect, z=0, max_chars=16):
+    def __init__(
+        self, level: interfaces.Level, rect: RectLike, z: int = 0, max_chars: int = 16
+    ) -> None:
         super().__init__(level, None, rect, z)
-        self.text = ["_"] * max_chars
-        self.cursor_position = 0
-        self.age = 0
+        self.text: list[str] = ["_"] * max_chars
+        self.cursor_position: int = 0
+        self.age: float = 0
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.age += dt
         return super().update(dt)
 
-    def draw(self, surface):
+    def draw(self, surface: pygame.Surface) -> None:
         text_copy = self.text.copy()
         if self.age % 1 < 0.5:
             text_copy[self.cursor_position] = "|"
-        text = self.hardware.loader.font.render("".join(text_copy))
+        text = hardware.loader.font.render("".join(text_copy))
         surface.blit(text, text.get_rect(center=self.rect.center))
 
-    def input_character(self, char):
+    def input_character(self, char: str) -> None:
         if char == "\b":
             self.cursor_position -= 1
             self.text[self.cursor_position] = "_"
@@ -557,13 +592,19 @@ class TextInput(sprite.GUISprite):
                 char = " "
             self.text[self.cursor_position] = char
             self.cursor_position += 1
-        self.cursor_position = pygame.math.clamp(
-            self.cursor_position, 0, len(self.text) - 1
+        self.cursor_position = int(
+            pygame.math.clamp(self.cursor_position, 0, len(self.text) - 1)
         )
 
 
 class Save(TextButton):
-    def __init__(self, level, rect, index, name):
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike,
+        index: int,
+        name: interfaces.FileID,
+    ) -> None:
         self.name = name
         super().__init__(
             level,
@@ -572,18 +613,21 @@ class Save(TextButton):
             self.load,
         )
 
-    def load(self):
-        if self.level.delete_mode:
+    def get_level(self) -> "MainMenu":  # type: ignore
+        return super().get_level()  # type: ignore
+
+    def load(self) -> None:
+        if self.get_level().delete_mode:
             if self.name:
-                self.level.game.stack.appendleft(
-                    DeleteConfirmationMenu(self.level.game, self.name)
+                self.get_game().push_state(
+                    DeleteConfirmationMenu(self.get_game(), self.name)
                 )
-            self.level.delete_mode_toggle()
+            self.get_level().delete_mode_toggle()
             return
         if self.name:
-            self.level.game.load_save(self.name)
+            self.get_game().load_save(self.name)
         else:
-            self.level.game.stack.appendleft(NameInputMenu(self.level.game))
+            self.get_game().push_state(NameInputMenu(self.get_game()))
 
 
 class Image(sprite.GUISprite):
@@ -591,19 +635,19 @@ class Image(sprite.GUISprite):
 
 
 class MainMenu(game_state.GameState):
-    def __init__(self, game):
+    def __init__(self, game: interfaces.Game) -> None:
         super().__init__(game, "black")
         self.delete_mode = False
 
         backdrop = pygame.transform.scale(
-            game.loader.get_surface("background.png"), game.screen_rect.size
+            hardware.loader.get_surface("background.png"), util_draw.SCREEN_RECT.size
         )
 
-        background_rect = game.screen_rect.inflate(-16, -16)
-        title1 = game.loader.get_surface("gui.png", "PROJECT")
+        background_rect = util_draw.SCREEN_RECT.inflate(-16, -16)
+        title1 = hardware.loader.get_surface("gui.png", (0, 0, 80, 16))
         title1_rect = pygame.Rect(20, background_rect.top + 10, *title1.get_size())
 
-        title2 = game.loader.get_surface("gui.png", "GEMINI")
+        title2 = hardware.loader.get_surface("gui.png", (0, 16, 128, 32))
         title2_rect = pygame.Rect(0, title1_rect.bottom, *title2.get_size())
         title2_rect.centerx = background_rect.centerx
 
@@ -612,26 +656,26 @@ class MainMenu(game_state.GameState):
         button_rect.centerx = background_rect.centerx
         button_dict = {}
 
-        save_names = self.game.loader.get_save_names(5)
+        save_names = hardware.loader.get_save_names(5)
 
-        self.gui = [
-            Image(self, backdrop, game.screen_rect),
-            Background(self, background_rect, -1),
+        self.gui: list[interfaces.GUISprite] = [  # type: ignore
+            Image(self, backdrop, util_draw.SCREEN_RECT),  # type: ignore
+            Background(self, background_rect, -1),  # type: ignore
             Image(
-                self,
+                self,  # type: ignore
                 title1,
                 title1_rect,
             ),
             Image(
-                self,
+                self,  # type: ignore
                 title2,
                 title2_rect,
             ),
         ]
         i = 0
         for i, save_name in enumerate(save_names):
-            button = Save(self, button_rect, i + 1, save_name)
-            self.gui.append(button)
+            button = Save(self, button_rect, i + 1, save_name)  # type: ignore
+            self.gui.append(button)  # type: ignore
             button_dict[(0, i)] = button
             button_rect.top = button_rect.bottom + 3
 
@@ -639,9 +683,9 @@ class MainMenu(game_state.GameState):
         button_rect.width -= 25
         button_rect.x += 25
         delete_button = Button(
-            self,
+            self,  # type: ignore
             button_rect,
-            self.game.loader.font.render("Delete Data"),
+            hardware.loader.font.render("Delete Data"),
             self.delete_mode_toggle,
         )
         i += 1
@@ -651,9 +695,9 @@ class MainMenu(game_state.GameState):
         button_rect.top = button_rect.bottom + 3
 
         settings_button = Button(
-            self,
+            self,  # type: ignore
             button_rect,
-            self.game.loader.font.render("Settings"),
+            hardware.loader.font.render("Settings"),
             self.open_settings,
         )
         i += 1
@@ -664,63 +708,64 @@ class MainMenu(game_state.GameState):
 
         if not env.PYGBAG:
             exit_button = Button(
-                self,
+                self,  # type: ignore
                 button_rect,
-                self.game.loader.font.render("Exit Game"),
+                hardware.loader.font.render("Exit Game"),
                 self.game.exit,
             )
             self.gui.append(exit_button)
             button_dict[(0, i + 2)] = exit_button
 
-        self.knife = KnifeIndicator(self, button_dict=button_dict)
+        self.knife = KnifeIndicator(self, button_dict=button_dict)  # type: ignore
         self.gui.append(self.knife)
 
         # TODO: better place for this...?
         self.game.play_soundtrack("CelestialHymn")
 
-    def delete_mode_toggle(self):
+    def delete_mode_toggle(self) -> None:
         self.delete_mode = not self.delete_mode
         if self.delete_mode:
             self.knife.make_red()
         else:
             self.knife.make_green()
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
-        if "quit" in self.game.input_queue.just_pressed:
+        if "quit" in hardware.input_queue.just_pressed:
             self.game.exit()
         return super().update(dt)
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
         for sprite in self.gui:
             sprite.draw(self.game.window_surface)
 
-    def start(self):
+    def start(self) -> None:
         self.pop()
 
-    def quit(self):
+    def quit(self) -> None:
         self.game.quit()
 
-    def open_settings(self):
-        self.game.stack.appendleft(SettingsMenu(self.game))
+    def open_settings(self) -> None:
+        self.get_game().push_state(SettingsMenu(self.game))
 
 
 class NameInputMenu(game_state.GameState):
     MAX_CHARS = 16
 
-    def __init__(self, game):
+    def __init__(self, game: interfaces.Game) -> None:
         super().__init__(game, "black")
-        background_rect = game.screen_rect.inflate(-16, -16)
-        self.gui = [
+        background_rect = util_draw.SCREEN_RECT.inflate(-16, -16)
+        self.gui: list[interfaces.GUISprite] = [  # type: ignore
             Image(
-                self,
+                self,  # type: ignore
                 pygame.transform.scale(
-                    game.loader.get_surface("background.png"), game.screen_rect.size
+                    hardware.loader.get_surface("background.png"),
+                    util_draw.SCREEN_RECT.size,
                 ),
-                game.screen_rect,
+                util_draw.SCREEN_RECT,
             ),
-            Background(self, background_rect, -1),
+            Background(self, background_rect, -1),  # type: ignore
         ]
 
         per_row = 14
@@ -738,11 +783,11 @@ class NameInputMenu(game_state.GameState):
 
         button_x = 0
         button_y = 0
-        button_dict = {}
+        button_dict: dict[tuple[int | None, int | None], Button] = {}
 
-        for i, letter in enumerate(letters):
+        for letter in letters:
             button = TextButton(
-                self, letter_rect, letter, partial(self.click_letter, letter)
+                self, letter_rect, letter, partial(self.click_letter, letter)  # type: ignore
             )
             self.gui.append(button)
             button_dict[(button_x, button_y)] = button
@@ -755,59 +800,59 @@ class NameInputMenu(game_state.GameState):
                 button_y += 1
 
         button_rect = pygame.Rect(
-            (0, keyboard_rect.bottom), self.game.loader.font.size("ABCD")
+            (0, keyboard_rect.bottom), hardware.loader.font.size("ABCD")
         )
         button_rect.centerx = keyboard_rect.centerx
-        cancel_button = TextButton(self, button_rect, "Back", self.cancel)
+        cancel_button = TextButton(self, button_rect, "Back", self.cancel)  # type: ignore
         self.gui.append(cancel_button)
         button_dict[(None, button_y + 1)] = cancel_button
 
         button_rect.bottom = keyboard_rect.top
-        confirm_button = TextButton(self, button_rect, "Done", self.confirm_name)
+        confirm_button = TextButton(self, button_rect, "Done", self.confirm_name)  # type: ignore
         self.gui.append(confirm_button)
         button_dict[(None, -1)] = confirm_button
 
-        self.gui.append(KnifeIndicator(self, button_dict, (0, 0), 1))
+        self.gui.append(KnifeIndicator(self, button_dict, (0, 0), 1))  # type: ignore
 
         start_text = "_" * self.MAX_CHARS
-        name_rect = pygame.Rect((0, 0), self.game.loader.font.size(start_text))
+        name_rect = pygame.Rect((0, 0), hardware.loader.font.size(start_text))
         name_rect.bottom = button_rect.top - 10
         name_rect.centerx = background_rect.centerx
-        self.input = TextInput(self, name_rect)
+        self.input = TextInput(self, name_rect)  # type: ignore
         self.gui.append(self.input)
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
-        if "quit" in self.game.input_queue.just_pressed:
+        if "quit" in hardware.input_queue.just_pressed:
             self.game.quit()
         return super().update(dt)
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
         for sprite in self.gui:
             sprite.draw(self.game.window_surface)
 
-    def click_letter(self, letter):
+    def click_letter(self, letter: str) -> None:
         self.input.input_character(letter)
 
-    def confirm_name(self):
-        self.game.save.load("start1")
+    def confirm_name(self) -> None:
+        self.get_game().get_save().load("start1")
         save_name = "".join(self.input.text).replace("_", "")
         if save_name:
-            self.game.save.loaded_path = save_name
-            self.game.save.save()
+            self.get_game().get_save().loaded_path = save_name
+            self.get_game().get_save().save()
             self.game.load_save(save_name)
 
-    def cancel(self):
+    def cancel(self) -> None:
         self.pop()
 
 
 class DeleteConfirmationMenu(game_state.GameState):
-    def __init__(self, game, save_name):
+    def __init__(self, game: interfaces.Game, save_name: interfaces.FileID) -> None:
         self.save_name = save_name
         super().__init__(game, (0, 0, 0, 0))
         background_rect = pygame.Rect(0, 0, 256, 48)
-        background_rect.center = self.game.screen_rect.center
+        background_rect.center = util_draw.SCREEN_RECT.center
         button1_rect = pygame.Rect(
             background_rect.left + 32,
             background_rect.top + 8,
@@ -820,119 +865,107 @@ class DeleteConfirmationMenu(game_state.GameState):
             background_rect.width - 64,
             16,
         )
-        button_dict = {
+        button_dict: dict[tuple[int | None, int | None], Button] = {
             (0, 0): Button(
-                self,
+                self,  # type: ignore
                 button1_rect,
-                self.game.loader.font.render(f"Keep '{save_name}'"),
+                hardware.loader.font.render(f"Keep '{save_name}'"),
                 self.keep,
             ),
             (0, 1): Button(
-                self,
+                self,  # type: ignore
                 button2_rect,
-                self.game.loader.font.render(f"Delete '{save_name}'"),
+                hardware.loader.font.render(f"Delete '{save_name}'"),
                 self.delete,
             ),
         }
-        self.gui = [
+        self.gui: list[interfaces.GUISprite] = [  # type: ignore
             Image(
-                self,
+                self,  # type: ignore
                 pygame.transform.scale(
-                    game.loader.get_surface("background.png"), game.screen_rect.size
+                    hardware.loader.get_surface("background.png"),
+                    util_draw.SCREEN_RECT.size,
                 ),
-                game.screen_rect,
+                util_draw.SCREEN_RECT,
             ),
-            Background(self, background_rect, -1),
+            Background(self, background_rect, -1),  # type: ignore
             *button_dict.values(),
-            KnifeIndicator(self, button_dict),
+            KnifeIndicator(self, button_dict),  # type: ignore
         ]
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
-        if "quit" in self.game.input_queue.just_pressed:
+        if "quit" in hardware.input_queue.just_pressed:
             self.game.quit()
         return super().update(dt)
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
         for sprite in self.gui:
             sprite.draw(self.game.window_surface)
 
-    def keep(self):
+    def keep(self) -> None:
         self.pop()
 
-    def delete(self):
-        self.game.save.delete(self.save_name)
-        print(self.game.loader.get_save_names())
-        self.game.stack.clear()
-        self.game.stack.appendleft(MainMenu(self.game))
+    def delete(self) -> None:
+        self.get_game().get_save().delete(self.save_name)
+        print(hardware.loader.get_save_names())
+        self.get_game().quit()  # runs back into main menu
 
 
 class SettingsMenu(game_state.GameState):
-    def __init__(self, game):
+    def __init__(self, game: interfaces.Game) -> None:
         super().__init__(game, "black")
-        background_rect = game.screen_rect.inflate(-16, -16)
-        button_dict = {}
-        self.gui = []
+        background_rect = util_draw.SCREEN_RECT.inflate(-16, -16)
+        button_dict: dict[tuple[int | None, int | None], Button] = {}
+        self.gui: list[interfaces.GUISprite] = []
         y = 0
         z = 1
-        print(self.game.settings)
-        for name, value in self.game.settings.items():
+        for name, value in hardware.settings.fields():
             rect = pygame.Rect(32, y * 20 + 48, background_rect.width - 32 - 8, 16)
-            if value in {True, False}:
-                setting_type = Setting.TYPE_BOOL
-            elif value in util_draw.SCALEMODES:
-                setting_type = Setting.TYPE_SCALEMODE
-            elif value in util_draw.QUALITY_PRESETS:
-                setting_type = Setting.TYPE_GRAPHICS_PRESET
-            elif value in util_draw.FRAMECAPS:
-                setting_type = Setting.TYPE_FRAMECAP
-            else:
-                print(name, value)
-                raise
             element = Setting(
-                self,
+                self,  # type: ignore
                 rect,
                 name,
-                setting_type,
                 value,
                 partial(self.game.switch_setting, name),
                 z,
             )
             self.gui.append(element)
-            button_dict[(0, y)] = element
+            button_dict[(0, y)] = element  # type: ignore
             y += 1
 
         rect = pygame.Rect(32, y * 20 + 48, 128, 16)
         rect.centerx = background_rect.centerx
-        back_button = Button(
-            self, rect, self.game.loader.font.render("OK"), self.pop, 1
+        back_button: Button = Button(
+            self, rect, hardware.loader.font.render("OK"), self.pop, 1  # type: ignore
         )
         button_dict[(0, y)] = back_button
 
         self.gui.extend(
             [
                 Image(
-                    self,
+                    self,  # type: ignore
                     pygame.transform.scale(
-                        game.loader.get_surface("background.png"), game.screen_rect.size
+                        hardware.loader.get_surface("background.png"),
+                        util_draw.SCREEN_RECT.size,
                     ),
-                    game.screen_rect,
+                    util_draw.SCREEN_RECT,
                 ),
-                Background(self, background_rect, -1),
+                Background(self, background_rect, -1),  # type: ignore
                 *button_dict.values(),
-                KnifeIndicator(self, button_dict),
+                KnifeIndicator(self, button_dict),  # type: ignore
                 back_button,
             ]
         )
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
-        if "quit" in self.game.input_queue.just_pressed:
+        if "quit" in hardware.input_queue.just_pressed:
             self.game.quit()
         return super().update(dt)
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
         for sprite in self.gui:
             sprite.draw(self.game.window_surface)

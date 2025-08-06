@@ -22,3 +22,6 @@ class GameState(interfaces.GameState):
 
     def draw(self) -> None:
         pass
+
+    def get_game(self) -> interfaces.Game:
+        return self.game

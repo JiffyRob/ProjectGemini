@@ -1,8 +1,7 @@
 from enum import Enum, IntFlag, StrEnum, IntEnum, auto
-from typing import Callable, Any, Iterable, Protocol
+from typing import Callable, Any, Generator, Iterable, Protocol
 from pygame.typing import RectLike, Point, SequenceLike
 from pygame.math import Vector2
-from deprecated import deprecated
 from dataclasses import dataclass
 from copy import copy
 from numpy import ndarray
@@ -47,6 +46,14 @@ class Direction(StrEnum):
                 self.RIGHT: (1, 0),
             }[self]
         )
+
+    def to_tuple(self) -> tuple[int, int]:
+        return {
+            self.UP: (0, -1),
+            self.DOWN: (0, 1),
+            self.LEFT: (-1, 0),
+            self.RIGHT: (1, 0),
+        }[self]
 
     def reverse(self) -> "Direction":
         cls = self.__class__
@@ -135,6 +142,10 @@ class GameSettings:
             "graphics": self.graphics.value,
         }
 
+    def fields(self) -> Generator[tuple[str, Any]]:
+        for field in {"vsync", "fullscreen", "scale", "framecap", "graphics,"}:
+            yield field, getattr(self, field)
+
 
 class Quaternion(Protocol):
     def magnitude(self) -> float: ...
@@ -161,15 +172,23 @@ class Quaternion(Protocol):
 
     def __bool__(self) -> bool: ...
 
-    def __eq__(self, other: object) -> bool: ...
-
-    def __ne__(self, other: object) -> bool: ...
-
     def __mul__(
         self, other: "Quaternion | pygame.Vector3 | float"
     ) -> "Quaternion | pygame.Vector3": ...
 
     def __repr__(self) -> str: ...
+
+    @property
+    def real(self) -> float: ...
+
+    @real.setter
+    def real(self, value: float) -> None: ...
+
+    @property
+    def vector(self) -> pygame.Vector3: ...
+
+    @vector.setter
+    def vector(self, value: pygame.Vector3) -> None: ...
 
 
 class GameSave(Protocol):
@@ -189,6 +208,9 @@ class GameSave(Protocol):
 
     @property
     def loaded_path(self) -> FileID: ...
+
+    @loaded_path.setter
+    def loaded_path(self, value: FileID): ...
 
 
 class SoundManager(Protocol):
@@ -501,6 +523,8 @@ class Loader(Protocol):
 
 
 class Game(Protocol):
+    def push_state(self, state: "GameState") -> None: ...
+
     def pop_state(self) -> None: ...
 
     def get_level(self) -> "Level": ...
@@ -573,6 +597,8 @@ class GameState(Protocol):
     def update(self, dt: float) -> bool: ...
 
     def draw(self) -> None: ...
+
+    def get_game(self) -> Game: ...
 
 
 class Background(Protocol):

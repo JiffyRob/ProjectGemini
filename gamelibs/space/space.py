@@ -49,9 +49,6 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
             self.minimap,
         ]
         self.sprites = []
-        self.ship_overlay = hardware.loader.get_surface_scaled_to(
-            "ship-inside.png", util_draw.RESOLUTION
-        )
 
         self.space_renderer = glsprite3d.SpaceRendererHW(self, self.RADIUS)
         self.gui_renderer = gui3d.GUIRendererHW(self, self.gui)

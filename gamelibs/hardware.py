@@ -7,3 +7,4 @@ loader: interfaces.Loader = Loader()
 sound_manager: interfaces.SoundManager = SoundManager(loader)
 input_queue: interfaces.InputQueue = InputQueue()
 save: interfaces.GameSave
+settings: interfaces.GameSettings

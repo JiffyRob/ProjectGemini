@@ -94,10 +94,10 @@ class GunPlatform(sprite.Sprite):
         self.dest_dt = 0
         self.shoot_timer = timer.DTimer(2000)
         if self.facing_left:
-            self.shoot_direction = pygame.Vector2(-128, 0)
+            self.shoot_direction = interfaces.Direction.LEFT
             self.shoot_start = pygame.Vector2(-2, 4)
         else:
-            self.shoot_direction = pygame.Vector2(128, 0)
+            self.shoot_direction = interfaces.Direction.RIGHT
             self.shoot_start = pygame.Vector2(self.rect.width + 2, 4)
 
     def shoot(self) -> None:

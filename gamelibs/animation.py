@@ -51,7 +51,7 @@ class NoLoopAnimation(interfaces.Animation):
         speed: float = 0.2,
         flip_x: bool = False,
         flip_y: bool = False,
-    ):
+    ) -> None:
         self.frames = list(frames)
         self.time = 0.0
         self.speed = speed

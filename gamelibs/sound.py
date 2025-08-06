@@ -92,13 +92,13 @@ class SoundManager:
     ) -> None:
         if track is None:
             return
-        track = self.loader.join(track)
+        path = self.loader.join(track)
         if track != self.current_track:
             pygame.mixer.music.set_volume(self.music_volume * volume)
             pygame.mixer.music.stop()
-            pygame.mixer.music.load(track)
+            pygame.mixer.music.load(path)
             pygame.mixer.music.play(loops, start, fade_ms)
-            self.current_track = track
+            self.current_track = str(path)
         else:
             pass
 
