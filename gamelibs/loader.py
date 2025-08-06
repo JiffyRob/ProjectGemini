@@ -93,7 +93,7 @@ class Loader(interfaces.Loader):
 
     @functools.cache
     def get_csv(self, path: FileID, item_delimiter: str = ",", line_delimiter: str = "\n", for_map: bool = False) -> tuple[tuple[str, ...], ...]:  # type: ignore
-        text = self.get_text(path, for_map)
+        text = self.get_text(path + ".csv", for_map)
         lines: list[tuple[str, ...]] = []
         for line in text.split(line_delimiter):
             if not line:

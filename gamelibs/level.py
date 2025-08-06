@@ -2,7 +2,7 @@ import asyncio
 import pathlib
 from collections import defaultdict
 from random import uniform
-from typing import Any, Callable, Generator, cast
+from typing import Any, Callable, Iterator, cast
 
 import pygame
 from pygame.typing import ColorLike, Point, RectLike
@@ -61,7 +61,7 @@ class Parallax(interfaces.Background):
         self.image = self.anim.image
 
     @classmethod
-    def load(cls, level: interfaces.Level, name: str) -> Generator["Parallax"]:
+    def load(cls, level: interfaces.Level, name: str) -> Iterator["Parallax"]:
         # load background data
         data = hardware.loader.get_json("backgrounds.json")
         defaults = data.get("default", None)
@@ -253,8 +253,7 @@ class Level(game_state.GameState, interfaces.Level):
         self.add_sprite(self.player)
         self.add_sprite(self.iball)
         self.update(0)
-        self.get_game().run_cutscene("level_begin")
-
+        self.get_game().delayed_callback(0, lambda: self.get_game().run_cutscene("level_begin"))
     @property
     def map_rect(self) -> pygame.Rect:
         return self._map_rect
@@ -451,6 +450,9 @@ class Level(game_state.GameState, interfaces.Level):
 
     def get_group(self, group_name: str) -> set[interfaces.Sprite]:
         return self.groups[group_name]
+    
+    def get_player(self) -> interfaces.Player:
+        return self.player
 
     def get_rects(self, rect_name: str) -> list[interfaces.MiscRect]:
         return self.rects[rect_name]

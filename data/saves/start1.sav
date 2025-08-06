@@ -1,6 +1,6 @@
 {
   "health": 6,
-  "health_capacity": 6,
+  "max_health": 6,
   "planet": "GeminiII_left_left",
   "bush_interactions": 0,
   "emeralds": 10,

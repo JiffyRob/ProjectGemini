@@ -82,7 +82,7 @@ class Sprite(interfaces.Sprite):
 
     @rect.setter
     def rect(self, value: RectLike) -> None:
-        self.rect = pygame.FRect(value)
+        self._rect = pygame.FRect(value)
 
     def update(self, dt: float) -> bool:
         if self.hidden:

@@ -26,8 +26,24 @@ class Animation(interfaces.Animation):
         self.frames = list(frames)
         self.time = 0.0
         self.speed = speed
-        self.flip_x = flip_x
-        self.flip_y = flip_y
+        self._flip_x = flip_x
+        self._flip_y = flip_y
+
+    @property
+    def flip_x(self) -> bool:
+        return self._flip_x
+    
+    @flip_x.setter
+    def flip_x(self, value: bool) -> None:
+        self._flip_x = value
+    
+    @property
+    def flip_y(self) -> bool:
+        return self._flip_y
+    
+    @flip_y.setter
+    def flip_y(self, value: bool) -> None:
+        self._flip_y = value
 
     def update(self, dt: float) -> None:
         self.time += dt
@@ -58,6 +74,22 @@ class NoLoopAnimation(interfaces.Animation):
         self.flip_x = flip_x
         self.flip_y = flip_y
 
+    @property
+    def flip_x(self) -> bool:
+        return self._flip_x
+    
+    @flip_x.setter
+    def flip_x(self, value: bool) -> None:
+        self._flip_x = value
+    
+    @property
+    def flip_y(self) -> bool:
+        return self._flip_y
+    
+    @flip_y.setter
+    def flip_y(self, value: bool) -> None:
+        self._flip_y = value
+
     def update(self, dt: float) -> None:
         self.time += dt
 
@@ -84,6 +116,22 @@ class SingleAnimation(interfaces.Animation):
         self.flip_x = flip_x
         self.flip_y = flip_y
 
+    @property
+    def flip_x(self) -> bool:
+        return self._flip_x
+    
+    @flip_x.setter
+    def flip_x(self, value: bool) -> None:
+        self._flip_x = value
+    
+    @property
+    def flip_y(self) -> bool:
+        return self._flip_y
+    
+    @flip_y.setter
+    def flip_y(self, value: bool) -> None:
+        self._flip_y = value
+
     def update(self, dt: float) -> None:
         pass
 
@@ -105,7 +153,7 @@ class AnimatedSurface(pygame.Surface, interfaces.Animation):
         speed: float = 0.2,
         flip_x: bool = False,
         flip_y: bool = False,
-    ):
+    ) -> None:
         self.frames = list(frames)
         self.time = 0.0
         self.speed = speed
@@ -113,6 +161,22 @@ class AnimatedSurface(pygame.Surface, interfaces.Animation):
         self.flip_y = flip_y
         self.index = 0
         super().__init__(self.frames[0].get_size(), pygame.SRCALPHA)
+
+    @property
+    def flip_x(self) -> bool:
+        return self._flip_x
+    
+    @flip_x.setter
+    def flip_x(self, value: bool) -> None:
+        self._flip_x = value
+    
+    @property
+    def flip_y(self) -> bool:
+        return self._flip_y
+    
+    @flip_y.setter
+    def flip_y(self, value: bool) -> None:
+        self._flip_y = value
 
     def restart(self) -> None:
         self.time = 0.0

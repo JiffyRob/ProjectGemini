@@ -63,6 +63,9 @@ class Game(interfaces.Game):
 
     def get_gl_context(self) -> zengl.Context:
         return self.context
+    
+    def get_current_planet_name(self) -> str:
+        return self.stack[0].name  # type: ignore
 
     def run_cutscene(
         self, name: interfaces.FileID, api: interfaces.SnekAPI = None
@@ -155,14 +158,11 @@ class Game(interfaces.Game):
         )
 
     def play_soundtrack(self, track_name: interfaces.FileID | None = None) -> None:
-        current_state = self.stack[0]
-        if track_name is None and type(
-            getattr(current_state, "soundtrack", None)
-        ) == type(""):
-            track_name = current_state.soundtrack  # type: ignore
-        if track_name is None:
-            # Use type check instead of isinstance for NewType
-            if type(getattr(current_state, "soundtrack", None)) == type(""):
+        if len(self.stack):
+            current_state = self.stack[0]
+            if track_name is None and type(
+                getattr(current_state, "soundtrack", None)
+            ) == type(""):
                 track_name = current_state.soundtrack  # type: ignore
             hardware.sound_manager.stop_track()
             hardware.sound_manager.stop_track()

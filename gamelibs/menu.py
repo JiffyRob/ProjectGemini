@@ -120,29 +120,29 @@ class Button(sprite.GUISprite):
             self.State.NORMAL: three_slice(
                 [
                     hardware.loader.get_surface("gui.png", i)
-                    for i in [
-                        [16, 64, 16, 16],
-                        [32, 64, 16, 16],
-                        [48, 64, 16, 16],
-                    ]
+                    for i in (
+                        (16, 64, 16, 16),
+                        (32, 64, 16, 16),
+                        (48, 64, 16, 16),
+                    )
                 ],
                 rect.width,
             ),
             self.State.SELECTED: three_slice(
                 [
                     hardware.loader.get_surface("gui.png", i)
-                    for i in [
-                        [16, 48, 16, 16],
-                        [32, 48, 16, 16],
-                        [48, 48, 16, 16],
-                    ]
+                    for i in (
+                        (16, 48, 16, 16),
+                        (32, 48, 16, 16),
+                        (48, 48, 16, 16),
+                    )
                 ],
                 rect.width,
             ),
             self.State.DISABLED: three_slice(
                 [
                     hardware.loader.get_surface("gui.png", i)
-                    for i in [[16, 80, 16, 16], [32, 80, 16, 16], [48, 80, 16, 16]]
+                    for i in ((16, 80, 16, 16), (32, 80, 16, 16), (48, 80, 16, 16))
                 ],
                 rect.width,
             ),
@@ -424,23 +424,23 @@ class KnifeIndicator(sprite.GUISprite):
         self.anim = animation.Animation(
             [
                 hardware.loader.get_surface("gui.png", i)
-                for i in [
-                    [0, 48, 16, 16],
-                    [0, 64, 16, 16],
-                    [0, 80, 16, 16],
-                    [0, 96, 16, 16],
-                ]
+                for i in (
+                    (0, 48, 16, 16),
+                    (0, 64, 16, 16),
+                    (0, 80, 16, 16),
+                    (0, 96, 16, 16),
+                )
             ]
         )
         self.red_anim = animation.Animation(
             [
                 hardware.loader.get_surface("gui.png", i)
-                for i in [
-                    [16, 96, 16, 16],
-                    [32, 96, 16, 16],
-                    [48, 96, 16, 16],
-                    [64, 96, 16, 16],
-                ]
+                for i in (
+                    (16, 96, 16, 16),
+                    (32, 96, 16, 16),
+                    (48, 96, 16, 16),
+                    (64, 96, 16, 16),
+                )
             ]
         )
         self.state = self.STATE_GREEN

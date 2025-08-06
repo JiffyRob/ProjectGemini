@@ -61,10 +61,10 @@ class ScrollingBackground(sprite.Sprite, interfaces.Background):
         super().__init__(level, self.get_next_image(), rect, z)
 
     def get_level(self) -> interfaces.HoverboardLevel:
-        return self.get_level()
+        return super().get_level()  # type: ignore
 
     def get_player(self) -> interfaces.HoverboardPlayer:
-        return self.get_player()
+        return super().get_player()  # type: ignore
 
     def lock(self) -> None:
         self.locked = True

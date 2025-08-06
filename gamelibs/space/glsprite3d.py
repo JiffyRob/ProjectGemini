@@ -83,29 +83,29 @@ class SpaceRendererHW:
 
         angle = numpy.linspace(0.0, numpy.pi * 2.0, self.CIRCLE_RESOLUTION)
         xy = numpy.array([numpy.cos(angle), numpy.sin(angle)])
-        vertex_buffer = self.level.game.context.buffer(xy.T.astype("f4").tobytes())
+        vertex_buffer = self.level.get_game().get_gl_context().buffer(xy.T.astype("f4").tobytes())
 
-        self.depth_buffer = self.level.game.context.image(
+        self.depth_buffer = self.level.get_game().get_gl_context().image(
             util_draw.RESOLUTION, "depth24plus"
         )
 
-        self.uniform_buffer = self.level.game.context.buffer(size=48)
+        self.uniform_buffer = self.level.get_game().get_gl_context().buffer(size=48)
 
         self.uniform_buffer.view()
 
-        self.star_pipeline = self.level.game.context.pipeline(
-            vertex_shader=self.level.game.loader.get_vertex_shader("space"),
-            fragment_shader=self.level.game.loader.get_fragment_shader("star"),
+        self.star_pipeline = self.level.get_game().get_gl_context().pipeline(
+            vertex_shader=hardware.loader.get_vertex_shader("space"),
+            fragment_shader=hardware.loader.get_fragment_shader("star"),
             framebuffer=[self.level.game.window.get_gl_surface(), self.depth_buffer],
             topology="triangle_fan",
             vertex_buffers=[
                 *zengl.bind(
-                    self.level.game.context.buffer(self.star_locations), "3f /i", 0
+                    self.level.get_game().get_gl_context().buffer(self.star_locations), "3f /i", 0
                 ),
-                *zengl.bind(self.level.game.context.buffer(self.star_ids), "1i /i", 1),
+                *zengl.bind(self.level.get_game().get_gl_context().buffer(self.star_ids), "1i /i", 1),
                 *zengl.bind(vertex_buffer, "2f", 2),
                 *zengl.bind(
-                    self.level.game.context.buffer(self.star_radii), "1f /i", 3
+                    self.level.get_game().get_gl_context().buffer(self.star_radii), "1f /i", 3
                 ),
             ],
             layout=[
@@ -124,28 +124,28 @@ class SpaceRendererHW:
             vertex_count=self.CIRCLE_RESOLUTION,
             instance_count=self.STAR_COUNT,
         )
-        self.planet_pipeline = self.level.game.context.pipeline(
+        self.planet_pipeline = self.level.get_game().get_gl_context().pipeline(
             includes={
-                "cnoise": self.level.game.loader.get_shader_library("cnoise"),
+                "cnoise": hardware.loader.get_shader_library("cnoise"),
                 "planets": planet_lib,
-                "planet_struct": self.level.game.loader.get_shader_library(
+                "planet_struct": hardware.loader.get_shader_library(
                     "planet_struct"
                 ),
             },
-            vertex_shader=self.level.game.loader.get_vertex_shader("space"),
-            fragment_shader=self.level.game.loader.get_fragment_shader("planet"),
+            vertex_shader=hardware.loader.get_vertex_shader("space"),
+            fragment_shader=hardware.loader.get_fragment_shader("planet"),
             framebuffer=[self.level.game.window.get_gl_surface(), self.depth_buffer],
             topology="triangle_fan",
             vertex_buffers=[
                 *zengl.bind(
-                    self.level.game.context.buffer(self.planet_locations), "3f /i", 0
+                    self.level.get_game().get_gl_context().buffer(self.planet_locations), "3f /i", 0
                 ),
                 *zengl.bind(
-                    self.level.game.context.buffer(self.planet_ids), "1i /i", 1
+                    self.level.get_game().get_gl_context().buffer(self.planet_ids), "1i /i", 1
                 ),
                 *zengl.bind(vertex_buffer, "2f", 2),
                 *zengl.bind(
-                    self.level.game.context.buffer(self.planet_radii), "1f /i", 3
+                    self.level.get_game().get_gl_context().buffer(self.planet_radii), "1f /i", 3
                 ),
             ],
             layout=[

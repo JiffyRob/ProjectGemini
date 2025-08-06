@@ -1,5 +1,5 @@
 from enum import Enum, IntFlag, StrEnum, IntEnum, auto
-from typing import Callable, Any, Iterator, Protocol, runtime_checkable
+from typing import Callable, Any, Iterable, Iterator, Protocol, runtime_checkable
 from pygame.typing import ColorLike, RectLike, Point, SequenceLike
 from pygame.math import Vector2
 from dataclasses import dataclass
@@ -150,7 +150,7 @@ class GameSettings:
             setattr(self, *field)
     
     def fields(self) -> Iterator[tuple[str, Any]]:
-        for field in {"vsync", "fullscreen", "scale", "framecap", "graphics,"}:
+        for field in {"vsync", "fullscreen", "scale", "framecap", "graphics"}:
             yield field, getattr(self, field)
 
 @runtime_checkable
@@ -259,7 +259,7 @@ class InputQueue(Protocol):
 
     def stop_rumble(self) -> None: ...
 
-    def update(self, events: Iterator[pygame.Event] | None = None) -> None: ...
+    def update(self, events: Iterable[pygame.Event] | None = None) -> None: ...
 
     def load_bindings(
         self, bindings: dict[str, set[str | None]], delete_old: bool = True
@@ -479,12 +479,12 @@ class _Timer(Protocol):
 
 
 @runtime_checkable
-class Timer(_Timer):
+class Timer(_Timer, Protocol):
     def update(self) -> None: ...
 
 
 @runtime_checkable
-class DTimer(_Timer):
+class DTimer(_Timer, Protocol):
     def update(self, dt: float) -> None: ...
 
 
@@ -562,7 +562,9 @@ class Game(Protocol):
 
     def get_gl_context(self) -> zengl.Context: ...
 
-    def run_cutscene(self, name: FileID, api: SnekAPI | None = None) -> None: ...
+    def get_current_planet_name(self) -> FileID: ...
+
+    def run_cutscene(self, name: FileID, api: SnekAPI = None) -> None: ...
 
     async def run_sub_cutscene(self, name: FileID, api: SnekAPI) -> None: ...
 

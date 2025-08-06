@@ -60,7 +60,7 @@ class Ship(Interactable, interfaces.Collider):
 
     @property
     def collision_rect(self) -> interfaces.MiscRect:
-        return self.collision_rect
+        return self._collision_rect
 
 
 class BrokenShip(Interactable, interfaces.Collider):
@@ -225,9 +225,6 @@ class Furniture(Interactable, interfaces.Collider):
     ) -> None:
         self.type = custom_fields["Type"]
         self.info = custom_fields["Info"]
-        self._collision_rect = self.rect.copy()
-        self._collision_rect.height *= 0.7
-        self._collision_rect.centery = self.rect.centery
         super().__init__(
             level,
             rect=rect,
@@ -238,6 +235,9 @@ class Furniture(Interactable, interfaces.Collider):
             script="furniture",
             api={"TEXT": self.info},
         )
+        self._collision_rect = self.rect.copy()
+        self._collision_rect.height *= 0.7
+        self._collision_rect.centery = self.rect.centery
 
     @property
     def collision_rect(self) -> interfaces.MiscRect:

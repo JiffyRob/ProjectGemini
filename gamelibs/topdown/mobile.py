@@ -1,6 +1,6 @@
 from math import sin
 import random
-from typing import Any, Generator
+from typing import Any, Iterator
 
 import pygame
 from pygame.typing import RectLike, Point
@@ -561,7 +561,7 @@ class DeadPlayer(sprite.Sprite):
         return super().update(dt)
 
 
-def search(start: Point) -> Generator[tuple[int, int]]:
+def search(start: Point) -> Iterator[tuple[int, int]]:
     """yields positions in a grid of spacing 'dist', in order of rough proximity to 'start'"""
 
     def neighbors(

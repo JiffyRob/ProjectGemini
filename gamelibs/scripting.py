@@ -4,6 +4,7 @@
 import pygame
 
 from SNEK2 import SNEKCallable, AsyncSNEKCallable, SNEKProgram, Arity
+from gamelibs import hardware
 
 
 class Write(AsyncSNEKCallable):
@@ -12,7 +13,7 @@ class Write(AsyncSNEKCallable):
         self._arity = 1
 
     async def call(self, interpreter, args):
-        await self.game.get_level().run_dialog(*args)
+        await self.game.get_state().run_dialog(*args)
 
 
 class Ask(AsyncSNEKCallable):
@@ -22,7 +23,7 @@ class Ask(AsyncSNEKCallable):
         self._arity = Arity(1, None)
 
     async def call(self, interpreter, args):
-        return await self.game.get_level().run_dialog(*args)
+        return await self.game.get_state().run_dialog(*args)
 
 
 class Transition(AsyncSNEKCallable):
@@ -34,11 +35,11 @@ class Transition(AsyncSNEKCallable):
         self._arity = Arity(1, 3)
 
     async def call(self, interpreter, args):
-        return await self.game.get_level().transition(*args)
+        return await self.game.get_state().transition(*args)
 
 
 class Rickroll(AsyncSNEKCallable):
-    def __init__(self):
+    def __init__(self) -> None:
         self._arity = 0
 
     async def call(self, interpreter, args):
@@ -60,19 +61,18 @@ class RunMap(AsyncSNEKCallable):
         self._arity = Arity(0, 1)
 
     async def call(self, interpreter, args):
-        return await self.game.get_level().attempt_map_cutscene()
+        return await self.game.get_state().attempt_map_cutscene()
 
 
 class Spawn(SNEKCallable):
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
-        self._arity = Arity(5, 6)
-
+        self._arity = Arity
     async def call(self, interpreter, args):
         if len(args) == 6:
             args = list(args)
             args.append(0)
-        return self.game.get_level().spawn(
+        return self.game.get_state().spawn(
             args[0],  # sprite name
             args[1:5],  # rect
             args[5],  # z
@@ -85,7 +85,7 @@ class SpawnShip(SNEKCallable):
         self._arity = 5
 
     async def call(self, interpreter, args):
-        self.game.get_level().spawn(
+        self.game.get_state().spawn(
             "Ship",
             pygame.Rect(args[1] - 24, args[2] - 16, 48, 32),
             start=(args[1], args[2]),
@@ -100,7 +100,7 @@ class Fade(AsyncSNEKCallable):
         self._arity = Arity(1, 5)
 
     async def call(self, interpreter, args):
-        return await self.game.get_level().fade(*args)
+        return await self.game.get_state().fade(*args)
 
 
 class Script(SNEKProgram):
@@ -116,44 +116,44 @@ class Script(SNEKProgram):
             "attempt_map_cutscene": RunMap(game),
             "spawn": Spawn(game),
             "lock": SNEKCallable(
-                lambda *args: game.get_level().lock(*args), Arity(0, 1)
+                lambda *args: game.get_state().lock(*args), Arity(0, 1)
             ),
             "unlock": SNEKCallable(
-                lambda *args: game.get_level().unlock(*args), Arity(0, 1)
+                lambda *args: game.get_state().unlock(*args), Arity(0, 1)
             ),
             "hide": SNEKCallable(
-                lambda *args: game.get_level().hide(*args), Arity(0, 1)
+                lambda *args: game.get_state().hide(*args), Arity(0, 1)
             ),
             "show": SNEKCallable(
-                lambda *args: game.get_level().show(*args), Arity(0, 1)
+                lambda *args: game.get_state().show(*args), Arity(0, 1)
             ),
             "fade": Fade(game),
-            "clear_effects": SNEKCallable(lambda: game.get_level().clear_effects(), 0),
+            "clear_effects": SNEKCallable(lambda: game.get_state().clear_effects(), 0),
             "play_soundtrack": SNEKCallable(game.play_soundtrack, Arity(0, 1)),
             "spawn_ship": SpawnShip(game),
             "fill": SNEKCallable(
-                lambda *args: game.get_level().fill(*args), Arity(0, 4)
+                lambda *args: game.get_state().fill(*args), Arity(0, 4)
             ),
-            "clear": SNEKCallable(lambda *args: game.get_level().clear(*args), 0),
+            "clear": SNEKCallable(lambda *args: game.get_state().clear(*args), 0),
             "map_switch": SNEKCallable(lambda *args: game.load_map(*args), Arity(1, 4)),
             "exit_level": SNEKCallable(lambda: game.pop_state(), 0),
             "pop_state": SNEKCallable(lambda: game.pop_state(), 0),
-            "get_save_state": SNEKCallable(game.save.get_state, 1),
-            "set_save_state": SNEKCallable(game.save.set_state, 2),
+            "get_save_state": SNEKCallable(hardware.save.get_state, 1),
+            "set_save_state": SNEKCallable(hardware.save.set_state, 2),
             "get_current_planet_name": SNEKCallable(game.get_current_planet_name, 0),
             "get_x": SNEKCallable(
-                lambda *args: game.get_level().get_x(*args), Arity(0, 1)
+                lambda *args: game.get_state().get_x(*args), Arity(0, 1)
             ),
             "get_y": SNEKCallable(
-                lambda *args: game.get_level().get_y(*args), Arity(0, 1)
+                lambda *args: game.get_state().get_y(*args), Arity(0, 1)
             ),
             "get_z": SNEKCallable(
-                lambda *args: game.get_level().get_z(*args), Arity(0, 1)
+                lambda *args: game.get_state().get_z(*args), Arity(0, 1)
             ),
             "get_facing": SNEKCallable(
-                lambda *args: game.get_level().get_facing(*args), Arity(0, 1)
+                lambda *args: game.get_state().get_facing(*args), Arity(0, 1)
             ),
-            "save": SNEKCallable(game.save_to_disk, 0),
+            "save": SNEKCallable(hardware.save.save, 0),
             "quit": SNEKCallable(game.quit, 0),
             **api,
         }
