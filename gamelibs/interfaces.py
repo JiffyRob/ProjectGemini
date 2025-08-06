@@ -1,5 +1,5 @@
 from enum import Enum, IntFlag, StrEnum, IntEnum, auto
-from typing import Callable, Any, Generator, Iterable, Protocol, runtime_checkable
+from typing import Callable, Any, Iterator, Protocol, runtime_checkable
 from pygame.typing import ColorLike, RectLike, Point, SequenceLike
 from pygame.math import Vector2
 from dataclasses import dataclass
@@ -145,7 +145,11 @@ class GameSettings:
             "graphics": self.graphics.value,
         }
 
-    def fields(self) -> Generator[tuple[str, Any]]:
+    def update(self, other: "GameSettings") -> None:
+        for field in other.fields():
+            setattr(self, *field)
+    
+    def fields(self) -> Iterator[tuple[str, Any]]:
         for field in {"vsync", "fullscreen", "scale", "framecap", "graphics,"}:
             yield field, getattr(self, field)
 
@@ -192,6 +196,7 @@ class Quaternion(Protocol):
 
     @vector.setter
     def vector(self, value: pygame.Vector3) -> None: ...
+
 
 @runtime_checkable
 class GameSave(Protocol):
@@ -254,7 +259,7 @@ class InputQueue(Protocol):
 
     def stop_rumble(self) -> None: ...
 
-    def update(self, events: Iterable[pygame.Event] | None = None) -> None: ...
+    def update(self, events: Iterator[pygame.Event] | None = None) -> None: ...
 
     def load_bindings(
         self, bindings: dict[str, set[str | None]], delete_old: bool = True
@@ -554,8 +559,6 @@ class Game(Protocol):
     def pop_state(self) -> None: ...
 
     def get_state(self) -> "GameState": ...
-
-    def get_save(self) -> GameSave: ...
 
     def get_gl_context(self) -> zengl.Context: ...
 

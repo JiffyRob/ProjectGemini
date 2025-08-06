@@ -3,9 +3,8 @@ from typing import Any
 from gamelibs import interfaces, hardware
 
 
-class GameSave:
-    def __init__(self, game: interfaces.Game) -> None:
-        self.game = game
+class GameSave(interfaces.GameSave):
+    def __init__(self) -> None:
         self.data: dict[str, Any] = {}
         self.tmp_data: dict[str, Any] = {}
         self.loaded_path: str

@@ -410,7 +410,7 @@ class Hoverboard(sprite.Sprite, interfaces.Interactor):
         await self.exited.wait()
 
     def interact(self) -> interfaces.InteractionResult:
-        self.get_level().run_cutscene(
+        self.get_game().run_cutscene(
             "hoverboard",
             api={
                 "ride_off_into_sunset": AsyncSNEKCallable(self.ride_off_into_sunset, 0)

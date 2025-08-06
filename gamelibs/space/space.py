@@ -7,6 +7,7 @@ from gamelibs import game_state, util_draw, interfaces, hardware
 from gamelibs.space import gui3d, math3d, glsprite3d
 from math import pi
 
+
 class Space(game_state.GameState, interfaces.SpaceLevel):
     PLANET_CHECK_TOLERANCE = 100
     LANDING_TOLERANCE = 760
@@ -74,54 +75,59 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
         self.rear_view = False
         self.locked = False
 
-    def shake(self, magnitude: float = 5, delta: float = 8, axis: interfaces.Axis = interfaces.Axis.X | interfaces.Axis.Y) -> None:
+    def shake(
+        self,
+        magnitude: float = 5,
+        delta: float = 8,
+        axis: interfaces.Axis = interfaces.Axis.X | interfaces.Axis.Y,
+    ) -> None:
         raise NotImplementedError
-    
+
     def message(self, group: str, message: str) -> None:
         print("Space has sprites to message, so no message sent")
         return None
-    
+
     async def attempt_map_cutscene(self) -> None:
         print("Space has no map, so no cutscene")
         return None
-    
+
     def get_x(self, group: str = "player") -> float:
         raise KeyError("Group does not exist in Space")
-    
+
     def get_y(self, group: str = "player") -> float:
         raise KeyError("Group does not exist in Space")
-    
+
     def get_z(self, group: str = "player") -> float:
         raise KeyError("Group does not exist in Space")
-    
+
     def get_facing(self, group: str = "player") -> interfaces.Direction:
         raise KeyError("Group does not exist in Space")
-    
+
     def get_group(self, group_name: str = "player") -> set[interfaces.Sprite]:
         raise KeyError("Group does not exist in Space")
-    
+
     def get_rects(self, rect_name: str) -> list[interfaces.MiscRect]:
         raise KeyError("Group does not exist in Space")
-    
+
     def show(self, group: str = "player") -> None:
         raise KeyError("Group does not exist in Space")
-    
+
     def hide(self, group: str = "player") -> None:
         raise KeyError("Group does not exist in Space")
-    
+
     def get_player(self) -> interfaces.Player:
         raise NotImplementedError
-    
+
     def set_player(self, player: interfaces.Player) -> None:
         raise NotImplementedError
-    
+
     @property
     def map_rect(self) -> pygame.Rect:
         raise TypeError("Space has no rectangular map")
-    
+
     @property
     def map_type(self) -> interfaces.MapType:
-        return MapType.SPACE
+        return interfaces.MapType.SPACE
 
     @property
     def name(self) -> interfaces.FileID:
@@ -129,38 +135,51 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
 
     def time_phase(self, mult: float) -> None:
         raise NotImplementedError
-    
+
     @classmethod
-    def load(cls, game: interfaces.Game, name: str, direction: interfaces.Direction | None = None, position: Point[float] | None = None, entrance: interfaces.MapEntranceType = MapEntranceType.NORMAL) -> interfaces.Level:
+    def load(
+        cls,
+        game: interfaces.Game,
+        name: str,
+        direction: interfaces.Direction | None = None,
+        position: Point | None = None,
+        entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
+    ) -> interfaces.Level:
         raise TypeError("Space does not exist in file system")
-    
+
     def world_to_screen(self, pos: Point) -> pygame.Vector2:
         raise NotImplementedError
-    
+
     def screen_to_world(self, pos: Point) -> pygame.Vector2:
         raise NotImplementedError
-    
+
     def add_effect(self, effect: interfaces.GlobalEffect) -> None:
         raise NotImplementedError
-    
+
     async def fade(self, effect_type: str, *args: float) -> interfaces.GlobalEffect:
         raise NotImplementedError
-    
+
     def clear_effects(self) -> None:
         raise NotImplementedError
-    
-    def spawn(self, sprite_name: str, rect: RectLike, z: int | None = None, **custom_fields: Any) -> interfaces.Sprite | None:
+
+    def spawn(
+        self,
+        sprite_name: str,
+        rect: RectLike,
+        z: int | None = None,
+        **custom_fields: Any
+    ) -> interfaces.Sprite | None:
         raise NotImplementedError
-    
+
     def add_sprite(self, sprite: interfaces.Sprite) -> None:
         raise NotImplementedError
-    
+
     def finish_dialog(self, answer: str) -> None:
         raise NotImplementedError
-    
+
     async def run_dialog(self, *terms: str, face: str | None = None) -> None | str:
         raise NotImplementedError
-    
+
     def lock(self) -> None:
         self.locked = True
 
@@ -208,7 +227,9 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
                 if self.state == self.STATE_PAUSE:
                     self.game.save_to_disk()
                     self.game.quit()
-                elif self.state == self.STATE_NORMAL and self.possible_planet is not None:
+                elif (
+                    self.state == self.STATE_NORMAL and self.possible_planet is not None
+                ):
                     self.state = self.STATE_ENTRY
                     self.planet_indicator.enter()
 

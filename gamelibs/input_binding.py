@@ -1,4 +1,4 @@
-from typing import Generator, Iterable, Literal
+from typing import Iterator, Iterable, Literal
 import pygame
 import pygame._sdl2.controller as controller
 
@@ -32,7 +32,7 @@ def event_to_strings(
     joystick_deadzone: float = 0.3,
     controller_unique: bool = False,
     split_hats: bool = False,
-) -> Generator[str]:
+) -> Iterator[str]:
     event = pygame.Event(event.type, event.dict)
     if event.type == HAT_AXIS_MOTION:
         identifiers = ["HatAxisMotion"]
@@ -112,14 +112,14 @@ def releaser_string(event_string: str) -> str:
     return event_string
 
 
-def init_joysticks() -> Generator[tuple[int, pygame.joystick.JoystickType]]:
+def init_joysticks() -> Iterator[tuple[int, pygame.joystick.JoystickType]]:
     pygame.joystick.init()
     for i in range(pygame.joystick.get_count()):
         joy = pygame.joystick.Joystick(i)
         yield i, joy
 
 
-def init_controllers() -> Generator[tuple[int, controller.Controller]]:
+def init_controllers() -> Iterator[tuple[int, controller.Controller]]:
     controller.init()
     for i in range(controller.get_count()):
         if controller.is_controller(i):

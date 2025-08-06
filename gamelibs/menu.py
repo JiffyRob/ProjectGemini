@@ -836,11 +836,11 @@ class NameInputMenu(game_state.GameState):
         self.input.input_character(letter)
 
     def confirm_name(self) -> None:
-        self.get_game().get_save().load("start1")
+        hardware.save.load("start1")
         save_name = "".join(self.input.text).replace("_", "")
         if save_name:
-            self.get_game().get_save().loaded_path = save_name
-            self.get_game().get_save().save()
+            hardware.save.loaded_path = save_name
+            hardware.save.save()
             self.game.load_save(save_name)
 
     def cancel(self) -> None:
@@ -908,7 +908,7 @@ class DeleteConfirmationMenu(game_state.GameState):
         self.pop()
 
     def delete(self) -> None:
-        self.get_game().get_save().delete(self.save_name)
+        hardware.save.delete(self.save_name)
         print(hardware.loader.get_save_names())
         self.get_game().quit()  # runs back into main menu
 

@@ -180,7 +180,7 @@ class Player(PhysicsSprite, interfaces.Player):
                 short_name, direction=directions[0], position=self.pos
             )
         else:
-            self.get_level().run_cutscene("level_exit")
+            self.get_game().run_cutscene("level_exit")
 
     @property
     def facing(self) -> interfaces.Direction:
@@ -236,7 +236,7 @@ class Player(PhysicsSprite, interfaces.Player):
             if "interact" in pressed:
                 self.interact()
             if "quit" in pressed:
-                self.get_level().run_cutscene("quit")
+                self.get_game().run_cutscene("quit")
             held = hardware.input_queue.held
             if "up" in held:
                 self.walk_up()
@@ -266,7 +266,7 @@ class Player(PhysicsSprite, interfaces.Player):
                 hardware.input_queue.rumble(1, 1, 500)
             else:
                 hardware.input_queue.rumble(1, 1, 1000)
-                self.get_level().run_cutscene("death")
+                self.get_game().run_cutscene("death")
 
     def heal(self, amount: int) -> None:
         self.health = min(self.max_health, self.health + amount)
@@ -360,7 +360,7 @@ class Iball(sprite.Sprite):
         return True
 
 
-class Drone(sprite.Sprite):
+class Drone(sprite.Sprite, interfaces.Healthy):
     groups = {"hurtable"}
     SPEED = 32
     FALL_SPEED = 256
@@ -470,7 +470,7 @@ class Drone(sprite.Sprite):
         return super().update(dt)
 
 
-class TumbleFish(sprite.Sprite):
+class TumbleFish(sprite.Sprite, interfaces.Healthy):
     ROLL_SPEED = 96
     MOUNTAIN_ROLL_SPEED = 128
 

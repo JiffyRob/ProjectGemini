@@ -17,7 +17,7 @@ class Ship(sprite.GUISprite):
     TWIST = 16
     ROTATYNESS = 45
 
-    def __init__(self, level: interfaces.Level, rect: RectLike) -> None:
+    def __init__(self, level: interfaces.SpaceLevel, rect: RectLike) -> None:
         super().__init__(level, None, rect)
         frames = hardware.loader.get_spritesheet("ship.png", (24, 32))
         self.anim_dict = {
@@ -106,7 +106,7 @@ class Ship(sprite.GUISprite):
 
 
 class Compass(sprite.GUISprite):
-    def __init__(self, level: interfaces.Level, origin: pygame.Vector2) -> None:
+    def __init__(self, level: interfaces.SpaceLevel, origin: pygame.Vector2) -> None:
         super().__init__(level)
         self.origin = origin
         self.positions = (

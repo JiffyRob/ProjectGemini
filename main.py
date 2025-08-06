@@ -16,11 +16,8 @@ import zengl
 import SNEK2  # type: ignore
 
 from gamelibs import (
-    game_save,
     level,
-    loader,
     menu,
-    sound,
     space,
     env,
     window,
@@ -34,7 +31,11 @@ pygame.joystick.init()
 
 
 class Game(interfaces.Game):
-    def __init__(self, title: str="Project Gemini", fps: interfaces.FrameCap=interfaces.FrameCap.HIGH) -> None:
+    def __init__(
+        self,
+        title: str = "Project Gemini",
+        fps: interfaces.FrameCap = interfaces.FrameCap.HIGH,
+    ) -> None:
         self.title = title
         self.window: window.WindowOld
         self.clock = pygame.time.Clock()
@@ -42,7 +43,6 @@ class Game(interfaces.Game):
         self.stack: deque[interfaces.GameState] = deque()
         self.dt_mult = 1
         self.running = False
-        self.save = game_save.GameSave(self)
         self.timers: list[tuple[float, Callable[[], Any]]] = []
         self.context: zengl.Context
         self.just_ran_cutscene = False
@@ -56,15 +56,17 @@ class Game(interfaces.Game):
 
     def get_state(self) -> interfaces.GameState:
         return self.stack[0]
-    
+
     def exit_level(self) -> None:
         if isinstance(self.get_state(), interfaces.Level):
             self.pop_state()
 
     def get_gl_context(self) -> zengl.Context:
-        return self.context 
+        return self.context
 
-    def run_cutscene(self, name: interfaces.FileID, api: interfaces.SnekAPI=None) -> None:
+    def run_cutscene(
+        self, name: interfaces.FileID, api: interfaces.SnekAPI = None
+    ) -> None:
         if (
             name not in self.running_cutscenes
         ):  #  can't run multiple instances of the same cutscene
@@ -76,7 +78,9 @@ class Game(interfaces.Game):
             )
             self.running_cutscenes[name] = task
 
-    async def run_sub_cutscene(self, name: interfaces.FileID, api: interfaces.SnekAPI=None) -> None:
+    async def run_sub_cutscene(
+        self, name: interfaces.FileID, api: interfaces.SnekAPI = None
+    ) -> None:
         return await scripting.Script(
             self, hardware.loader.get_cutscene(name), api=api
         ).run_async()
@@ -107,10 +111,18 @@ class Game(interfaces.Game):
             pass
         if name == "graphics":
             self.set_graphics(value)
-        assert hasattr(self.settings, name), f'Setting should be an attribute of GameSettings interface, not "{name}".'
-        setattr(self.settings, name, value)
+        assert hasattr(
+            hardware.settings, name
+        ), f'Setting should be an attribute of GameSettings interface, not "{name}".'
+        setattr(hardware.settings, name, value)
 
-    def load_map(self, map_name: interfaces.FileID, direction: interfaces.Direction | None=None, position: Point | None=None, entrance: interfaces.MapEntranceType=interfaces.MapEntranceType.NORMAL):
+    def load_map(
+        self,
+        map_name: interfaces.FileID,
+        direction: interfaces.Direction | None = None,
+        position: Point | None = None,
+        entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
+    ) -> None:
         print("loading level:", map_name)
         new_map = level.Level.load(self, map_name, direction, position, entrance)
         if (
@@ -120,42 +132,50 @@ class Game(interfaces.Game):
             self.pop_state()
         self.stack.appendleft(new_map)
         if "_" not in map_name:
-            self.save.planet = map_name
+            hardware.save.set_state("planet", map_name)
 
     def load_save(self, save_name: interfaces.FileID) -> None:
         print("opening save:", save_name)
         self.stack.clear()
-        self.save.load(save_name)
+        hardware.save.load(save_name)
         self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(level.Level.load(self, self.save.planet))
+        self.stack.appendleft(level.Level.load(self, hardware.save.get_state("planet")))
 
     def delayed_callback(self, dt: float, callback: Callable[[], Any]) -> None:
         self.timers.append((dt, callback))
 
-    def load_input_binding(self, name: loader.FileID) -> None:
+    def load_input_binding(self, name: interfaces.FileID) -> None:
         hardware.input_queue.load_bindings(
             hardware.loader.get_json(f"keybindings/{name}"), delete_old=True
         )
 
-    def add_input_binding(self, name: loader.FileID) -> None:
+    def add_input_binding(self, name: interfaces.FileID) -> None:
         hardware.input_queue.load_bindings(
             hardware.loader.get_json(f"keybindings/{name}"), delete_old=False
         )
 
-    def play_soundtrack(self, track_name: interfaces.FileID | None=None) -> None:
+    def play_soundtrack(self, track_name: interfaces.FileID | None = None) -> None:
         current_state = self.stack[0]
-        if track_name is None and type(getattr(current_state, "soundtrack", None)) == type(""):
+        if track_name is None and type(
+            getattr(current_state, "soundtrack", None)
+        ) == type(""):
             track_name = current_state.soundtrack  # type: ignore
         if track_name is None:
             # Use type check instead of isinstance for NewType
             if type(getattr(current_state, "soundtrack", None)) == type(""):
                 track_name = current_state.soundtrack  # type: ignore
-            self.sound_manager.stop_track()
-            self.sound_manager.stop_track()
+            hardware.sound_manager.stop_track()
+            hardware.sound_manager.stop_track()
         else:
-            self.sound_manager.switch_track(f"music/{track_name}.ogg")
+            hardware.sound_manager.switch_track(f"music/{track_name}.ogg")
 
-    def switch_level(self, level_name: interfaces.FileID, direction: interfaces.Direction | None=None, position: Point | None=None, entrance: interfaces.MapEntranceType=interfaces.MapEntranceType.NORMAL):
+    def switch_level(
+        self,
+        level_name: interfaces.FileID,
+        direction: interfaces.Direction | None = None,
+        position: Point | None = None,
+        entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
+    ) -> None:
         self.run_cutscene(
             "level_switch",
             api={
@@ -166,16 +186,13 @@ class Game(interfaces.Game):
             },
         )
 
-    def get_save(self) -> interfaces.GameSave:
-        return self.save
-
     def update(self, dt: float) -> float:
         kill_state = False
         if not self.stack[0].update(dt * self.dt_mult):
             kill_state = True
         # if fps drops below 10 the game will start to lag
         dt = pygame.math.clamp(
-            self.clock.tick(self.settings.framecap * (not env.PYGBAG))
+            self.clock.tick(hardware.settings.framecap * (not env.PYGBAG))
             * self.dt_mult
             / 1000,
             -0.1,
@@ -203,26 +220,22 @@ class Game(interfaces.Game):
         self.context.end_frame()
         self.window.flip()
 
-    async def run(self):
+    async def run(self) -> None:
         self.running = True
-        hardware.loader = loader.Loader()
-        self.settings = hardware.loader.get_settings()
+        hardware.settings.update(hardware.loader.get_settings())
 
         self.window = window.WindowOld(
             self,
             "Project Gemini",
             (0, 0),  # makes it maximized by default
-            self.settings.scale,
-            self.settings.vsync,
-            self.settings.fullscreen,
+            hardware.settings.scale,
+            hardware.settings.vsync,
+            hardware.settings.fullscreen,
         )
         self.context = zengl.context()
 
-        hardware.loader.postwindow_init()
-
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
-        self.sound_manager = sound.SoundManager(hardware.loader)
 
         self.stack.appendleft(menu.MainMenu(self))
         # self.stack.appendleft(space.Space(self))
@@ -250,10 +263,10 @@ class Game(interfaces.Game):
         pygame.quit()
 
     def save_to_disk(self) -> None:
-        self.save.save()
+        hardware.save.save()
 
     def quit(self) -> None:
-        hardware.loader.save_settings(self.settings)
+        hardware.loader.save_settings(hardware.settings)
         hardware.loader.flush()
         while len(self.stack) > 1:
             self.stack.clear()

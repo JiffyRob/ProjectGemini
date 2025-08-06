@@ -224,27 +224,27 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
 
     @property
     def health(self) -> int:
-        return self.get_level().get_game().get_save().get_state("health")
+        return hardware.save.get_state("health")
 
     @health.setter
     def health(self, value: int) -> None:
-        self.get_level().get_game().get_save().set_state("health", value)
+        hardware.save.set_state("health", value)
 
     @property
     def max_health(self) -> int:
-        return self.get_level().get_game().get_save().get_state("max_health")
+        return hardware.save.get_state("max_health")
 
     @max_health.setter
     def max_health(self, value: int) -> None:
-        self.get_level().get_game().get_save().set_state("max_health", value)
+        hardware.save.set_state("max_health", value)
 
     @property
     def emeralds(self) -> int:
-        return self.get_level().get_game().get_save().get_state("emeralds")
+        return hardware.save.get_state("emeralds")
 
     @emeralds.setter
     def emeralds(self, value: int) -> None:
-        self.get_level().get_game().get_save().set_state("emeralds", value)
+        hardware.save.set_state("emeralds", value)
 
     @property
     def collision_rect(self) -> pygame.Rect:
@@ -280,7 +280,7 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                 hardware.input_queue.rumble(1, 1, 500)
             else:
                 hardware.input_queue.rumble(1, 1, 1000)
-                self.get_level().run_cutscene("death")
+                self.get_game().run_cutscene("death")
 
     def heal(self, amount: int) -> None:
         self.health = min(self.max_health, self.health + amount)
@@ -328,7 +328,7 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                 self.state = "idle"
                 self._facing = interfaces.Direction.RIGHT
                 if "quit" in just_input:
-                    self.get_level().run_cutscene("quit")
+                    self.get_game().run_cutscene("quit")
                 if "down" in held_input:
                     self.rect.y = min(self.MAX_Y, self.rect.y + self.BANK_SPEED * dt)
                 if "up" in held_input:
@@ -479,9 +479,9 @@ class Drone(sprite.Sprite):
                     else:
                         self.state = "idle"
                 elif self.shoot_cooldown.done():
-                    direction = pygame.Vector2(1, 0)
+                    direction = interfaces.Direction.RIGHT
                     if self.facing_left:
-                        direction.x *= -1
+                        direction = interfaces.Direction.LEFT
                     self.get_level().add_sprite(
                         projectile.Laser(
                             self.get_level(),

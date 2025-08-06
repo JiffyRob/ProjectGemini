@@ -17,7 +17,7 @@ class GameState(interfaces.GameState):
     @property
     def opengl(self) -> bool:
         return self._opengl
-    
+
     @opengl.setter
     def opengl(self, value: bool) -> None:
         self._opengl = value
@@ -25,7 +25,7 @@ class GameState(interfaces.GameState):
     @property
     def bgcolor(self) -> ColorLike:
         return self._bgcolor
-    
+
     @bgcolor.setter
     def bgcolor(self, value: ColorLike) -> None:
         self._bgcolor = value

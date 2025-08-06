@@ -9,7 +9,9 @@ from gamelibs import interfaces
 
 
 class Quaternion(interfaces.Quaternion):
-    def __init__(self, theta: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)) -> None:
+    def __init__(
+        self, theta: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)
+    ) -> None:
         self.real = math.cos(theta / 2)
         self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
 
@@ -19,7 +21,9 @@ class Quaternion(interfaces.Quaternion):
         )
 
     @classmethod
-    def from_standard(cls, r: float, i: float, j: float, k: float) -> interfaces.Quaternion:
+    def from_standard(
+        cls, r: float, i: float, j: float, k: float
+    ) -> interfaces.Quaternion:
         result = cls()
         result.real = r
         result.vector.xyz = i, j, k  # type: ignore

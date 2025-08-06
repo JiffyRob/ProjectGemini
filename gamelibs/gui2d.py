@@ -7,7 +7,7 @@ from pygame.typing import RectLike
 from gamelibs import pixelfont, sprite, timer, util_draw, interfaces, hardware
 
 
-class HeartMeter(sprite.GUISprite):
+class HeartMeter(sprite.GUISprite, interfaces.GUISprite):
     def __init__(self, level: interfaces.Level, rect: RectLike = (0, 0, 16, 16)):
         super().__init__(level, None, rect)
         self.heart_frames = hardware.loader.get_spritesheet("heart.png", (8, 8))
@@ -32,7 +32,7 @@ class HeartMeter(sprite.GUISprite):
                 position.y += 9
 
 
-class EmeraldMeter(sprite.GUISprite):
+class EmeraldMeter(sprite.GUISprite, interfaces.GUISprite):
     X = 10
     EMERALD = 11
 
@@ -56,7 +56,7 @@ class EmeraldMeter(sprite.GUISprite):
         surface.blit(self.surface, self.rect)
 
 
-class Dialog(sprite.GUISprite):
+class Dialog(sprite.GUISprite, interfaces.GUISprite):
     # pulled and modified from Tred's Adventure (v2)
     STATE_WRITING_PROMPT = 1
     STATE_GETTING_ANSWER = 2

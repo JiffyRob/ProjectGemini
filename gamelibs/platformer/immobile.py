@@ -45,7 +45,7 @@ class Emerald(sprite.Sprite, interfaces.PlatformerSprite, interfaces.Pickup):
         return super().update(dt)
 
 
-class CrazyMushroom(sprite.Sprite, interfaces.PlatformerSprite):
+class CrazyMushroom(sprite.Sprite, interfaces.PlatformerSprite, interfaces.Interactor):
     groups = {"interactable", "static-collision"}
 
     def __init__(
@@ -67,8 +67,9 @@ class CrazyMushroom(sprite.Sprite, interfaces.PlatformerSprite):
         self.image = self.anim.image
         return super().update(dt)
 
-    def interact(self) -> None:
+    def interact(self) -> interfaces.InteractionResult:
         self.get_game().run_cutscene("psychedelic")
+        return interfaces.InteractionResult.NO_MORE
 
 
 class Prop(sprite.Sprite, interfaces.PlatformerSprite):

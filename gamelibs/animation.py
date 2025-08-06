@@ -98,7 +98,7 @@ class SingleAnimation(interfaces.Animation):
         return flip_surface(self.surface, self.flip_x, self.flip_y)
 
 
-class AnimatedSurface(pygame.Surface):
+class AnimatedSurface(pygame.Surface, interfaces.Animation):
     def __init__(
         self,
         frames: Sequence[pygame.Surface],
