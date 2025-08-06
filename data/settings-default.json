@@ -1,7 +1,0 @@
-{
-  "vsync": true,
-  "fullscreen": false,
-  "scale": "aspect",
-  "frame-cap": 60,
-  "graphics": "snazzy potato"
-}

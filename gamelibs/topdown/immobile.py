@@ -296,7 +296,13 @@ class Spikefruit(sprite.Sprite, interfaces.Interactor):
 class WaspberryBush(sprite.Sprite, interfaces.Collider):
     groups = {"static-collision"}
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         super().__init__(
             level,
             hardware.loader.get_surface("waspberry-bush.png"),
@@ -321,7 +327,13 @@ class WaspberryBush(sprite.Sprite, interfaces.Collider):
 class Waspberry(sprite.Sprite, interfaces.Interactor):
     groups = {"interactable"}
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 2, 2), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 2, 2),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         self.frames = hardware.loader.get_spritesheet("waspberry.png", (2, 2))
         super().__init__(
             level,
@@ -340,7 +352,13 @@ class Waspberry(sprite.Sprite, interfaces.Interactor):
 class Spapple(sprite.Sprite, interfaces.Interactor):
     groups = {"interactable"}
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         self.frames = hardware.loader.get_spritesheet("spapple.png", (16, 16))
         self.fruit = 1
         self.collision_rect = pygame.FRect(rect)
@@ -363,7 +381,13 @@ class Spapple(sprite.Sprite, interfaces.Interactor):
 class Hoverboard(sprite.Sprite, interfaces.Interactor):
     groups = {"interactable"}
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 32, 32), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 32, 32),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         self.anim = Animation(
             hardware.loader.get_spritesheet("hoverboard.png", (32, 32))[:4]
         )

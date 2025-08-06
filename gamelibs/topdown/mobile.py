@@ -167,7 +167,7 @@ class Player(PhysicsSprite, interfaces.Player):
             long_name = f"{self.get_level().name}_{directions[0]}"
             x = long_name.count("right") - long_name.count("left")
             y = long_name.count("down") - long_name.count("up")
-            short_name = self.get_level().name.split("_")[0]
+            short_name = str(self.get_level().name).split("_")[0]
             if x < 0:
                 short_name += "_left" * abs(x)
             if x > 0:

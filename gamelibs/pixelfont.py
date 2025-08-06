@@ -1,14 +1,21 @@
-from collections import namedtuple
 from functools import cache
 from typing import Sequence, Iterator
-from pygame.typing import Point, RectLike
+from pygame.typing import RectLike
 import pygame
+from dataclasses import dataclass
+from enum import Enum
 
-WORD = 0
-SPACE = 1
-NEWLINE = 2
 
-Chunk = namedtuple("Chunk", ("type", "data", "size"))
+class ChunkType(Enum):
+    WORD = 0
+    SPACE = 1
+    NEWLINE = 2
+
+@dataclass(frozen=True)
+class Chunk:
+    type: ChunkType
+    data: str
+    size: tuple[int, int]
 
 
 class PixelFont:
@@ -17,7 +24,7 @@ class PixelFont:
         self.encoding = encoding
 
     @cache
-    def get_word_size(self, word: str) -> Point:
+    def get_word_size(self, word: str) -> tuple[int, int]:
         width = 0
         height = 0
         for char in word.encode(self.encoding):
@@ -32,16 +39,16 @@ class PixelFont:
     def chunkify(self, text: str) -> Iterator[Chunk]:
         current = ""
         for char in text:
-            whitespace_type = {" ": SPACE, "\n": NEWLINE, "\r": NEWLINE}.get(char)
-            if char not in {" ", "\n", "\r"}:
+            whitespace_type = {" ": ChunkType.SPACE, "\n": ChunkType.NEWLINE, "\r": ChunkType.NEWLINE}.get(char)
+            if whitespace_type is None:
                 current += char
             else:
                 if current:
-                    yield Chunk(WORD, current, self.get_word_size(current))
+                    yield Chunk(ChunkType.WORD, current, self.get_word_size(current))
                     current = ""
-                yield Chunk(whitespace_type, None, self.get_surface(" ").get_size())
+                yield Chunk(whitespace_type, "", self.get_surface(" ").get_size())
         if current:
-            yield Chunk(WORD, current, self.get_word_size(current))
+            yield Chunk(ChunkType.WORD, current, self.get_word_size(current))
 
     @cache
     def positions(
@@ -53,13 +60,13 @@ class PixelFont:
         for chunk in chunks:
             row_height = max(row_height, chunk.size[1])
             row_width += chunk.size[0]
-            if (width and (row_width > width)) or chunk.type == NEWLINE:
+            if (width and (row_width > width)) or chunk.type == ChunkType.NEWLINE:
                 row_width = chunk.size[0]
                 height += row_height + 1
             yield (max(row_width - chunk.size[0], 0), height), chunk
 
     @cache
-    def size(self, text: str, width: int = 0) -> Point:
+    def size(self, text: str, width: int = 0) -> tuple[int, int]:
         (last_x, last_y), last_chunk = tuple(
             self.positions(tuple(self.chunkify(text)), width)
         )[-1]
@@ -71,7 +78,7 @@ class PixelFont:
         position = pygame.Vector2(pygame.Rect(rect)[:2])
         rect = pygame.Rect(rect)
         for offset, chunk in self.positions(tuple(self.chunkify(text)), rect.width):
-            if chunk.type == WORD:
+            if chunk.type == ChunkType.WORD:
                 letter_position = position + offset
                 for char in chunk.data:
                     char_surface = self.get_surface(char)

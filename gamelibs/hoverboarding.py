@@ -19,7 +19,7 @@ from gamelibs import (
 from gamelibs.animation import Animation, SingleAnimation, NoLoopAnimation
 
 
-class ScrollingBackground(sprite.Sprite, interfaces.Player):
+class ScrollingBackground(sprite.Sprite, interfaces.Background):
     STATE_GROUND = 0
     STATE_WATER = 1
     STATE_SLOWDOWN = 2
@@ -92,7 +92,7 @@ class ScrollingBackground(sprite.Sprite, interfaces.Player):
         else:
             return util_draw.repeat_surface(self.sea_tile, (16, self.rect.height))
 
-    def update(self, dt: float) -> bool:
+    def update(self, dt: float) -> None:  # type: ignore[override]
         if not self.locked:
             self.age += dt
             self.x_offset -= self.get_level().speed * dt
@@ -163,7 +163,6 @@ class ScrollingBackground(sprite.Sprite, interfaces.Player):
                 if not self.finished:
                     self.get_player().exit()
                     self.finished = True
-        return True
 
     def draw(self, surface: pygame.Surface, offset: Point) -> None:
         if self.x_offset < 0:
@@ -218,7 +217,7 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
 
     def interact(self) -> interfaces.InteractionResult:
         return interfaces.InteractionResult.FAILED
-    
+
     @property
     def facing(self) -> interfaces.Direction:
         return self._facing
@@ -257,7 +256,7 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
         rect.x += self.rect.x
         rect.y += self.rect.y
         return rect
-    
+
     def get_inventory(self, name: str) -> int:
         return hardware.save.get_state("inventory").get(name, 0)
 
@@ -265,7 +264,7 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
         # TODO: this mutability looks not right
         hardware.save.get_state("inventory")[thing] = self.get_inventory(thing) + count
         return True  # TODO: return whether acquisition was successful
-    
+
     def pay(self, emeralds: int) -> None:
         self.emeralds = min(999, self.emeralds + emeralds)
 
@@ -308,7 +307,7 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                     long_name = f"{self.get_level().name}_right"
                     x = long_name.count("right") - long_name.count("left")
                     y = long_name.count("down") - long_name.count("up")
-                    short_name = self.get_level().name.split("_")[0]
+                    short_name = str(self.get_level().name).split("_")[0]
                     if x < 0:
                         short_name += "_left" * abs(x)
                     if x > 0:
@@ -341,7 +340,9 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                     self.state = "lookback"
                     self._facing = interfaces.Direction.LEFT
                 if (
-                    self.collision_rect.collidelist(self.get_level().get_rects("collision"))
+                    self.collision_rect.collidelist(
+                        self.get_level().get_rects("collision")
+                    )
                     != -1
                 ):
                     self.hurt(3)
@@ -354,7 +355,13 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
 
 
 class DeadPlayer(sprite.Sprite):
-    def __init__(self, level: interfaces.HoverboardLevel, rect: RectLike=(0, 0, 16, 16), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.HoverboardLevel,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         self.anim = NoLoopAnimation(
             hardware.loader.get_spritesheet("me.png")[30:35], 0.1
         )
@@ -379,7 +386,13 @@ class Drone(sprite.Sprite):
     FALL_SPEED = 48
     MAX_HEALTH = 2
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 10, 10), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 10, 10),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         frames = hardware.loader.get_spritesheet("drone.png", (10, 10))
         self.images = {
             "ascent": SingleAnimation(frames[0]),
@@ -496,7 +509,13 @@ class Drone(sprite.Sprite):
 class Rock(sprite.Sprite):
     groups = {"static-collision"}
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         image = hardware.loader.get_surface("tileset.png").subsurface(64, 192, 16, 16)
         super().__init__(level, image, rect, z)
 
@@ -518,7 +537,13 @@ class Rock(sprite.Sprite):
 class Stump(sprite.Sprite):
     groups = {"static-collision"}
 
-    def __init__(self, level: interfaces.Level, rect: RectLike=(0, 0, 16, 16), z: int=0, **_: Any) -> None:
+    def __init__(
+        self,
+        level: interfaces.Level,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+        **_: Any,
+    ) -> None:
         image = hardware.loader.get_surface("tileset.png").subsurface(16, 256, 32, 32)
         super().__init__(level, image, rect, z)
 

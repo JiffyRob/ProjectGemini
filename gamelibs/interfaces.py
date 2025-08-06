@@ -6,13 +6,16 @@ from deprecated import deprecated
 from dataclasses import dataclass
 from copy import copy
 from numpy import ndarray
+from pathlib import Path
 
 import zengl
 import pygame
 from SNEK2 import SNEKCallable, AsyncSNEKCallable  # type: ignore
 
-type SnekAPI = dict[str, SNEKCallable | AsyncSNEKCallable]  # TODO: this could be more specific
-type FileID = str  # TODO: could this be more specific?
+type SnekAPI = dict[
+    str, SNEKCallable | AsyncSNEKCallable
+]  # TODO: this could be more specific
+type FileID = str # TODO: could this be more specific?
 type MiscRect = pygame.Rect | pygame.FRect
 
 
@@ -122,6 +125,15 @@ class GameSettings:
     scale: ScaleMode = ScaleMode.ASPECT
     framecap: FrameCap = FrameCap.HIGH
     graphics: GraphicsSetting = GraphicsSetting.MEDIUM
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "vsync": self.vsync,
+            "fullscreen": self.fullscreen,
+            "scale": self.scale.value,
+            "framecap": self.framecap.value,
+            "graphics": self.graphics.value,
+        }
 
 
 class Quaternion(Protocol):
@@ -255,11 +267,17 @@ class Sprite(Protocol):
     @property
     def z(self) -> int: ...
 
+    @z.setter
+    def z(self, value: int) -> None: ...
+
     @property
     def rect(self) -> MiscRect: ...
 
     @rect.setter
     def rect(self, value: MiscRect) -> None: ...
+
+    @property
+    def to_draw(self) -> pygame.Surface: ...
 
     def update(self, dt: float) -> bool: ...
 
@@ -356,7 +374,18 @@ class PlatformerPlayer(Player, Protocol):
     def jump(self, cause: JumpCause, just: bool = False) -> None: ...
 
 
-class GlobalEffect(Protocol): ...
+class GlobalEffect(Protocol):
+    def update(self, dt: float) -> bool: ...
+
+    def draw(self, surface: pygame.Surface) -> None: ...
+
+    def draw_over(self, dest_surface: pygame.Surface, dest_rect: MiscRect) -> None: ...
+
+    @property
+    def done(self) -> bool: ...
+
+    @done.setter
+    def done(self, value: bool) -> None: ...
 
 
 class SpriteEffect(Protocol):
@@ -414,17 +443,17 @@ class Loader(Protocol):
     @property
     def font(self) -> PixelFont: ...
 
-    def join(self, path: FileID, for_map: bool = False) -> str: ...
+    def join(self, path: FileID | Path) -> Path: ...
 
     def get_text(self, path: FileID, for_map: bool = False) -> str: ...
 
-    def get_json(self, path: FileID, for_map: bool = False) -> dict[str, Any]: ...
+    def get_json(self, path: FileID, for_map: bool = False) -> Any: ...
 
     def save_json(self, path: FileID, data: dict[str, Any]) -> None: ...
 
     def get_settings(self) -> GameSettings: ...
 
-    def save_settings(self) -> None: ...
+    def save_settings(self, settings: GameSettings) -> None: ...
 
     def get_csv(
         self,
@@ -444,24 +473,9 @@ class Loader(Protocol):
         self, path: FileID, rect: RectLike | None = None
     ) -> pygame.Surface: ...
 
-    @deprecated("Manually scale instead")
-    def get_surface_scaled_by(
-        self, path: FileID, factor: Point = (2, 2)
-    ) -> pygame.Surface: ...
-
-    @deprecated("Manually scale instead")
-    def get_surface_scaled_to(
-        self, path: FileID, size: Point = (16, 16)
-    ) -> pygame.Surface: ...
-
     def get_spritesheet(
         self, path: FileID, size: Point = (16, 16)
-    ) -> list[pygame.Surface]: ...
-
-    @deprecated("Old file format that we shouldn't use anymore")
-    def get_image(
-        self, path: FileID, area: str | RectLike | None = None
-    ) -> pygame.Surface: ...
+    ) -> tuple[pygame.Surface, ...]: ...
 
     def get_sound(self, path: FileID) -> pygame.mixer.Sound: ...
 
@@ -561,6 +575,19 @@ class GameState(Protocol):
     def draw(self) -> None: ...
 
 
+class Background(Protocol):
+    def update(self, dt: float) -> None: ...
+
+    def draw(self, surface: pygame.Surface, offset: Point) -> None: ...
+
+    @property
+    def rect(self) -> MiscRect: ...
+
+    def lock(self) -> None: ...
+
+    def unlock(self) -> None: ...
+
+
 class Level(GameState, Protocol):
     def shake(
         self, magnitude: float = 5.0, delta: float = 8, axis: Axis = Axis.X | Axis.Y
@@ -586,13 +613,13 @@ class Level(GameState, Protocol):
         rect: RectLike,
         z: int | None = None,
         **custom_fields: Any,
-    ) -> Sprite: ...
+    ) -> Sprite | None: ...
 
     def add_sprite(self, sprite: Sprite) -> None: ...
 
     def finish_dialog(self, answer: str) -> None: ...
 
-    async def run_dialog(self, *terms: str, face: str | None=None) -> None | str: ...
+    async def run_dialog(self, *terms: str, face: str | None = None) -> None | str: ...
 
     async def fade(self, effect_type: str, *args: float) -> GlobalEffect:
         """ "
@@ -611,7 +638,7 @@ class Level(GameState, Protocol):
 
     def get_z(self, group: str = "player") -> float: ...
 
-    def get_facing(self, group: str = "player") -> float: ...
+    def get_facing(self, group: str = "player") -> Direction: ...
 
     def get_group(self, group_name: str) -> set[Sprite]: ...
 

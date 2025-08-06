@@ -18,33 +18,37 @@ from gamelibs import (
     topdown,
     util_draw,
     visual_fx,
-    hardware
+    hardware,
 )
 
 CAMERA_SPEED = 128
 
 
-class Parallax:
+class Parallax(interfaces.Background):
     def __init__(
         self,
         level: interfaces.Level,
         anim: interfaces.Animation,
-        rect: RectLike=((0, 0), util_draw.RESOLUTION),
-        item_size: tuple[int, int]=(64, 64),
-        scroll_speed: tuple[float, float]=(1, 1),
-        anchor_bottom: bool=False,
-        loop_x: bool=True,
-        loop_y: bool=True,
+        rect: RectLike = ((0, 0), util_draw.RESOLUTION),
+        item_size: tuple[int, int] = (64, 64),
+        scroll_speed: tuple[float, float] = (1, 1),
+        anchor_bottom: bool = False,
+        loop_x: bool = True,
+        loop_y: bool = True,
     ) -> None:
         self.level = level
         self.anim = anim
         self.image = anim.image
-        self.rect = pygame.FRect(rect)
+        self._rect = pygame.FRect(rect)
         self.scroll_speed = pygame.Vector2(scroll_speed)
         self.item_size = pygame.Vector2(item_size)
         self.anchor_bottom = anchor_bottom
         self.loop_x = loop_x
         self.loop_y = loop_y
+
+    @property
+    def rect(self) -> pygame.FRect:
+        return self._rect
 
     def lock(self) -> None:
         pass
@@ -52,10 +56,9 @@ class Parallax:
     def unlock(self) -> None:
         pass
 
-    def update(self, dt: float) -> bool:
+    def update(self, dt: float) -> None:
         self.anim.update(dt)
         self.image = self.anim.image
-        return True
 
     @classmethod
     def load(cls, level: interfaces.Level, name: str) -> Generator["Parallax"]:
@@ -143,7 +146,7 @@ class Level(game_state.GameState, interfaces.Level):
 
     TERRAIN_MOUNTAIN = 1
 
-    sprite_classes: dict[interfaces.MapType, dict[str, type]] = {
+    sprite_classes: dict[interfaces.MapType, dict[str, type | None]] = {
         interfaces.MapType.TOPDOWN: {
             "Emerald": platformer.immobile.Emerald,  # same for both perspectives
             "Ship": topdown.immobile.Ship,
@@ -191,16 +194,16 @@ class Level(game_state.GameState, interfaces.Level):
         self,
         game: interfaces.Game,
         name: interfaces.FileID,
-        player_pos: Point=(0, 0),
-        player_facing: interfaces.Direction | None=None,
-        map_size: Point=(256, 256),
-        map_type: interfaces.MapType=interfaces.MapType.TOPDOWN,
-        soundtrack: interfaces.FileID | None=None,
-        entrance: interfaces.MapEntranceType=interfaces.MapEntranceType.NORMAL,
+        player_pos: Point = (0, 0),
+        player_facing: interfaces.Direction | None = None,
+        map_size: Point = (256, 256),
+        map_type: interfaces.MapType = interfaces.MapType.TOPDOWN,
+        soundtrack: interfaces.FileID | None = None,
+        entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
     ):
         super().__init__(game)
         self._name = name
-        self.backgrounds: list[Parallax] = []
+        self.backgrounds: list[interfaces.Background] = []
         self.groups: dict[str, set[interfaces.Sprite]] = defaultdict(set)
         self.rects: dict[str, list[interfaces.MiscRect]] = defaultdict(list)
         self.soundtrack = soundtrack
@@ -208,13 +211,17 @@ class Level(game_state.GameState, interfaces.Level):
         small_rect = pygame.FRect(0, 0, 5, 5)
         rect.center = player_pos
         if map_type == interfaces.MapType.PLATFORMER:
-            self.player = platformer.player.Player(cast(interfaces.PlatformerLevel, self), rect)
+            self.player = platformer.player.Player(
+                cast(interfaces.PlatformerLevel, self), rect
+            )
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type in {interfaces.MapType.HOUSE, interfaces.MapType.TOPDOWN}:
             self.player = topdown.mobile.Player(self, rect, entrance=entrance)
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type == interfaces.MapType.HOVERBOARD:
-            self.player = hoverboarding.Player(cast(interfaces.HoverboardLevel, self), rect)
+            self.player = hoverboarding.Player(
+                cast(interfaces.HoverboardLevel, self), rect
+            )
             self.iball = topdown.mobile.Iball(self, small_rect)
         else:
             print("AAAAHAHH")
@@ -260,7 +267,12 @@ class Level(game_state.GameState, interfaces.Level):
     def name(self) -> interfaces.FileID:
         return self._name
 
-    def shake(self, magnitude: float=5, delta: float=8, axis: interfaces.Axis=interfaces.Axis.X | interfaces.Axis.Y) -> None:
+    def shake(
+        self,
+        magnitude: float = 5,
+        delta: float = 8,
+        axis: interfaces.Axis = interfaces.Axis.X | interfaces.Axis.Y,
+    ) -> None:
         self.shake_magnitude += magnitude
         self.shake_delta += delta
         self.shake_axes = axis
@@ -296,14 +308,22 @@ class Level(game_state.GameState, interfaces.Level):
     def clear_effects(self) -> None:
         self.effects.clear()
 
-    def spawn(self, sprite_name: str, rect: RectLike, z: int | None=None, **custom_fields: Any) -> interfaces.Sprite:
+    def spawn(
+        self,
+        sprite_name: str,
+        rect: RectLike,
+        z: int | None = None,
+        **custom_fields: Any
+    ) -> interfaces.Sprite | None:
         if z is None:
             z = self.entity_layer
-        new_sprite = self.sprite_classes[self.map_type][sprite_name](
-            self, rect, z, **custom_fields
-        )
-        self.add_sprite(new_sprite)
-        return new_sprite
+        sprite_cls = self.sprite_classes[self.map_type].get(sprite_name, None)
+        if sprite_cls is not None:
+            new_sprite = sprite_cls(
+                self, rect, z, **custom_fields
+            )
+            self.add_sprite(new_sprite)
+            return new_sprite
 
     def add_sprite(self, sprite: interfaces.Sprite) -> None:
         self.to_add.add(sprite)
@@ -329,7 +349,7 @@ class Level(game_state.GameState, interfaces.Level):
         self.dialog_answer = answer
         self.dialog_event.set()
 
-    async def run_dialog(self, *terms: str, face: str | None=None) -> None | str:
+    async def run_dialog(self, *terms: str, face: str | None = None) -> None | str:
         async with self.dialog_lock:
             self.dialog = gui2d.Dialog(
                 self,
@@ -345,7 +365,9 @@ class Level(game_state.GameState, interfaces.Level):
             self.dialog_answer = None
             return answer
 
-    async def fade(self, effect_type: str, *args: str | float) -> interfaces.GlobalEffect:
+    async def fade(
+        self, effect_type: str, *args: str | float
+    ) -> interfaces.GlobalEffect:
         """ "
         Args:
         "fadein_circle", x, y
@@ -368,8 +390,12 @@ class Level(game_state.GameState, interfaces.Level):
 
         def get_pos() -> pygame.Vector2:
             if len(arg_list):
-                assert isinstance(arg_list[0], (int, float)), "Position must be a number"
-                assert isinstance(arg_list[1], (int, float)), "Position must be a number"
+                assert isinstance(
+                    arg_list[0], (int, float)
+                ), "Position must be a number"
+                assert isinstance(
+                    arg_list[1], (int, float)
+                ), "Position must be a number"
                 return self.world_to_screen((arg_list.pop(0), arg_list.pop(0)))  # type: ignore
             return self.world_to_screen(self.player.pos)
 
@@ -403,26 +429,26 @@ class Level(game_state.GameState, interfaces.Level):
         await finish_event.wait()
         return effect  # only useful if you don't terminate
 
-    def get_x(self, group: str="player") -> float:
+    def get_x(self, group: str = "player") -> float:
         if group not in self.groups:
             print(self.groups)
             exit()
         print(self.groups[group])
         return next(iter(self.get_group(group))).pos.x
 
-    def get_y(self, group: str="player") -> float:
+    def get_y(self, group: str = "player") -> float:
         if group not in self.groups:
             print(self.groups)
             exit()
         return next(iter(self.get_group(group))).pos.y
 
-    def get_z(self, group: str="player") -> int:
+    def get_z(self, group: str = "player") -> int:
         if group not in self.groups:
             print(self.groups)
             exit()
         return next(iter(self.get_group(group))).z
 
-    def get_facing(self, group: str="player") -> interfaces.Direction:
+    def get_facing(self, group: str = "player") -> interfaces.Direction:
         return next(iter(self.get_group(group))).facing  # type: ignore
 
     def get_group(self, group_name: str) -> set[interfaces.Sprite]:
@@ -431,42 +457,50 @@ class Level(game_state.GameState, interfaces.Level):
     def get_rects(self, rect_name: str) -> list[interfaces.MiscRect]:
         return self.rects[rect_name]
 
-    def show(self, group: str="player") -> None:
+    def show(self, group: str = "player") -> None:
         for sprite in self.get_group(group):
             sprite.show()
 
-    def hide(self, group="player"):
-        for sprite in group:
+    def hide(self, group: str="player") -> None:
+        for sprite in self.get_group(group):
             sprite.hide()
 
     @classmethod
-    def load(cls, game, name, direction=None, position=None, entrance="normal"):
+    def load(
+        cls,
+        game: interfaces.Game,
+        name: interfaces.FileID,
+        direction: interfaces.Direction | None = None,
+        position: Point | None = None,
+        entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
+    ) -> "Level":
         # basic metadata
         folder = pathlib.Path("ldtk/simplified", name)
-        data = game.loader.get_json(folder / "data.json", for_map=True)
+        data = hardware.loader.get_json(str(folder / "data"), for_map=True)
         size = data["width"], data["height"]
         map_type = data["customFields"]["Maptype"]
         soundtrack = data["customFields"]["Soundtrack"]
         map_rect = pygame.Rect((0, 0), size)
         # level initialization
-        player_position = data["customFields"]["start"]
-        if map_type == cls.MAP_PLATFORMER:
+        player_position: list[int] = data["customFields"]["start"]
+        position = [int(position[0]), int(position[1])] if position else player_position.copy()
+        if map_type == interfaces.MapType.PLATFORMER:
             if direction == "left":
-                player_position = (size[0] - 8, player_position[1])
+                player_position = [size[0] - 8, player_position[1]]
             if direction == "right":
                 print("right", player_position, position)
-                player_position = (8, player_position[1])
+                player_position = [8, player_position[1]]
         elif map_type == interfaces.MapType.HOVERBOARD:
             pass
-        elif entrance == "normal":
-            if direction == "down":
-                player_position = (position[0], 8)
+        elif entrance == interfaces.MapEntranceType.NORMAL:
+            if direction == interfaces.Direction.DOWN:
+                player_position = [position[0], 8]
             if direction == "up":
-                player_position = (position[0], size[1] - 8)
+                player_position = [position[0], size[1] - 8]
             if direction == "right":
-                player_position = (8, position[1])
+                player_position = [8, position[1]]
             if direction == "left":
-                player_position = (size[0] - 8, position[1])
+                player_position = [size[0] - 8, position[1]]
         level = cls(
             game,
             name=name,
@@ -483,7 +517,7 @@ class Level(game_state.GameState, interfaces.Level):
             Parallax.load(level, data["customFields"]["Background"])
         )
         if map_type == interfaces.MapType.HOVERBOARD:
-            level.backgrounds.append(hoverboarding.ScrollingBackground(level))
+            level.backgrounds.append(hoverboarding.ScrollingBackground(cast(interfaces.HoverboardLevel, level)))
         # tile layers
         entity_layer = data["customFields"]["entity_layer"]
         level.entity_layer = entity_layer
@@ -491,7 +525,7 @@ class Level(game_state.GameState, interfaces.Level):
             level.add_sprite(
                 sprite.Sprite(
                     level,
-                    game.loader.get_surface(folder / layer),
+                    hardware.loader.get_surface(folder / layer),
                     pygame.FRect(map_rect),
                     z=layer_ind * 3 + 1,
                 )
@@ -513,24 +547,24 @@ class Level(game_state.GameState, interfaces.Level):
         # collision data creation
         background_type = data["customFields"]["Background"] or "chasm"
         for row, line in enumerate(
-            game.loader.get_csv(folder / "Ground.csv", for_map=True)
+            hardware.loader.get_csv(str(folder / "Ground"), for_map=True)
         ):
             for col, value in enumerate(line):
                 value = int(value)
                 rect = pygame.FRect(col * 16, row * 16, 16, 16)
-                if map_type == cls.MAP_PLATFORMER:
+                if map_type == interfaces.MapType.PLATFORMER:
                     if value == cls.TERRAIN_GROUND:
                         level.rects["collision"].append(rect)
                     if value == cls.TERRAIN_GROUND2:
                         level.rects["platform"].append(rect)
-                elif map_type in {interfaces.MapType.TOPDOWN}:, interfaces.MapType.HOUSE}:
+                elif map_type in {interfaces.MapType.TOPDOWN, interfaces.MapType.HOUSE}:
                     if value == cls.TERRAIN_CLEAR:
                         level.rects[background_type].append(rect)
                     if value in {cls.TERRAIN_GROUND, cls.TERRAIN_GROUND2}:
                         level.rects["ground"].append(rect)
-        if map_type == interfaces.MapType.TOPDOWN}:
+        if map_type == interfaces.MapType.TOPDOWN:
             for row, line in enumerate(
-                game.loader.get_csv(folder / "Elevation.csv", for_map=True)
+                hardware.loader.get_csv(str(folder / "Elevation"), for_map=True)
             ):
                 for col, value in enumerate(line):
                     value = int(value)
@@ -542,13 +576,13 @@ class Level(game_state.GameState, interfaces.Level):
         level.iball.z = entity_layer
         return level
 
-    def world_to_screen(self, pos):
+    def world_to_screen(self, pos: Point) -> pygame.Vector2:
         return pygame.Vector2(pos) - self.viewport_rect.topleft
 
-    def screen_to_world(self, pos):
+    def screen_to_world(self, pos: Point) -> pygame.Vector2:
         return pygame.Vector2(pos) + self.viewport_rect.topleft
 
-    def update(self, dt):
+    def update(self, dt: float) -> bool:
         # adds new sprites to the list
         for sprite in self.to_add:
             self.add_sprite_internal(sprite)
@@ -575,7 +609,7 @@ class Level(game_state.GameState, interfaces.Level):
             self.shake_delta *= 0
         return super().update(dt) and True
 
-    def draw(self):
+    def draw(self) -> None:
         super().draw()
         # draw backgrounds
         shake_offset = pygame.Vector2(
@@ -595,11 +629,10 @@ class Level(game_state.GameState, interfaces.Level):
                 (-int(self.viewport_rect.left), -int(self.viewport_rect.top))
                 + shake_offset
             )
-            if sprite.to_draw is not None:
-                self.game.window_surface.blit(
-                    sprite.to_draw,
-                    rect,
-                )
+            self.game.window_surface.blit(
+                sprite.to_draw,
+                rect,
+            )
         # draw visual effects
         for effect in self.effects:
             effect.draw(self.game.window_surface)

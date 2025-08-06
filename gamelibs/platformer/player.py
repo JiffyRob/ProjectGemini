@@ -50,13 +50,13 @@ class Player(mobile.PhysicsSprite, interfaces.PlatformerPlayer):
     @property
     def skidding(self) -> bool:
         return self.time_on_wall >= 0.2 and not self.on_ground
-    
+
     @property
     def facing(self) -> interfaces.Direction:
         if self.facing_left:
             return interfaces.Direction.LEFT
         return interfaces.Direction.RIGHT
-    
+
     @property
     def head_rect(self) -> interfaces.MiscRect:
         return pygame.FRect(self.rect.left, self.rect.top, self.rect.width, 8)

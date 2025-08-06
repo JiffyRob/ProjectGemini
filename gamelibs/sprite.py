@@ -18,15 +18,30 @@ class Sprite(interfaces.Sprite):
             image = pygame.Surface((0, 0))
         self._level: interfaces.Level = level
         self.image: pygame.Surface = image
-        self.to_draw: pygame.Surface = image
         self._rect: interfaces.MiscRect = pygame.FRect(rect)
-        self.z = z
+        self._z = z
         self.velocity = pygame.Vector2()
         self.dead = False
         self.locked = False
         self.effects: list[interfaces.SpriteEffect] = []
         self.hidden = False
         self.hidden_image = pygame.Surface((0, 0))
+
+    @property
+    def to_draw(self) -> pygame.Surface:
+        return self._to_draw
+    
+    @to_draw.setter
+    def to_draw(self, value: pygame.Surface) -> None:
+        self._to_draw = value
+
+    @property
+    def z(self) -> int:
+        return self._z
+    
+    @z.setter
+    def z(self, value: int) -> None:
+        self._z = value
 
     def message(self, message: str) -> None:
         print(self, "received", message)
