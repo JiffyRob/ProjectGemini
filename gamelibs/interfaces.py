@@ -40,6 +40,11 @@ class Direction(StrEnum):
     LEFT = "left"
     RIGHT = "right"
 
+    def get_axis(self) -> Axis:
+        if self.value in {"up", "down"}:
+            return Axis.Y
+        return Axis.X
+
     def to_vector(self) -> Vector2:
         return Vector2(
             {

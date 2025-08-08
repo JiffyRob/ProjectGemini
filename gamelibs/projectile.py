@@ -1,4 +1,6 @@
-from pygame.typing import RectLike
+import pygame
+
+from pygame.typing import Point
 
 from gamelibs import sprite, timer, interfaces, hardware
 
@@ -10,11 +12,17 @@ class Laser(sprite.Sprite):
     def __init__(
         self,
         level: interfaces.Level,
-        rect: RectLike,
+        pos: Point,
         z: int,
         direction: interfaces.Direction,
     ) -> None:
-        surface = hardware.loader.create_surface((4, 1))
+        if direction.get_axis() == interfaces.Axis.X:
+            surface = hardware.loader.create_surface((4, 1))
+            rect = pygame.FRect(0, 0, 4, 1)
+        else:
+            surface = hardware.loader.create_surface((1, 4))
+            rect = pygame.FRect(0, 0, 1, 4)
+        rect.center = pos
         surface.fill((205, 36, 36))
         self.death_timer = timer.Timer(15000)
         super().__init__(level, surface, rect, z + 1)
@@ -41,11 +49,17 @@ class MiniLaser(sprite.Sprite):
     def __init__(
         self,
         level: interfaces.Level,
-        rect: RectLike,
+        pos: Point,
         z: int,
         direction: interfaces.Direction,
     ) -> None:
-        surface = hardware.loader.create_surface((2, 1))
+        if direction.get_axis() == interfaces.Axis.X:
+            surface = hardware.loader.create_surface((2, 1))
+            rect = pygame.FRect(0, 0, 2, 1)
+        else:
+            surface = hardware.loader.create_surface((1, 2))
+            rect = pygame.FRect(0, 0, 1, 2)
+        rect.center = pos
         surface.fill((199, 86, 190))
         self.death_timer = timer.Timer(15000)
         super().__init__(level, surface, rect, z + 1)

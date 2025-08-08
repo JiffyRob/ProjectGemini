@@ -145,7 +145,7 @@ class GunPlatform(sprite.Sprite):
                 self.get_level().add_sprite(
                     projectile.Laser(
                         self.get_level(),
-                        pygame.Rect(self.rect.topleft + self.shoot_start, (4, 1)),
+                        self.shoot_start,
                         self.z,
                         self.shoot_direction,
                     )

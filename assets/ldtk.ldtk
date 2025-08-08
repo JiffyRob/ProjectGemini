@@ -6560,70 +6560,6 @@
 							"fieldInstances": [],
 							"__worldX": 1656,
 							"__worldY": -478
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [5,9],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "82d51fb0-5e50-11f0-a868-97c006e2f037",
-							"width": 10,
-							"height": 10,
-							"defUid": 194,
-							"px": [91,150],
-							"fieldInstances": [],
-							"__worldX": 1379,
-							"__worldY": -584
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [17,6],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "836a5ad0-5e50-11f0-a868-918ebbcd10bc",
-							"width": 10,
-							"height": 10,
-							"defUid": 194,
-							"px": [284,111],
-							"fieldInstances": [],
-							"__worldX": 1572,
-							"__worldY": -623
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [8,14],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "83d6b130-5e50-11f0-a868-1d80e129b529",
-							"width": 10,
-							"height": 10,
-							"defUid": 194,
-							"px": [130,234],
-							"fieldInstances": [],
-							"__worldX": 1418,
-							"__worldY": -500
-						},
-						{
-							"__identifier": "Drone",
-							"__grid": [13,11],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#0099DB",
-							"iid": "842cc070-5e50-11f0-a868-c1c14d6dc6e8",
-							"width": 10,
-							"height": 10,
-							"defUid": 194,
-							"px": [208,185],
-							"fieldInstances": [],
-							"__worldX": 1496,
-							"__worldY": -549
 						}
 					]
 				},
@@ -7487,7 +7423,7 @@
 								}] },
 								{ "__identifier": "Info", "__type": "String", "__value": "Out shopping.  Will return soon.\n\n --Father", "__tile": null, "defUid": 100, "realEditorValues": [{
 									"id": "V_String",
-									"params": ["Out shopping.  Will return soon.\\n\\n --Father"]
+									"params": ["Out shopping.  Will return soon.\n\n --Father"]
 								}] }
 							],
 							"__worldX": 1320,

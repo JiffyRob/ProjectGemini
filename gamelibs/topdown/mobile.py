@@ -315,6 +315,7 @@ class Iball(sprite.Sprite):
             rect,
             z + 1,
         )
+        self.rect = pygame.FRect(self.rect)
         self.true_pos = pygame.Vector2(self.rect.center)
         self.shoot_cooldown = timer.Timer(300)
 
@@ -347,7 +348,7 @@ class Iball(sprite.Sprite):
                 self.get_level().add_sprite(
                     projectile.MiniLaser(
                         self.get_level(),
-                        pygame.Rect(self.rect.center, (2, 1)),
+                        self.rect.center,
                         self.z,
                         self.facing,
                     )
@@ -456,7 +457,7 @@ class Drone(sprite.Sprite, interfaces.Healthy):
                     self.get_level().add_sprite(
                         projectile.Laser(
                             self.get_level(),
-                            pygame.Rect(self.rect.topleft + self.shoot_start, (4, 1)),
+                            self.shoot_start,
                             self.z,
                             direction,
                         )
