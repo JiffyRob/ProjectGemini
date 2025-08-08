@@ -249,11 +249,17 @@ class Level(game_state.GameState, interfaces.Level):
         self.shake_delta = 0
         self.shake_axes = 0
         self.speed = 0  # used for hoverboard levels
+        self.dt_multiplier = 1
 
         self.add_sprite(self.player)
         self.add_sprite(self.iball)
         self.update(0)
         self.get_game().delayed_callback(0, lambda: self.get_game().run_cutscene("level_begin"))
+
+
+    def time_phase(self, mult: float) -> None:
+        self.dt_mult = mult
+    
     @property
     def map_rect(self) -> pygame.Rect:
         return self._map_rect
@@ -588,6 +594,9 @@ class Level(game_state.GameState, interfaces.Level):
         return pygame.Vector2(pos) + self.viewport_rect.topleft
 
     def update(self, dt: float) -> bool:
+        # adjusts dt if needed
+        dt *= self.dt_multiplier
+        self.dt_multiplier = 1
         # adds new sprites to the list
         for sprite in self.to_add:
             self.add_sprite_internal(sprite)
