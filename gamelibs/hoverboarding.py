@@ -188,11 +188,6 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
     BANK_SPEED = 82
     ACCEL_SPEED = 48
 
-    MIN_Y = 32
-    MAX_Y = util_draw.RESOLUTION[1] - 32
-    MIN_X = 32
-    MAX_X = util_draw.RESOLUTION[0] - 32
-
     def __init__(
         self,
         level: interfaces.HoverboardLevel,
@@ -214,6 +209,11 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
             level, self.anim_dict[f"{self.state}-{self.facing}"].image, rect, z
         )
         self.rect.right = 0
+
+
+        margin = 16
+        self.min_x, self.max_x = margin, level.map_rect.right - margin
+        self.min_y, self.max_y = margin, level.map_rect.bottom - margin
 
     def interact(self) -> interfaces.InteractionResult:
         return interfaces.InteractionResult.FAILED
@@ -329,14 +329,15 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                 self._facing = interfaces.Direction.RIGHT
                 if "quit" in just_input:
                     self.get_game().run_cutscene("quit")
+                print(self.rect)
                 if "down" in held_input:
-                    self.rect.y = min(self.MAX_Y, self.rect.y + self.BANK_SPEED * dt)
+                    self.rect.centery = min(self.max_y, self.rect.centery + self.BANK_SPEED * dt)
                 if "up" in held_input:
-                    self.rect.y = max(self.MIN_Y, self.rect.y - self.BANK_SPEED * dt)
+                    self.rect.centery = max(self.min_y, self.rect.centery - self.BANK_SPEED * dt)
                 if "right" in held_input:
-                    self.rect.x = min(self.MAX_X, self.rect.x + self.ACCEL_SPEED * dt)
+                    self.rect.x = min(self.max_x, self.rect.x + self.ACCEL_SPEED * dt)
                 if "left" in held_input:
-                    self.rect.x = max(self.MIN_Y, self.rect.x - self.ACCEL_SPEED * dt)
+                    self.rect.x = max(self.min_x, self.rect.x - self.ACCEL_SPEED * dt)
                     self.state = "lookback"
                     self._facing = interfaces.Direction.LEFT
                 if (

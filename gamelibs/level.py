@@ -202,6 +202,7 @@ class Level(game_state.GameState, interfaces.Level):
         entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
     ):
         super().__init__(game)
+        self._map_rect = pygame.Rect((0, 0), map_size)
         self._name = name
         self.backgrounds: list[interfaces.Background] = []
         self.groups: dict[str, set[interfaces.Sprite]] = defaultdict(set)
@@ -219,6 +220,7 @@ class Level(game_state.GameState, interfaces.Level):
             self.player = topdown.mobile.Player(self, rect, entrance=entrance)
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type == interfaces.MapType.HOVERBOARD:
+            rect.size = (32, 32)
             self.player = hoverboarding.Player(
                 cast(interfaces.HoverboardLevel, self), rect
             )
@@ -240,7 +242,6 @@ class Level(game_state.GameState, interfaces.Level):
         self.dialog_answer = None
         self.dialog_lock = asyncio.Lock()
         self.dialog_event = asyncio.Event()
-        self._map_rect = pygame.Rect((0, 0), map_size)
         self.viewport_rect = pygame.FRect(util_draw.SCREEN_RECT)
         self.effects: list[interfaces.GlobalEffect] = []
         self.locked = False
