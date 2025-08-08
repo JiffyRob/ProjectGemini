@@ -1,3 +1,4 @@
+from enum import Enum, auto
 import math
 from typing import Callable, Any
 
@@ -58,9 +59,10 @@ class EmeraldMeter(sprite.GUISprite, interfaces.GUISprite):
 
 class Dialog(sprite.GUISprite, interfaces.GUISprite):
     # pulled and modified from Tred's Adventure (v2)
-    STATE_WRITING_PROMPT = 1
-    STATE_GETTING_ANSWER = 2
-    STATE_COMPLETE = 3
+    class State(Enum):
+        TYPING = auto()
+        WAITING = auto()
+        DONE = auto()
 
     def __init__(
         self,
@@ -81,7 +83,7 @@ class Dialog(sprite.GUISprite, interfaces.GUISprite):
         self.on_kill = on_kill
         self.add_letter_timer = timer.DTimer(20, self.add_text, True)
         self.image.set_colorkey(util_draw.COLORKEY)
-        self.state = self.STATE_WRITING_PROMPT
+        self.state = self.State.TYPING
         self.pad = 3
         self.font = pixelfont.PixelFont(
             hardware.loader.get_spritesheet("font.png", (7, 8))
@@ -89,26 +91,21 @@ class Dialog(sprite.GUISprite, interfaces.GUISprite):
         self.motion_cooldown = timer.Timer(100)
         self.rebuild()
 
-    def update_text(self):
-        self.rebuild()
-
-    def add_text(self):
+    def add_text(self) -> None:
         if not self.text:
-            self.state = self.STATE_GETTING_ANSWER
-            self.update_text()
-            if not self.answers:
-                self.state = self.STATE_COMPLETE
+            self.state = self.State.WAITING
+            self.rebuild()
             self.add_letter_timer = timer.DTimer()
         else:
             self.displayed_text += self.text[0]
             self.text = self.text[1:]
-            self.update_text()
+            self.rebuild()
 
-    def get_full_text(self):
+    def get_full_text(self) -> str:
         # beginning prompt
         text = self.displayed_text
         # add all the choices
-        if self.state == self.STATE_GETTING_ANSWER:
+        if self.state == self.State.WAITING:
             for i, choice in enumerate(self.answers):
                 text += "\n"
                 if i == self.answer_index:
@@ -118,7 +115,7 @@ class Dialog(sprite.GUISprite, interfaces.GUISprite):
                     text += f" {choice}"
         return text
 
-    def rebuild(self):
+    def rebuild(self) -> None:
         self.image.fill(util_draw.COLORKEY)
         text = self.get_full_text()
         self.font.render_to(
@@ -130,7 +127,7 @@ class Dialog(sprite.GUISprite, interfaces.GUISprite):
 
     def choose(self) -> None:
         self.chosen_index = self.answer_index
-        self.state = self.STATE_COMPLETE
+        self.state = self.State.DONE
         self.on_kill(self.get_answer())
         self.live = False
 
@@ -144,19 +141,19 @@ class Dialog(sprite.GUISprite, interfaces.GUISprite):
         self.motion_cooldown.update()
         self.add_letter_timer.update(dt)
         pressed = hardware.input_queue.just_pressed
-        if self.state == self.STATE_GETTING_ANSWER:
+        if self.state == self.State.WAITING:
             if "up" in pressed and self.motion_cooldown.done():
                 self.answer_index = max(self.answer_index - 1, 0)
-                self.update_text()
+                self.rebuild()
                 self.motion_cooldown.reset()
             if "down" in pressed and self.motion_cooldown.done():
                 self.answer_index = min(self.answer_index + 1, len(self.answers) - 1)
-                self.update_text()
+                self.rebuild()
                 self.motion_cooldown.reset()
             if "interact" in pressed:
                 self.choose()
-        if (
-            self.state == self.STATE_COMPLETE
+        elif (
+            self.state == self.State.DONE
             and not self.answers
             and "interact" in pressed
         ):

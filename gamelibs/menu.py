@@ -839,9 +839,9 @@ class NameInputMenu(game_state.GameState):
         hardware.save.load("start1")
         save_name = "".join(self.input.text).replace("_", "")
         if save_name:
-            hardware.save.loaded_path = save_name
-            hardware.save.save()
+            hardware.save.new(save_name)
             self.game.load_save(save_name)
+
 
     def cancel(self) -> None:
         self.pop()

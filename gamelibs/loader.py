@@ -78,8 +78,8 @@ class Loader(interfaces.Loader):
             file.write(json.dumps(data))
 
     def get_settings(self) -> interfaces.GameSettings:
-        return interfaces.GameSettings(
-            **{
+        return interfaces.GameSettings.from_dict(
+            {
                 **self.get_json("settings"),
                 **env.get_settings(),
             }
@@ -198,7 +198,7 @@ class Loader(interfaces.Loader):
             env.delete_save(path)
             env.write_saves()
         else:
-            self.join_save(path).unlink()
+            pathlib.Path(self.join_save(path)).with_suffix(".sav").unlink()
 
     def get_save_names(self, amount: int = 5) -> list[FileID]:
         names: list[FileID] = []

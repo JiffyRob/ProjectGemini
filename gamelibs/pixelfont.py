@@ -55,9 +55,8 @@ class PixelFont:
         if current:
             yield Chunk(ChunkType.WORD, current, self.get_word_size(current))
 
-    @cache
     def positions(
-        self, chunks: tuple[Chunk], width: int = 0
+        self, chunks: tuple[Chunk, ...], width: int = 0
     ) -> Iterator[tuple[tuple[int, int], Chunk]]:
         row_width = 0
         row_height = 0
@@ -72,6 +71,8 @@ class PixelFont:
 
     @cache
     def size(self, text: str, width: int = 0) -> tuple[int, int]:
+        if text == "":
+            return (0, 0)
         (last_x, last_y), last_chunk = tuple(
             self.positions(tuple(self.chunkify(text)), width)
         )[-1]

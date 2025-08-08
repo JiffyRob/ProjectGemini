@@ -160,14 +160,12 @@ class Game(interfaces.Game):
     def play_soundtrack(self, track_name: interfaces.FileID | None = None) -> None:
         if len(self.stack):
             current_state = self.stack[0]
-            if track_name is None and type(
-                getattr(current_state, "soundtrack", None)
-            ) == type(""):
+            if track_name is None:
                 track_name = current_state.soundtrack  # type: ignore
-            hardware.sound_manager.stop_track()
-            hardware.sound_manager.stop_track()
-        else:
-            hardware.sound_manager.switch_track(f"music/{track_name}.ogg")
+            if track_name is None:
+                hardware.sound_manager.stop_track()
+            else:
+                hardware.sound_manager.switch_track(f"music/{track_name}.ogg")
 
     def switch_level(
         self,
@@ -266,6 +264,7 @@ class Game(interfaces.Game):
         hardware.save.save()
 
     def quit(self) -> None:
+        print(hardware.settings)
         hardware.loader.save_settings(hardware.settings)
         hardware.loader.flush()
         while len(self.stack) > 1:

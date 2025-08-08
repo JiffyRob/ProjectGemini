@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import numpy
 
 import pygame
 from pygame.typing import SequenceLike
@@ -12,8 +13,24 @@ class Quaternion(interfaces.Quaternion):
     def __init__(
         self, theta: float = 0.0, axis: SequenceLike[float] = (0, 0, 1)
     ) -> None:
-        self.real = math.cos(theta / 2)
-        self.vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
+        self._real = math.cos(theta / 2)
+        self._vector = pygame.Vector3(axis).normalize() * math.sin(theta / 2)
+
+    @property
+    def real(self) -> float:
+        return self._real
+    
+    @real.setter
+    def real(self, value: float) -> None:
+        self._real = value
+
+    @property
+    def vector(self) -> pygame.Vector3:
+        return self._vector
+    
+    @vector.setter
+    def vector(self, value: pygame.Vector3):
+        self._vector = value
 
     def magnitude(self) -> float:
         return math.sqrt(
@@ -96,3 +113,54 @@ class Quaternion(interfaces.Quaternion):
 
     def __repr__(self) -> str:
         return f"<{self.real:.3f}, {self.vector.x:.3f}, {self.vector.y:.3f}, {self.vector.z:.3f}>"
+
+
+def translate_points(points: numpy.ndarray, offset: numpy.ndarray) -> None:
+    numpy.add(points, offset, points)
+
+
+def rotate_points(points: numpy.ndarray, quaternion: interfaces.Quaternion) -> None:
+    # Equation:
+    # sprite_pos + 2 * rot_real * (rot_vec X sprite_pos) + 2 * (rot_vec X (rot_vec X sprite_pos))
+    # rot_vec X sprite_pos is used twice, so let's grab that and call it "cross"
+    crosses = numpy.cross(quaternion.vector, points)  # type: ignore
+
+    # add 2 * rot_real * cross
+    term = numpy.multiply(crosses, 2)  # type: ignore
+    numpy.multiply(term, quaternion.real, term)
+    numpy.add(points, term, points)
+
+    # add 2 * (camera_vector x (camera_vector x position))
+    term = numpy.cross(quaternion.vector, crosses)  # dirty double crosser ;)  # type: ignore
+    term = numpy.multiply(term, 2, term)  # type: ignore
+    numpy.add(points, term, points)
+
+
+def project_points_sizes(points: numpy.ndarray, sizes: numpy.ndarray, near_z: float) -> None:
+    # Note that this is a linear projection using integer multiplication
+    # NOT the curved shape you get with homogenous coordinates and a matmul
+    scale_factors = numpy.divide(near_z, points[:, 2]).reshape(len(points), 1)
+    numpy.multiply(sizes, scale_factors, sizes)
+    numpy.multiply(points[:, :2], scale_factors, points[:, :2])
+
+
+def inverse_camera_transform_points_sizes(points: numpy.ndarray, sizes: numpy.ndarray, camera: interfaces.Camera3d) -> None:
+    # translate
+    numpy.add(points, -camera.pos, points)  # type: ignore
+    # rotate
+    quaternion = camera.rotation.invert()
+    crosses = numpy.cross(quaternion.vector, points)  # type: ignore
+    term = numpy.multiply(crosses, 2)  # type: ignore
+    numpy.multiply(term, quaternion.real, term)
+    numpy.add(points, term, points)
+    term = numpy.cross(quaternion.vector, crosses)  # dirty double crosser ;)  # type: ignore
+    term = numpy.multiply(term, 2, term)  # type: ignore
+    numpy.add(points, term, points)
+    # scale
+    scale_factors = numpy.divide(camera.near_z, points[:, 2]).reshape(len(points), 1)
+    numpy.multiply(sizes, scale_factors, sizes)
+    numpy.multiply(points[:, :2], scale_factors, points[:, :2])
+    # project
+    scale_factors = numpy.divide(camera.near_z, points[:, 2]).reshape(len(points), 1)
+    numpy.multiply(sizes, scale_factors, sizes)
+    numpy.multiply(points[:, :2], scale_factors, points[:, :2])

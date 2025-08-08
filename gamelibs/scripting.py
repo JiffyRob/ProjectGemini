@@ -4,30 +4,30 @@
 import pygame
 
 from SNEK2 import SNEKCallable, AsyncSNEKCallable, SNEKProgram, Arity
-from gamelibs import hardware
+from gamelibs import hardware, interfaces
 
 
 class Write(AsyncSNEKCallable):
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
         self._arity = 1
 
-    async def call(self, interpreter, args):
+    async def call(self, interpreter, args) -> None:
         await self.game.get_state().run_dialog(*args)
 
 
 class Ask(AsyncSNEKCallable):
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
         # question, *answers
         self._arity = Arity(1, None)
 
-    async def call(self, interpreter, args):
+    async def call(self, interpreter, args) -> str:
         return await self.game.get_state().run_dialog(*args)
 
 
 class Transition(AsyncSNEKCallable):
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
         # type
         # type, x, y
@@ -42,33 +42,34 @@ class Rickroll(AsyncSNEKCallable):
     def __init__(self) -> None:
         self._arity = 0
 
-    async def call(self, interpreter, args):
+    async def call(self, interpreter, args) -> None:
         raise NotImplementedError("Better get the rickroll written....")
 
 
 class Run(AsyncSNEKCallable):
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
         self._arity = Arity(1, 2)
 
-    async def call(self, interpreter, args):
+    async def call(self, interpreter, args) -> None:
         return await self.game.run_sub_cutscene(args[0], **args[1])
 
 
 class RunMap(AsyncSNEKCallable):
-    def __init__(self, game):
+    def __init__(self, game) -> None:
         self.game = game
         self._arity = Arity(0, 1)
 
-    async def call(self, interpreter, args):
+    async def call(self, interpreter, args) -> None:
         return await self.game.get_state().attempt_map_cutscene()
 
 
 class Spawn(SNEKCallable):
     def __init__(self, game) -> None:
         self.game = game
-        self._arity = Arity
-    async def call(self, interpreter, args):
+        self._arity = Arity(5, 6)
+
+    async def call(self, interpreter, args) -> interfaces.Sprite:
         if len(args) == 6:
             args = list(args)
             args.append(0)

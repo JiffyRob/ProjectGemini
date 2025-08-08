@@ -430,7 +430,6 @@ class Level(game_state.GameState, interfaces.Level):
         if group not in self.groups:
             print(self.groups)
             exit()
-        print(self.groups[group])
         return next(iter(self.get_group(group))).pos.x
 
     def get_y(self, group: str = "player") -> float:

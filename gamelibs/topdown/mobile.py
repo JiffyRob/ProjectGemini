@@ -335,7 +335,6 @@ class Iball(sprite.Sprite):
             self.true_pos = pygame.Vector2(self.true_pos) + desired_motion * 4 * dt
             self.rect.center = self.true_pos
             self.rect.y += 3 * sin(self.age * 8)
-            print(self.rect.size)
 
             # image handling
             self.facing = self.get_player().facing
@@ -390,10 +389,19 @@ class Drone(sprite.Sprite, interfaces.Healthy):
         self.distance = 16
         self.offset = 16
         self.new_pos()
-        self.health = self.MAX_HEALTH
+        self._health: int = self.MAX_HEALTH
         self.pain_cooldown = timer.Timer(200)
         super().__init__(level, self.images[self.state].image, rect, z)
         self.true_pos.y = self.dest.y - self.get_level().map_rect.height
+
+    @property
+    def health(self) -> int:
+        return self._health
+    
+    @health.setter
+    def health(self, value: int) -> None:
+        self._health = value
+    
 
     @property
     def collision_rect(self) -> pygame.FRect | pygame.Rect:
@@ -417,7 +425,6 @@ class Drone(sprite.Sprite, interfaces.Healthy):
                 self.effects.append(
                     visual_fx.Blink(color=(205, 36, 36), speed=0.1, count=1)
                 )
-            print("OW!")
 
     def update(self, dt: float) -> bool:
         if not self.locked:
@@ -509,7 +516,7 @@ class TumbleFish(sprite.Sprite, interfaces.Healthy):
                 - self.pos
             )
             self.image.blit(
-                self.eye_frames[interfaces.Direction.from_vector(direction).name],
+                self.eye_frames[interfaces.Direction.from_vector(direction).value],
                 (0, 0),
             )
             if abs(direction.x) < 16 and 0 < direction.y < 96:
