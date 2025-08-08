@@ -29,7 +29,7 @@ class Quaternion(interfaces.Quaternion):
         return self._vector
 
     @vector.setter
-    def vector(self, value: pygame.Vector3):
+    def vector(self, value: pygame.Vector3) -> None:
         self._vector = value
 
     def magnitude(self) -> float:

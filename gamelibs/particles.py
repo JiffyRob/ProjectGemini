@@ -1,6 +1,9 @@
+from typing import Iterator
 import pygame
-from pygame.typing import Point, RectLike
+from pygame.typing import ColorLike, Point, RectLike
 
+from gamelibs import hardware
+from random import uniform
 
 class ParticleManager:
     def __init__(self) -> None:
@@ -63,3 +66,22 @@ class ParticleManager:
         surface.fblits(
             zip(self.surfaces, map(lambda rect: rect.move(offset), self.rects))
         )
+
+
+def splat(center: Point, size: Point, color: ColorLike, speed: float | tuple[float, float], duration: float, count: int) -> Iterator[tuple[pygame.Surface, pygame.FRect, pygame.Vector2, float]]:
+    def get_speed() -> float | int:
+        if isinstance(speed, (float, int)):
+            return speed
+        else:
+            return uniform(speed[0], speed[1])
+    theta = 0
+    dtheta = 360 / count
+    surface = hardware.loader.create_surface(size)
+    surface.fill(color)
+    for _ in range(count):
+        rotated_surface = pygame.transform.rotate(surface, theta)
+        rotated_rect = rotated_surface.get_frect()
+        rotated_rect.center = center
+        direction = pygame.Vector2(get_speed(), 0)
+        yield rotated_surface, rotated_rect, direction.rotate(theta), duration
+        theta += dtheta
