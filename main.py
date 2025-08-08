@@ -168,6 +168,8 @@ class Game(interfaces.Game):
                 hardware.sound_manager.stop_track()
             else:
                 hardware.sound_manager.switch_track(f"music/{track_name}.ogg")
+        elif track_name is not None:
+            hardware.sound_manager.switch_track(f"music/{track_name}.ogg")
 
     def switch_level(
         self,

@@ -26,6 +26,14 @@ class Sprite(interfaces.Sprite):
         self.effects: list[interfaces.SpriteEffect] = []
         self.hidden = False
         self.hidden_image = pygame.Surface((0, 0))
+        self.attached_to: interfaces.Sprite | None = None
+
+    def attach(self, other: interfaces.Sprite) -> None:
+        self.attached_to = other
+
+    def detach(self) -> None:
+        self.attached_to = None
+        self._rect = self.rect
 
     @property
     def to_draw(self) -> pygame.Surface:
@@ -87,6 +95,8 @@ class Sprite(interfaces.Sprite):
     def update(self, dt: float) -> bool:
         if self.hidden:
             self.image = pygame.Surface((0, 0))
+        if self.attached_to is not None:
+            self.rect.center = self.attached_to.rect.center
         self.effects = [effect for effect in self.effects if effect.update(dt)]
         if max(self.image.size):
             self.to_draw = self.image.copy()

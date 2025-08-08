@@ -299,6 +299,10 @@ class PixelFont(Protocol):
 class Sprite(Protocol):
     groups: set[str]
 
+    def attach(self, other: "Sprite") -> None: raise NotImplementedError
+
+    def detach(self) -> None: raise NotImplementedError
+
     def message(self, message: str) -> None: raise NotImplementedError
 
     def hide(self) -> None: raise NotImplementedError

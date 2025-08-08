@@ -36,6 +36,7 @@ class ScrollingBackground(sprite.Sprite, interfaces.Background):
         ),
         z: int = 0,
     ) -> None:
+        self.attached_to = None
         tileset = hardware.loader.get_surface("tileset.png")
         self.land_tile = tileset.subsurface((112, 176, 16, 16))
         self.land_sea_transition = tileset.subsurface((128, 176, 16, 16))
@@ -57,7 +58,6 @@ class ScrollingBackground(sprite.Sprite, interfaces.Background):
         self.locked = False
         self.finished = False
         self.age = 0
-
         super().__init__(level, self.get_next_image(), rect, z)
 
     def get_level(self) -> interfaces.HoverboardLevel:

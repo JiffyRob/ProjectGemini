@@ -330,33 +330,32 @@ class Iball(sprite.Sprite):
         )
 
     def update(self, dt: float) -> bool:
-        if not self.locked:
-            # motion handling
-            self.age += dt
-            desired_motion = (
-                self.nearest_in_rect(self.get_player().head_rect) - self.true_pos
-            )
-            self.true_pos = pygame.Vector2(self.true_pos) + desired_motion * 4 * dt
-            self.rect.center = self.true_pos
-            self.rect.y += 3 * sin(self.age * 8)
+        # motion handling
+        self.age += dt
+        desired_motion = (
+            self.nearest_in_rect(self.get_player().head_rect) - self.true_pos
+        )
+        self.true_pos = pygame.Vector2(self.true_pos) + desired_motion * 4 * dt
+        self.rect.center = self.true_pos
+        self.rect.y += 3 * sin(self.age * 8)
 
-            # image handling
-            self.facing = self.get_player().facing
-            self.image = self.frames[self.facing]
+        # image handling
+        self.facing = self.get_player().facing
+        self.image = self.frames[self.facing]
 
-            # input handling
-            pressed = hardware.input_queue.just_pressed
-            if "shoot" in pressed and self.shoot_cooldown.done():
-                self.effects.append(visual_fx.Blink(speed=0.1, count=1))
-                self.get_level().add_sprite(
-                    projectile.MiniLaser(
-                        self.get_level(),
-                        self.rect.center,
-                        self.z,
-                        self.facing,
-                    )
+        # input handling
+        pressed = hardware.input_queue.just_pressed
+        if "shoot" in pressed and self.shoot_cooldown.done():
+            self.effects.append(visual_fx.Blink(speed=0.1, count=1))
+            self.get_level().add_sprite(
+                projectile.MiniLaser(
+                    self.get_level(),
+                    self.rect.center,
+                    self.z,
+                    self.facing,
                 )
-                self.shoot_cooldown.reset()
+            )
+            self.shoot_cooldown.reset()
 
         self.shoot_cooldown.update()
         super().update(dt)

@@ -405,6 +405,7 @@ class Hoverboard(sprite.Sprite, interfaces.Interactor):
     async def ride_off_into_sunset(self) -> None:
         self.get_player().lock()
         self.get_player().hide()
+        self.get_player().attach(self)
         self.anim = self.exit_anim
         self.exiting = True
         await self.exited.wait()
