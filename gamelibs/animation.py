@@ -32,15 +32,15 @@ class Animation(interfaces.Animation):
     @property
     def flip_x(self) -> bool:
         return self._flip_x
-    
+
     @flip_x.setter
     def flip_x(self, value: bool) -> None:
         self._flip_x = value
-    
+
     @property
     def flip_y(self) -> bool:
         return self._flip_y
-    
+
     @flip_y.setter
     def flip_y(self, value: bool) -> None:
         self._flip_y = value
@@ -77,15 +77,15 @@ class NoLoopAnimation(interfaces.Animation):
     @property
     def flip_x(self) -> bool:
         return self._flip_x
-    
+
     @flip_x.setter
     def flip_x(self, value: bool) -> None:
         self._flip_x = value
-    
+
     @property
     def flip_y(self) -> bool:
         return self._flip_y
-    
+
     @flip_y.setter
     def flip_y(self, value: bool) -> None:
         self._flip_y = value
@@ -119,15 +119,15 @@ class SingleAnimation(interfaces.Animation):
     @property
     def flip_x(self) -> bool:
         return self._flip_x
-    
+
     @flip_x.setter
     def flip_x(self, value: bool) -> None:
         self._flip_x = value
-    
+
     @property
     def flip_y(self) -> bool:
         return self._flip_y
-    
+
     @flip_y.setter
     def flip_y(self, value: bool) -> None:
         self._flip_y = value
@@ -165,15 +165,15 @@ class AnimatedSurface(pygame.Surface, interfaces.Animation):
     @property
     def flip_x(self) -> bool:
         return self._flip_x
-    
+
     @flip_x.setter
     def flip_x(self, value: bool) -> None:
         self._flip_x = value
-    
+
     @property
     def flip_y(self) -> bool:
         return self._flip_y
-    
+
     @flip_y.setter
     def flip_y(self, value: bool) -> None:
         self._flip_y = value

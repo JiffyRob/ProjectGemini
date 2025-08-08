@@ -3,5 +3,6 @@
     "python-envs.pythonProjects": [],
     "python.analysis.typeCheckingMode": "strict",
     "python.languageServer": "Pylance",
-    "python.analysis.languageServerMode": "full"
+    "python.analysis.languageServerMode": "full",
+    "python.analysis.diagnosticMode": "workspace"
 }

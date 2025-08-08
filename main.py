@@ -65,7 +65,7 @@ class Game(interfaces.Game):
 
     def get_gl_context(self) -> zengl.Context:
         return self.context
-    
+
     def get_current_planet_name(self) -> str:
         return self.get_state().name  # type: ignore
 

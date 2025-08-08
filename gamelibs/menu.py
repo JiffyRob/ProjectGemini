@@ -842,7 +842,6 @@ class NameInputMenu(game_state.GameState):
             hardware.save.new(save_name)
             self.game.load_save(save_name)
 
-
     def cancel(self) -> None:
         self.pop()
 

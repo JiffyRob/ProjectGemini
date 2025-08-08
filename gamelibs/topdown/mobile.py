@@ -400,11 +400,10 @@ class Drone(sprite.Sprite, interfaces.Healthy):
     @property
     def health(self) -> int:
         return self._health
-    
+
     @health.setter
     def health(self, value: int) -> None:
         self._health = value
-    
 
     @property
     def collision_rect(self) -> pygame.FRect | pygame.Rect:

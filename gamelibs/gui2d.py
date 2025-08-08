@@ -153,9 +153,7 @@ class Dialog(sprite.GUISprite, interfaces.GUISprite):
             if "interact" in pressed:
                 self.choose()
         elif (
-            self.state == self.State.DONE
-            and not self.answers
-            and "interact" in pressed
+            self.state == self.State.DONE and not self.answers and "interact" in pressed
         ):
             self.choose()
         return self.live

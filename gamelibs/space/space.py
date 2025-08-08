@@ -75,6 +75,12 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
         self.rear_view = False
         self.locked = False
 
+    def add_particle(
+        self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float
+    ) -> int:
+        print("No particles in space :/")
+        return 0
+
     def shake(
         self,
         magnitude: float = 5,

@@ -12,6 +12,7 @@ from gamelibs import (
     game_state,
     gui2d,
     interfaces,
+    particles,
     platformer,
     hoverboarding,
     sprite,
@@ -200,7 +201,7 @@ class Level(game_state.GameState, interfaces.Level):
         map_type: interfaces.MapType = interfaces.MapType.TOPDOWN,
         soundtrack: interfaces.FileID | None = None,
         entrance: interfaces.MapEntranceType = interfaces.MapEntranceType.NORMAL,
-    ):
+    ) -> None:
         super().__init__(game)
         self._map_rect = pygame.Rect((0, 0), map_size)
         self._name = name
@@ -251,16 +252,28 @@ class Level(game_state.GameState, interfaces.Level):
         self.shake_axes = 0
         self.speed = 0  # used for hoverboard levels
         self.dt_multiplier = 1
+        self.particle_manager = particles.ParticleManager()
 
         self.add_sprite(self.player)
         self.add_sprite(self.iball)
         self.update(0)
-        self.get_game().delayed_callback(0, lambda: self.get_game().run_cutscene("level_begin"))
+        self.get_game().delayed_callback(
+            0, lambda: self.get_game().run_cutscene("level_begin")
+        )
+        surface = hardware.loader.create_surface((16, 16))
+        surface.fill("blue")
 
+    def add_particle(self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float) -> int:
+        return self.particle_manager.add_particle(
+            surface,
+            rect,
+            velocity,
+            duration
+        )
 
     def time_phase(self, mult: float) -> None:
         self.dt_mult = mult
-    
+
     @property
     def map_rect(self) -> pygame.Rect:
         return self._map_rect
@@ -456,7 +469,7 @@ class Level(game_state.GameState, interfaces.Level):
 
     def get_group(self, group_name: str) -> set[interfaces.Sprite]:
         return self.groups[group_name]
-    
+
     def get_player(self) -> interfaces.Player:
         return self.player
 
@@ -622,6 +635,8 @@ class Level(game_state.GameState, interfaces.Level):
         self.shake_magnitude = max(self.shake_magnitude - self.shake_delta * dt, 0)
         if not self.shake_magnitude:
             self.shake_delta *= 0
+        # update particles
+        self.particle_manager.update(dt)
         return super().update(dt) and True
 
     def draw(self) -> None:
@@ -648,6 +663,8 @@ class Level(game_state.GameState, interfaces.Level):
                 sprite.to_draw,
                 rect,
             )
+        # draw particles
+        self.particle_manager.draw(self.game.window_surface, (-int(self.viewport_rect.left), -int(self.viewport_rect.top)))
         # draw visual effects
         for effect in self.effects:
             effect.draw(self.game.window_surface)

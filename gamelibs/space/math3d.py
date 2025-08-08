@@ -19,7 +19,7 @@ class Quaternion(interfaces.Quaternion):
     @property
     def real(self) -> float:
         return self._real
-    
+
     @real.setter
     def real(self, value: float) -> None:
         self._real = value
@@ -27,7 +27,7 @@ class Quaternion(interfaces.Quaternion):
     @property
     def vector(self) -> pygame.Vector3:
         return self._vector
-    
+
     @vector.setter
     def vector(self, value: pygame.Vector3):
         self._vector = value
@@ -131,12 +131,16 @@ def rotate_points(points: numpy.ndarray, quaternion: interfaces.Quaternion) -> N
     numpy.add(points, term, points)
 
     # add 2 * (camera_vector x (camera_vector x position))
-    term = numpy.cross(quaternion.vector, crosses)  # dirty double crosser ;)  # type: ignore
+    term = numpy.cross(  # type: ignore
+        quaternion.vector, crosses  # type: ignore
+    )  # dirty double crosser ;)  # type: ignore
     term = numpy.multiply(term, 2, term)  # type: ignore
     numpy.add(points, term, points)
 
 
-def project_points_sizes(points: numpy.ndarray, sizes: numpy.ndarray, near_z: float) -> None:
+def project_points_sizes(
+    points: numpy.ndarray, sizes: numpy.ndarray, near_z: float
+) -> None:
     # Note that this is a linear projection using integer multiplication
     # NOT the curved shape you get with homogenous coordinates and a matmul
     scale_factors = numpy.divide(near_z, points[:, 2]).reshape(len(points), 1)
@@ -144,7 +148,9 @@ def project_points_sizes(points: numpy.ndarray, sizes: numpy.ndarray, near_z: fl
     numpy.multiply(points[:, :2], scale_factors, points[:, :2])
 
 
-def inverse_camera_transform_points_sizes(points: numpy.ndarray, sizes: numpy.ndarray, camera: interfaces.Camera3d) -> None:
+def inverse_camera_transform_points_sizes(
+    points: numpy.ndarray, sizes: numpy.ndarray, camera: interfaces.Camera3d
+) -> None:
     # translate
     numpy.add(points, -camera.pos, points)  # type: ignore
     # rotate
@@ -153,7 +159,9 @@ def inverse_camera_transform_points_sizes(points: numpy.ndarray, sizes: numpy.nd
     term = numpy.multiply(crosses, 2)  # type: ignore
     numpy.multiply(term, quaternion.real, term)
     numpy.add(points, term, points)
-    term = numpy.cross(quaternion.vector, crosses)  # dirty double crosser ;)  # type: ignore
+    term = numpy.cross(  # type: ignore
+        quaternion.vector, crosses  # type: ignore
+    )  # dirty double crosser ;)  # type: ignore
     term = numpy.multiply(term, 2, term)  # type: ignore
     numpy.add(points, term, points)
     # scale

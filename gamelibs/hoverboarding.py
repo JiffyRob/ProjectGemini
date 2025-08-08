@@ -210,7 +210,6 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
         )
         self.rect.right = 0
 
-
         margin = 16
         self.min_x, self.max_x = margin, level.map_rect.right - margin
         self.min_y, self.max_y = margin, level.map_rect.bottom - margin
@@ -331,9 +330,13 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                     self.get_game().run_cutscene("quit")
                 print(self.rect)
                 if "down" in held_input:
-                    self.rect.centery = min(self.max_y, self.rect.centery + self.BANK_SPEED * dt)
+                    self.rect.centery = min(
+                        self.max_y, self.rect.centery + self.BANK_SPEED * dt
+                    )
                 if "up" in held_input:
-                    self.rect.centery = max(self.min_y, self.rect.centery - self.BANK_SPEED * dt)
+                    self.rect.centery = max(
+                        self.min_y, self.rect.centery - self.BANK_SPEED * dt
+                    )
                 if "right" in held_input:
                     self.rect.x = min(self.max_x, self.rect.x + self.ACCEL_SPEED * dt)
                 if "left" in held_input:
