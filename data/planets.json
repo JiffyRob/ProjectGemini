@@ -39,7 +39,7 @@
     "cloud_rotation_speed": 0.5
   },
   "GeminiII": {
-    "loc": [20, 0, 20],
+    "loc": [50, 0, 20],
     "water_color1": [52, 197, 163],
     "water_color2": [64, 137, 142],
     "low_color1": [102, 42, 113],

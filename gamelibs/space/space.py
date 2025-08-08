@@ -290,9 +290,7 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
                         self.possible_planet is not None
                     ), "Possible planet should not be None during entry."
                     self.game.load_map(self.possible_planet)
-                    print(self.camera.rotation)
-                    self.camera.rotation *= math3d.Quaternion(pi)  # type: ignore
-                    print(self.camera.rotation)
+                    self.camera.rotation *= math3d.Quaternion(pi, axis=(0, 1, 0))  # type: ignore
                     self.state = self.STATE_NORMAL
                     self.planet_indicator.reset()
                 self.camera.pos += motion.clamp_magnitude(self.min_forward_speed) * dt
