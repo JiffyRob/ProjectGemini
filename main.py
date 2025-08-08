@@ -5,6 +5,7 @@
 #   "zengl",
 #   "numpy",
 # ]
+# TODO: vendor in snek2
 
 import asyncio
 from collections import deque
@@ -40,7 +41,7 @@ class Game(interfaces.Game):
         self.window: window.WindowOld
         self.clock = pygame.time.Clock()
         self.fps = fps
-        self.stack: deque[interfaces.GameState] = deque()
+        self._stack: deque[interfaces.GameState] = deque()
         self.dt_mult = 1
         self.running = False
         self.timers: list[tuple[float, Callable[[], Any]]] = []
@@ -49,13 +50,14 @@ class Game(interfaces.Game):
         self.running_cutscenes: dict[str, asyncio.Task[Any]] = {}
 
     def pop_state(self) -> None:
-        self.stack.popleft()
+        self._stack.popleft().on_pop()
 
     def push_state(self, state: interfaces.GameState) -> None:
-        self.stack.appendleft(state)
+        self._stack.appendleft(state)
+        state.on_push()
 
     def get_state(self) -> interfaces.GameState:
-        return self.stack[0]
+        return self._stack[0]
 
     def exit_level(self) -> None:
         if isinstance(self.get_state(), interfaces.Level):
@@ -65,7 +67,7 @@ class Game(interfaces.Game):
         return self.context
     
     def get_current_planet_name(self) -> str:
-        return self.stack[0].name  # type: ignore
+        return self.get_state().name  # type: ignore
 
     def run_cutscene(
         self, name: interfaces.FileID, api: interfaces.SnekAPI = None
@@ -129,20 +131,20 @@ class Game(interfaces.Game):
         print("loading level:", map_name)
         new_map = level.Level.load(self, map_name, direction, position, entrance)
         if (
-            isinstance(self.stack[0], level.Level)
+            isinstance(self.get_state(), level.Level)
             and new_map.map_type != interfaces.MapType.HOUSE
         ):
             self.pop_state()
-        self.stack.appendleft(new_map)
+        self.push_state(new_map)
         if "_" not in map_name:
             hardware.save.set_state("planet", map_name)
 
     def load_save(self, save_name: interfaces.FileID) -> None:
         print("opening save:", save_name)
-        self.stack.clear()
+        self.quit()
         hardware.save.load(save_name)
-        self.stack.appendleft(space.Space(self))
-        self.stack.appendleft(level.Level.load(self, hardware.save.get_state("planet")))
+        self.push_state(space.Space(self))
+        self.push_state(level.Level.load(self, hardware.save.get_state("planet")))
 
     def delayed_callback(self, dt: float, callback: Callable[[], Any]) -> None:
         self.timers.append((dt, callback))
@@ -158,8 +160,8 @@ class Game(interfaces.Game):
         )
 
     def play_soundtrack(self, track_name: interfaces.FileID | None = None) -> None:
-        if len(self.stack):
-            current_state = self.stack[0]
+        if len(self._stack):
+            current_state = self.get_state()
             if track_name is None:
                 track_name = current_state.soundtrack  # type: ignore
             if track_name is None:
@@ -186,7 +188,7 @@ class Game(interfaces.Game):
 
     def update(self, dt: float) -> float:
         kill_state = False
-        if not self.stack[0].update(dt * self.dt_mult):
+        if not self.get_state().update(dt * self.dt_mult):
             kill_state = True
         # if fps drops below 10 the game will start to lag
         dt = pygame.math.clamp(
@@ -206,15 +208,15 @@ class Game(interfaces.Game):
                 still_waiting.append(self.timers[index])
         self.timers = still_waiting
         if kill_state:
-            self.stack.popleft()
+            self.pop_state()
         self.dt_mult = 1
         return dt
 
     def draw(self) -> None:
         self.context.new_frame()
-        self.window.get_soft_surface().fill(self.stack[0].bgcolor)
-        self.stack[0].draw()
-        self.window.render(not self.stack[0].opengl)
+        self.window.get_soft_surface().fill(self.get_state().bgcolor)
+        self.get_state().draw()
+        self.window.render(not self.get_state().opengl)
         self.context.end_frame()
         self.window.flip()
 
@@ -235,11 +237,11 @@ class Game(interfaces.Game):
         self.load_input_binding("arrow")
         self.add_input_binding("controller")
 
-        self.stack.appendleft(menu.MainMenu(self))
-        # self.stack.appendleft(space.Space(self))
+        self.push_state(menu.MainMenu(self))
+        # self.push_state(space.Space(self))
         pygame.key.set_repeat(0, 0)
         dt = 0
-        while self.running and len(self.stack):
+        while self.running and len(self._stack):
             # make sure that a cutscene has a chance to update before the next draw call
             if self.just_ran_cutscene:
                 await asyncio.sleep(0)
@@ -267,9 +269,8 @@ class Game(interfaces.Game):
         print(hardware.settings)
         hardware.loader.save_settings(hardware.settings)
         hardware.loader.flush()
-        while len(self.stack) > 1:
-            self.stack.clear()
-        self.stack.appendleft(menu.MainMenu(self))
+        self._stack.clear()
+        self.push_state(menu.MainMenu(self))
 
     def exit(self) -> None:
         self.running = env.PYGBAG

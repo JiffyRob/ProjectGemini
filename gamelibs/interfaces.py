@@ -634,6 +634,10 @@ class Game(Protocol):
 
 @runtime_checkable
 class GameState(Protocol):
+    def on_push(self) -> None: raise NotImplementedError
+
+    def on_pop(self) -> None: raise NotImplementedError
+    
     def pop(self) -> None: raise NotImplementedError
 
     def update(self, dt: float) -> bool: raise NotImplementedError

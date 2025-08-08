@@ -14,5 +14,5 @@
   "turbo_ship": ["KeyDown_space", null],
   "rear_view": ["KeyDown_left ctrl"],
   "enter": ["KeyDown_return", null],
-  "shoot": ["Keydown_lctrl", null]
+  "shoot": ["KeyDown_left ctrl", null]
 }

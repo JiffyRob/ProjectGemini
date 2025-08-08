@@ -1,7 +1,6 @@
-import pygame
 from pygame.typing import ColorLike
 
-from gamelibs import util_draw, interfaces
+from gamelibs import interfaces
 
 
 class GameState(interfaces.GameState):
@@ -10,9 +9,14 @@ class GameState(interfaces.GameState):
     ) -> None:
         self.game = game
         self._bgcolor = color
-        self.screen_rect = pygame.Rect((0, 0), util_draw.RESOLUTION)
-        self.live = True
+        self._live = True
         self._opengl = opengl
+
+    def on_push(self) -> None:
+        pass
+
+    def on_pop(self) -> None:
+        pass
 
     @property
     def opengl(self) -> bool:
@@ -31,10 +35,10 @@ class GameState(interfaces.GameState):
         self._bgcolor = value
 
     def pop(self) -> None:
-        self.live = False
+        self._live = False
 
     def update(self, dt: float) -> bool:
-        return self.live
+        return self._live
 
     def draw(self) -> None:
         pass

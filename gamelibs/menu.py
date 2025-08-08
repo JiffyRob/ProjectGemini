@@ -959,6 +959,13 @@ class SettingsMenu(game_state.GameState):
             ]
         )
 
+    def pop(self):
+        print("pop!")
+        super().pop()
+
+    def on_pop(self) -> None:
+        hardware.loader.save_settings(hardware.settings)
+
     def update(self, dt: float) -> bool:
         self.gui = [sprite for sprite in self.gui if sprite.update(dt)]
         if "quit" in hardware.input_queue.just_pressed:
