@@ -495,7 +495,6 @@ class Level(game_state.GameState, interfaces.Level):
             if direction == "left":
                 player_position = [size[0] - 8, player_position[1]]
             if direction == "right":
-                print("right", player_position, position)
                 player_position = [8, player_position[1]]
         elif map_type == interfaces.MapType.HOVERBOARD:
             pass
@@ -584,7 +583,8 @@ class Level(game_state.GameState, interfaces.Level):
                         level.rects["mountain"].append(rect)
 
         level.player.z = entity_layer
-        level.iball.z = entity_layer
+        level.iball.z = entity_layer + 1
+        level.iball.move_to(level.player.head_rect.center)
         return level
 
     def world_to_screen(self, pos: Point) -> pygame.Vector2:

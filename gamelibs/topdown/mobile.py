@@ -319,6 +319,9 @@ class Iball(sprite.Sprite):
         self.true_pos = pygame.Vector2(self.rect.center)
         self.shoot_cooldown = timer.Timer(300)
 
+    def move_to(self, pos: Point) -> None:
+        self.true_pos = pygame.Vector2(pos)
+
     def nearest_in_rect(self, rect: interfaces.MiscRect) -> pygame.Vector2:
         x, y = self.true_pos
         return pygame.Vector2(
@@ -457,7 +460,7 @@ class Drone(sprite.Sprite, interfaces.Healthy):
                     self.get_level().add_sprite(
                         projectile.Laser(
                             self.get_level(),
-                            self.shoot_start,
+                            self.rect.topleft + self.shoot_start,
                             self.z,
                             direction,
                         )
