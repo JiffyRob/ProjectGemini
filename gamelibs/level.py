@@ -218,7 +218,6 @@ class Level(game_state.GameState, interfaces.Level):
             )
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type in {interfaces.MapType.HOUSE, interfaces.MapType.TOPDOWN}:
-            print(entrance)
             self.player = topdown.mobile.Player(self, rect, entrance=entrance)
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type == interfaces.MapType.HOVERBOARD:
@@ -227,9 +226,6 @@ class Level(game_state.GameState, interfaces.Level):
                 cast(interfaces.HoverboardLevel, self), rect
             )
             self.iball = topdown.mobile.Iball(self, small_rect)
-        else:
-            print("AAAAHAHH")
-            raise
         self._map_type = map_type
         self.entity_layer = 0
         if player_facing and isinstance(self.player, topdown.mobile.Player):
@@ -265,8 +261,6 @@ class Level(game_state.GameState, interfaces.Level):
         surface.fill("blue")
 
     def attach(self, base: str, follower: str="player") -> None:
-        print(base, self.get_group(base))
-        print(follower, self.get_group(follower))
         next(iter(self.get_group(follower))).attach(next(iter(self.get_group(base))))
 
     def add_particle(self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float) -> int:
@@ -411,7 +405,6 @@ class Level(game_state.GameState, interfaces.Level):
         def get_color() -> ColorLike:
             if len(arg_list):
                 item1 = arg_list.pop(0)
-                print(item1)
                 if isinstance(item1, str):
                     return item1
                 else:

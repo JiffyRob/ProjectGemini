@@ -75,7 +75,6 @@ class SpaceRendererHW:
         self.planet_radii = numpy.zeros(planet_count, "f4") + 5.0
 
         self.planet_names = {}
-        print(locations, self.id_to_name)
         for i, (planet, location) in enumerate(locations.items()):
             self.planet_locations[i] = location
             self.planet_ids[i] = planet

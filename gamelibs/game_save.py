@@ -26,7 +26,6 @@ class GameSave(interfaces.GameSave):
         self.tmp_data[key] = value
 
     def new(self, name: str) -> interfaces.FileID:
-        print(hardware.loader.get_save_count())
         count = hardware.loader.get_save_count()
         path = f"save{count + 1}"
         self.load(None)

@@ -431,7 +431,6 @@ class Drone(sprite.Sprite):
                 self.effects.append(
                     visual_fx.Blink(color=(205, 36, 36), speed=0.1, count=1)
                 )
-            print("OW!")
 
     @property
     def collision_rect(self) -> interfaces.MiscRect:

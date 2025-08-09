@@ -659,7 +659,6 @@ class MainMenu(game_state.GameState):
         button_dict = {}
 
         save_names = hardware.loader.get_save_names(5)
-        print(save_names)
 
         self.gui: list[interfaces.GUISprite] = [  # type: ignore
             Image(self, backdrop, util_draw.SCREEN_RECT),  # type: ignore
@@ -912,7 +911,6 @@ class DeleteConfirmationMenu(game_state.GameState):
 
     def delete(self) -> None:
         hardware.save.delete(self.save_path)
-        print(hardware.loader.get_save_names())
         self.get_game().quit()  # runs back into main menu
 
 
@@ -962,8 +960,7 @@ class SettingsMenu(game_state.GameState):
             ]
         )
 
-    def pop(self):
-        print("pop!")
+    def pop(self) -> None:
         super().pop()
 
     def on_pop(self) -> None:
