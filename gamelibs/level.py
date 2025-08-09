@@ -263,6 +263,11 @@ class Level(game_state.GameState, interfaces.Level):
         surface = hardware.loader.create_surface((16, 16))
         surface.fill("blue")
 
+    def attach(self, base: str, follower: str="player") -> None:
+        print(base, self.get_group(base))
+        print(follower, self.get_group(follower))
+        next(iter(self.get_group(follower))).attach(next(iter(self.get_group(base))))
+
     def add_particle(self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float) -> int:
         return self.particle_manager.add_particle(
             surface,
@@ -303,21 +308,29 @@ class Level(game_state.GameState, interfaces.Level):
             return False
         return await self.get_game().run_sub_cutscene(self.name, {})
 
-    def lock(self) -> None:
-        self.locked = True
-        for sprite in self.sprites:
-            sprite.lock()
-        for background in self.backgrounds:
-            background.lock()
+    def lock(self, group: str | None=None) -> None:
+        if group is None:
+            self.locked = True
+            for sprite in self.sprites:
+                sprite.lock()
+            for background in self.backgrounds:
+                background.lock()
+        else:
+            for sprite in self.get_group(group):
+                sprite.lock()
 
-    def unlock(self) -> None:
-        self.locked = False
-        for sprite in self.sprites:
-            sprite.unlock()
-        for background in self.backgrounds:
-            background.unlock()
+    def unlock(self, group: str | None=None) -> None:
+        if group is None:
+            self.locked = False
+            for sprite in self.sprites:
+                sprite.unlock()
+            for background in self.backgrounds:
+                background.unlock()
+        else:
+            for sprite in self.get_group(group):
+                sprite.unlock()
 
-    def message(self, group: str, message: str) -> None:
+    def message(self, message: str, group: str="player") -> None:
         for sprite in self.groups[group]:
             sprite.message(message)
 
@@ -448,19 +461,16 @@ class Level(game_state.GameState, interfaces.Level):
 
     def get_x(self, group: str = "player") -> float:
         if group not in self.groups:
-            print(self.groups)
             exit()
         return next(iter(self.get_group(group))).pos.x
 
     def get_y(self, group: str = "player") -> float:
         if group not in self.groups:
-            print(self.groups)
             exit()
         return next(iter(self.get_group(group))).pos.y
 
     def get_z(self, group: str = "player") -> int:
         if group not in self.groups:
-            print(self.groups)
             exit()
         return next(iter(self.get_group(group))).z
 

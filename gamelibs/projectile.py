@@ -6,7 +6,7 @@ from gamelibs import sprite, timer, interfaces, hardware
 
 
 class Laser(sprite.Sprite):
-    groups: set[str] = set()
+    groups = {"projectiles"}
     SPEED = 100
 
     def __init__(
@@ -43,7 +43,7 @@ class Laser(sprite.Sprite):
 
 
 class MiniLaser(sprite.Sprite):
-    groups: set[str] = set()
+    groups = {"projectiles"}
     SPEED = 250
 
     def __init__(

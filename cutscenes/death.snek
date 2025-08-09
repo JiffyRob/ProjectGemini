@@ -1,7 +1,12 @@
 lock();
 hide();
+unlock("drones");
+if get_map_type() == "Hoverboard" then unlock("projectiles");
+message("leave", "drones");
 
 spawn("DeadPlayer", get_x() - 8, get_y() - 8, 16, 16, get_z());
+wait(10);
+attach("dead-player");
 # fadeout_circle(get_x(), get_y(), 1, 100);
 # fill(0, 0, 0);
 

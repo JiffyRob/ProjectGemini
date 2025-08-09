@@ -850,11 +850,14 @@ class Level(GameState, Protocol):
 
     async def attempt_map_cutscene(self) -> None:
         raise NotImplementedError
-
-    def lock(self) -> None:
+    
+    def attach(self, base: str, follower: str="player") -> None:
         raise NotImplementedError
 
-    def unlock(self) -> None:
+    def lock(self, group: str | None=None) -> None:
+        raise NotImplementedError
+
+    def unlock(self, group: str | None=None) -> None:
         raise NotImplementedError
 
     def add_particle(
@@ -862,7 +865,7 @@ class Level(GameState, Protocol):
     ) -> int:
         raise NotImplementedError
 
-    def message(self, group: str, message: str) -> None:
+    def message(self, message: str, group: str = "player") -> None:
         raise NotImplementedError
 
     def add_effect(self, effect: GlobalEffect) -> None:

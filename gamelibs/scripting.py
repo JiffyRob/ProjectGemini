@@ -116,6 +116,8 @@ class Script(SNEKProgram):
             "run": Run(game),
             "attempt_map_cutscene": RunMap(game),
             "spawn": Spawn(game),
+            "message": SNEKCallable(game.get_state().message, Arity(1, 2)),
+            "attach": SNEKCallable(game.get_state().attach, Arity(1, 2)),
             "lock": SNEKCallable(
                 lambda *args: game.get_state().lock(*args), Arity(0, 1)
             ),
@@ -142,6 +144,7 @@ class Script(SNEKProgram):
             "get_save_state": SNEKCallable(hardware.save.get_state, 1),
             "set_save_state": SNEKCallable(hardware.save.set_state, 2),
             "get_current_planet_name": SNEKCallable(game.get_current_planet_name, 0),
+            "get_map_type": SNEKCallable(lambda: game.get_state().map_type, 0),
             "get_x": SNEKCallable(
                 lambda *args: game.get_state().get_x(*args), Arity(0, 1)
             ),

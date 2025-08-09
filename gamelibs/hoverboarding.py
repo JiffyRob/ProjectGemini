@@ -93,76 +93,75 @@ class ScrollingBackground(sprite.Sprite, interfaces.Background):
             return util_draw.repeat_surface(self.sea_tile, (16, self.rect.height))
 
     def update(self, dt: float) -> None:  # type: ignore[override]
-        if not self.locked:
-            self.age += dt
-            self.x_offset -= self.get_level().speed * dt
-            self.swap_cooldown.update()
-            self.spawn_cooldown.update()
-            self.slowdown_timer.update()
-            self.speedup_timer.update()
-            if (
-                self.state == self.STATE_GROUND
-                and 0.05 < self.swap_cooldown.percent_complete() < 0.95
-                and self.spawn_cooldown.done()
-            ):
-                if not random.randint(0, self.land_rock_chance):
-                    self.get_level().spawn(
-                        "Rock",
-                        (
-                            util_draw.RESOLUTION[0] + 8,
-                            random.randint(0, util_draw.RESOLUTION[1]),
-                            16,
-                            16,
-                        ),
-                        z=8,
-                    )
-                if not random.randint(0, self.stump_chance):
-                    self.get_level().spawn(
-                        "Stump",
-                        (
-                            util_draw.RESOLUTION[0] + 8,
-                            random.randint(0, util_draw.RESOLUTION[1]),
-                            16,
-                            16,
-                        ),
-                        z=8,
-                    )
-                self.spawn_cooldown.reset()
-            elif (
-                self.state == self.STATE_WATER
-                and 0.05 < self.swap_cooldown.percent_complete() < 0.95
-                and self.spawn_cooldown.done()
-            ):
-                if not random.randint(0, self.sea_rock_chance):
-                    self.get_level().spawn(
-                        "Rock",
-                        (
-                            util_draw.RESOLUTION[0] + 8,
-                            random.randint(0, util_draw.RESOLUTION[1]),
-                            16,
-                            16,
-                        ),
-                        z=8,
-                    )
-                self.spawn_cooldown.reset()
-            if not self.speedup_timer.done():
-                self.get_level().speed = 200 * easings.in_out_quad(
-                    self.age / self.speedup_time * 1000
+        self.age += dt
+        self.x_offset -= self.get_level().speed * dt
+        self.swap_cooldown.update()
+        self.spawn_cooldown.update()
+        self.slowdown_timer.update()
+        self.speedup_timer.update()
+        if (
+            self.state == self.STATE_GROUND
+            and 0.05 < self.swap_cooldown.percent_complete() < 0.95
+            and self.spawn_cooldown.done()
+        ):
+            if not random.randint(0, self.land_rock_chance):
+                self.get_level().spawn(
+                    "Rock",
+                    (
+                        util_draw.RESOLUTION[0] + 8,
+                        random.randint(0, util_draw.RESOLUTION[1]),
+                        16,
+                        16,
+                    ),
+                    z=8,
                 )
-            if self.slowdown_timer.done():
-                self.get_level().speed = 200 * (
-                    1
-                    - easings.in_out_quad(
-                        (self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time
-                    )
+            if not random.randint(0, self.stump_chance):
+                self.get_level().spawn(
+                    "Stump",
+                    (
+                        util_draw.RESOLUTION[0] + 8,
+                        random.randint(0, util_draw.RESOLUTION[1]),
+                        16,
+                        16,
+                    ),
+                    z=8,
                 )
-                self.state = self.STATE_SLOWDOWN
-                self.get_level().message("drones", "leave")
-            if self.stop_timer.done():
-                self.get_level().speed = 0
-                if not self.finished:
-                    self.get_player().exit()
-                    self.finished = True
+            self.spawn_cooldown.reset()
+        elif (
+            self.state == self.STATE_WATER
+            and 0.05 < self.swap_cooldown.percent_complete() < 0.95
+            and self.spawn_cooldown.done()
+        ):
+            if not random.randint(0, self.sea_rock_chance):
+                self.get_level().spawn(
+                    "Rock",
+                    (
+                        util_draw.RESOLUTION[0] + 8,
+                        random.randint(0, util_draw.RESOLUTION[1]),
+                        16,
+                        16,
+                    ),
+                    z=8,
+                )
+            self.spawn_cooldown.reset()
+        if not self.speedup_timer.done():
+            self.get_level().speed = 200 * easings.in_out_quad(
+                self.age / self.speedup_time * 1000
+            )
+        if self.slowdown_timer.done():
+            self.get_level().speed = 200 * (
+                1
+                - easings.in_out_quad(
+                    (self.age * 1000 - self.slowdown_timer.wait) / self.speedup_time
+                )
+            )
+            self.state = self.STATE_SLOWDOWN
+            self.get_level().message("drones", "leave")
+        if self.stop_timer.done():
+            self.get_level().speed = 0
+            if not self.finished:
+                self.get_player().exit()
+                self.finished = True
 
     def draw(self, surface: pygame.Surface, offset: Point) -> None:
         if self.x_offset < 0:
@@ -323,12 +322,8 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
                     )
             elif self.state != "empty":
                 held_input = hardware.input_queue.held
-                just_input = hardware.input_queue.just_pressed
                 self.state = "idle"
                 self._facing = interfaces.Direction.RIGHT
-                if "quit" in just_input:
-                    self.get_game().run_cutscene("quit")
-                print(self.rect)
                 if "down" in held_input:
                     self.rect.centery = min(
                         self.max_y, self.rect.centery + self.BANK_SPEED * dt
@@ -359,6 +354,8 @@ class Player(sprite.Sprite, interfaces.HoverboardPlayer):
 
 
 class DeadPlayer(sprite.Sprite):
+    groups = {"dead-player"}
+
     def __init__(
         self,
         level: interfaces.HoverboardLevel,
@@ -531,10 +528,9 @@ class Rock(sprite.Sprite):
         return self.rect
 
     def update(self, dt: float) -> bool:
-        if not self.locked:
-            self.rect.left -= self.get_level().speed * dt
-            if self.rect.right < 0:
-                return False
+        self.rect.left -= self.get_level().speed * dt
+        if self.rect.right < 0:
+            return False
         return super().update(dt)
 
 
@@ -559,8 +555,7 @@ class Stump(sprite.Sprite):
         return self.rect
 
     def update(self, dt: float) -> bool:
-        if not self.locked:
-            self.rect.left -= self.get_level().speed * dt
-            if self.rect.right < 0:
+        self.rect.left -= self.get_level().speed * dt
+        if self.rect.right < 0:
                 return False
         return super().update(dt)

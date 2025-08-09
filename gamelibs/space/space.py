@@ -89,7 +89,7 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
     ) -> None:
         raise NotImplementedError
 
-    def message(self, group: str, message: str) -> None:
+    def message(self, message: str, group: str="player") -> None:
         print("Space has sprites to message, so no message sent")
         return None
 
@@ -185,11 +185,14 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
 
     async def run_dialog(self, *terms: str, face: str | None = None) -> None | str:
         raise NotImplementedError
+    
+    def attach(self, base: str, follower: str = "player") -> None:
+        print("No sprites in space to attach")
 
-    def lock(self) -> None:
+    def lock(self, group: str | None=None) -> None:
         self.locked = True
 
-    def unlock(self) -> None:
+    def unlock(self, group: str | None=None) -> None:
         self.locked = False
 
     @property
