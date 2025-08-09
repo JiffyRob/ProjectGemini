@@ -244,7 +244,7 @@ class GameSave(Protocol):
     def set_tmp(self, key: str, value: Any) -> None:
         raise NotImplementedError
 
-    def new(self, path: FileID) -> None:
+    def new(self, name: str) -> FileID:
         raise NotImplementedError
 
     def load(self, path: FileID | None) -> None:
@@ -692,7 +692,10 @@ class Loader(Protocol):
     def delete_save(self, path: FileID) -> None:
         raise NotImplementedError
 
-    def get_save_names(self, amount: int = 5) -> list[FileID]:
+    def get_save_names(self, amount: int = 5) -> list[tuple[str, FileID]]:
+        raise NotImplementedError
+    
+    def get_save_count(self) -> int:
         raise NotImplementedError
 
     def flush(self) -> None:

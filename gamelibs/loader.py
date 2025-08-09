@@ -200,18 +200,25 @@ class Loader(interfaces.Loader):
         else:
             pathlib.Path(self.join_save(path)).with_suffix(".sav").unlink()
 
-    def get_save_names(self, amount: int = 5) -> list[FileID]:
-        names: list[FileID] = []
+    def get_save_names(self, amount: int = 5) -> list[tuple[str, FileID]]:
+        names: list[tuple[str, FileID]] = []
         i = 0
         if env.PYGBAG:
             paths = [pathlib.Path(i) for i in env.saves.keys()]
         else:
             paths = self.save_path.glob("*")
         for i, save_path in enumerate(paths):
-            names.append(save_path.stem)
+            names.append((self.get_save(save_path.stem)["name"], save_path.stem))
         if i < amount:
-            names.extend(("" for _ in range(amount - i)))
+            names.extend((("", "") for _ in range(amount - i)))
         return names[:amount]
+    
+    def get_save_count(self) -> int:
+        if env.PYGBAG:
+            paths = [pathlib.Path(i) for i in env.saves.keys()]
+        else:
+            paths = tuple(self.save_path.glob("*"))
+        return len(paths)
 
     def flush(self) -> None:
         env.write_saves()

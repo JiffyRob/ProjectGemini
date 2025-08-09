@@ -603,9 +603,11 @@ class Save(TextButton):
         level: interfaces.Level,
         rect: RectLike,
         index: int,
-        name: interfaces.FileID,
+        name: str,
+        path: interfaces.FileID,
     ) -> None:
         self.name = name
+        self.path = path
         super().__init__(
             level,
             rect,
@@ -620,12 +622,12 @@ class Save(TextButton):
         if self.get_level().delete_mode:
             if self.name:
                 self.get_game().push_state(
-                    DeleteConfirmationMenu(self.get_game(), self.name)
+                    DeleteConfirmationMenu(self.get_game(), self.name, self.path)
                 )
             self.get_level().delete_mode_toggle()
             return
         if self.name:
-            self.get_game().load_save(self.name)
+            self.get_game().load_save(self.path)
         else:
             self.get_game().push_state(NameInputMenu(self.get_game()))
 
@@ -657,6 +659,7 @@ class MainMenu(game_state.GameState):
         button_dict = {}
 
         save_names = hardware.loader.get_save_names(5)
+        print(save_names)
 
         self.gui: list[interfaces.GUISprite] = [  # type: ignore
             Image(self, backdrop, util_draw.SCREEN_RECT),  # type: ignore
@@ -673,8 +676,8 @@ class MainMenu(game_state.GameState):
             ),
         ]
         i = 0
-        for i, save_name in enumerate(save_names):
-            button = Save(self, button_rect, i + 1, save_name)  # type: ignore
+        for i, (save_name, save_path) in enumerate(save_names):
+            button = Save(self, button_rect, i + 1, save_name, save_path)  # type: ignore
             self.gui.append(button)  # type: ignore
             button_dict[(0, i)] = button
             button_rect.top = button_rect.bottom + 3
@@ -839,16 +842,17 @@ class NameInputMenu(game_state.GameState):
         hardware.save.load(None)
         save_name = "".join(self.input.text).replace("_", "")
         if save_name:
-            hardware.save.new(save_name)
-            self.game.load_save(save_name)
+            path = hardware.save.new(save_name)
+            self.game.load_save(path)
 
     def cancel(self) -> None:
         self.pop()
 
 
 class DeleteConfirmationMenu(game_state.GameState):
-    def __init__(self, game: interfaces.Game, save_name: interfaces.FileID) -> None:
+    def __init__(self, game: interfaces.Game, save_name: str, save_path: interfaces.FileID) -> None:
         self.save_name = save_name
+        self.save_path = save_path
         super().__init__(game, (0, 0, 0, 0))
         background_rect = pygame.Rect(0, 0, 256, 48)
         background_rect.center = util_draw.SCREEN_RECT.center
@@ -907,7 +911,7 @@ class DeleteConfirmationMenu(game_state.GameState):
         self.pop()
 
     def delete(self) -> None:
-        hardware.save.delete(self.save_name)
+        hardware.save.delete(self.save_path)
         print(hardware.loader.get_save_names())
         self.get_game().quit()  # runs back into main menu
 
