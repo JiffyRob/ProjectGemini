@@ -208,8 +208,7 @@ class Loader(interfaces.Loader):
         else:
             paths = self.save_path.glob("*")
         for i, save_path in enumerate(paths):
-            if save_path.stem != "start1":
-                names.append(save_path.stem)
+            names.append(save_path.stem)
         if i < amount:
             names.extend(("" for _ in range(amount - i)))
         return names[:amount]

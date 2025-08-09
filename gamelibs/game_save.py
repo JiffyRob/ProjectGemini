@@ -26,13 +26,25 @@ class GameSave(interfaces.GameSave):
         self.tmp_data[key] = value
 
     def new(self, path: interfaces.FileID) -> None:
-        self.load("start1")
+        self.load(None)
         self._loaded_path = path
         self.save()
 
-    def load(self, path: interfaces.FileID) -> None:
-        self.data = hardware.loader.get_save(path)
-        self._loaded_path = path
+    def load(self, path: interfaces.FileID | None) -> None:
+        if path is not None:
+            self.data = hardware.loader.get_save(path)
+            self._loaded_path = path
+        else:
+            self.data = {
+                "health": 6,
+                "max_health": 6,
+                "planet": "GeminiII_left_left",
+                "bush_interactions": 0,
+                "emeralds": 10,
+                "loaded_path": "Arthur",
+                "hoverboarded": False,
+                "inventory": {}
+            }
 
     def save(self, path: interfaces.FileID | None = None) -> None:
         if path is None:

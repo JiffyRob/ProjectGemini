@@ -836,7 +836,7 @@ class NameInputMenu(game_state.GameState):
         self.input.input_character(letter)
 
     def confirm_name(self) -> None:
-        hardware.save.load("start1")
+        hardware.save.load(None)
         save_name = "".join(self.input.text).replace("_", "")
         if save_name:
             hardware.save.new(save_name)

@@ -247,7 +247,7 @@ class GameSave(Protocol):
     def new(self, path: FileID) -> None:
         raise NotImplementedError
 
-    def load(self, path: FileID) -> None:
+    def load(self, path: FileID | None) -> None:
         raise NotImplementedError
 
     def save(self, path: FileID | None = None) -> None:
