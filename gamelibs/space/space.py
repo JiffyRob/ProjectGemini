@@ -89,7 +89,7 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
     ) -> None:
         raise NotImplementedError
 
-    def message(self, message: str, group: str="player") -> None:
+    def message(self, message: str, group: str = "player") -> None:
         print("Space has sprites to message, so no message sent")
         return None
 
@@ -125,6 +125,9 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
         raise NotImplementedError
 
     def set_player(self, player: interfaces.Player) -> None:
+        raise NotImplementedError
+    
+    def add_death_animation(self, position: Point) -> None:
         raise NotImplementedError
 
     @property
@@ -185,14 +188,14 @@ class Space(game_state.GameState, interfaces.SpaceLevel):
 
     async def run_dialog(self, *terms: str, face: str | None = None) -> None | str:
         raise NotImplementedError
-    
+
     def attach(self, base: str, follower: str = "player") -> None:
         print("No sprites in space to attach")
 
-    def lock(self, group: str | None=None) -> None:
+    def lock(self, group: str | None = None) -> None:
         self.locked = True
 
-    def unlock(self, group: str | None=None) -> None:
+    def unlock(self, group: str | None = None) -> None:
         self.locked = False
 
     @property

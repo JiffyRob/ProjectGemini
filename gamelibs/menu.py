@@ -849,7 +849,9 @@ class NameInputMenu(game_state.GameState):
 
 
 class DeleteConfirmationMenu(game_state.GameState):
-    def __init__(self, game: interfaces.Game, save_name: str, save_path: interfaces.FileID) -> None:
+    def __init__(
+        self, game: interfaces.Game, save_name: str, save_path: interfaces.FileID
+    ) -> None:
         self.save_name = save_name
         self.save_path = save_path
         super().__init__(game, (0, 0, 0, 0))

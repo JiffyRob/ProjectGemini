@@ -288,9 +288,13 @@ class Spikefruit(sprite.Sprite, interfaces.Interactor):
             self.fruit -= 1
             self.image = self.frames[self.fruit]
             self.get_player().acquire("spikefruit", 1)
-            for args in particles.splat(self.rect.center, (1, 1), "#777e86", (16, 32), 0.20, 6):
+            for args in particles.splat(
+                self.rect.center, (1, 1), "#777e86", (16, 32), 0.20, 6
+            ):
                 self.get_level().add_particle(*args)
-            for args in particles.splat(self.rect.center, (1, 1), "#3577a3", (16, 32), 0.20, 12):
+            for args in particles.splat(
+                self.rect.center, (1, 1), "#3577a3", (16, 32), 0.20, 12
+            ):
                 self.get_level().add_particle(*args)
             return interfaces.InteractionResult.NO_MORE
         else:

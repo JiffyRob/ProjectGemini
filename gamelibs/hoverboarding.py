@@ -427,6 +427,7 @@ class Drone(sprite.Sprite):
             if self.health <= 0:
                 self.health = 0
                 self.dead = True
+                self.get_level().add_death_animation(self.rect.center)
             else:
                 self.effects.append(
                     visual_fx.Blink(color=(205, 36, 36), speed=0.1, count=1)
@@ -556,5 +557,5 @@ class Stump(sprite.Sprite):
     def update(self, dt: float) -> bool:
         self.rect.left -= self.get_level().speed * dt
         if self.rect.right < 0:
-                return False
+            return False
         return super().update(dt)

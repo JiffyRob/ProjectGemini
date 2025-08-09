@@ -694,7 +694,7 @@ class Loader(Protocol):
 
     def get_save_names(self, amount: int = 5) -> list[tuple[str, FileID]]:
         raise NotImplementedError
-    
+
     def get_save_count(self) -> int:
         raise NotImplementedError
 
@@ -853,19 +853,22 @@ class Level(GameState, Protocol):
 
     async def attempt_map_cutscene(self) -> None:
         raise NotImplementedError
-    
-    def attach(self, base: str, follower: str="player") -> None:
+
+    def attach(self, base: str, follower: str = "player") -> None:
         raise NotImplementedError
 
-    def lock(self, group: str | None=None) -> None:
+    def lock(self, group: str | None = None) -> None:
         raise NotImplementedError
 
-    def unlock(self, group: str | None=None) -> None:
+    def unlock(self, group: str | None = None) -> None:
         raise NotImplementedError
 
     def add_particle(
         self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float
     ) -> int:
+        raise NotImplementedError
+    
+    def add_death_animation(self, position: Point) -> None:
         raise NotImplementedError
 
     def message(self, message: str, group: str = "player") -> None:

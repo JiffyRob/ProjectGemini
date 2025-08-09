@@ -423,6 +423,7 @@ class Drone(sprite.Sprite, interfaces.Healthy):
             if self.health <= 0:
                 self.health = 0
                 self.dead = True
+                self.get_level().add_death_animation(self.rect.center)
             else:
                 self.effects.append(
                     visual_fx.Blink(color=(205, 36, 36), speed=0.1, count=1)
@@ -479,7 +480,7 @@ class Drone(sprite.Sprite, interfaces.Healthy):
         return super().update(dt)
 
 
-class TumbleFish(sprite.Sprite, interfaces.Healthy):
+class TumbleFish(sprite.Sprite):
     ROLL_SPEED = 96
     MOUNTAIN_ROLL_SPEED = 128
 
@@ -539,6 +540,7 @@ class TumbleFish(sprite.Sprite, interfaces.Healthy):
                 self.hit_chasm
                 and self.rect.collidelist(self.get_level().get_rects("ground")) == -1
             ):
+                self.get_level().add_death_animation(self.rect.center)
                 return False
             if (
                 not self.hit_chasm

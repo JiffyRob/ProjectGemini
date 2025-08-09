@@ -46,7 +46,7 @@ class GameSave(interfaces.GameSave):
                 "bush_interactions": 0,
                 "emeralds": 10,
                 "hoverboarded": False,
-                "inventory": {}
+                "inventory": {},
             }
 
     def save(self, path: interfaces.FileID | None = None) -> None:

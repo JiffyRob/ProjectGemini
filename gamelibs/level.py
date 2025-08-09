@@ -260,15 +260,26 @@ class Level(game_state.GameState, interfaces.Level):
         surface = hardware.loader.create_surface((16, 16))
         surface.fill("blue")
 
-    def attach(self, base: str, follower: str="player") -> None:
+    def attach(self, base: str, follower: str = "player") -> None:
         next(iter(self.get_group(follower))).attach(next(iter(self.get_group(base))))
 
-    def add_particle(self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float) -> int:
-        return self.particle_manager.add_particle(
-            surface,
+    def add_particle(
+        self, surface: pygame.Surface, rect: RectLike, velocity: Point, duration: float
+    ) -> int:
+        return self.particle_manager.add_particle(surface, rect, velocity, duration)
+    
+    def add_death_animation(self, position: Point) -> None:
+        anim = animation.NoLoopAnimation(hardware.loader.get_spritesheet("death", (32, 32)), 0.1)
+        rect = pygame.Rect(0, 0, 32, 32)
+        rect.center = position
+        sprite = particles.AnimationSprite(
+            self,
+            anim,
             rect,
-            velocity,
-            duration
+            1000,
+        )
+        self.add_sprite(
+            sprite
         )
 
     def time_phase(self, mult: float) -> None:
@@ -303,7 +314,7 @@ class Level(game_state.GameState, interfaces.Level):
             return False
         return await self.get_game().run_sub_cutscene(self.name, {})
 
-    def lock(self, group: str | None=None) -> None:
+    def lock(self, group: str | None = None) -> None:
         if group is None:
             self.locked = True
             for sprite in self.sprites:
@@ -314,7 +325,7 @@ class Level(game_state.GameState, interfaces.Level):
             for sprite in self.get_group(group):
                 sprite.lock()
 
-    def unlock(self, group: str | None=None) -> None:
+    def unlock(self, group: str | None = None) -> None:
         if group is None:
             self.locked = False
             for sprite in self.sprites:
@@ -325,7 +336,7 @@ class Level(game_state.GameState, interfaces.Level):
             for sprite in self.get_group(group):
                 sprite.unlock()
 
-    def message(self, message: str, group: str="player") -> None:
+    def message(self, message: str, group: str = "player") -> None:
         for sprite in self.groups[group]:
             sprite.message(message)
 
@@ -668,7 +679,10 @@ class Level(game_state.GameState, interfaces.Level):
                 rect,
             )
         # draw particles
-        self.particle_manager.draw(self.game.window_surface, (-int(self.viewport_rect.left), -int(self.viewport_rect.top)))
+        self.particle_manager.draw(
+            self.game.window_surface,
+            (-int(self.viewport_rect.left), -int(self.viewport_rect.top)),
+        )
         # draw visual effects
         for effect in self.effects:
             effect.draw(self.game.window_surface)

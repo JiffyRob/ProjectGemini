@@ -59,6 +59,52 @@
 				"color": 4916999,
 				"customFields" : {}
 			}
+		],
+		"Drone": [
+			{
+				"id": "Drone",
+				"iid": "ebd53740-5e50-11f0-b2f7-bbaebf49ec05",
+				"layer": "Entities",
+				"x": 320,
+				"y": 48,
+				"width": 10,
+				"height": 10,
+				"color": 39387,
+				"customFields" : {}
+			},
+			{
+				"id": "Drone",
+				"iid": "ec5feb10-5e50-11f0-b2f7-058706d7af0d",
+				"layer": "Entities",
+				"x": 224,
+				"y": 336,
+				"width": 10,
+				"height": 10,
+				"color": 39387,
+				"customFields" : {}
+			},
+			{
+				"id": "Drone",
+				"iid": "ecc367d0-5e50-11f0-b2f7-f5c80fe32071",
+				"layer": "Entities",
+				"x": 96,
+				"y": 192,
+				"width": 10,
+				"height": 10,
+				"color": 39387,
+				"customFields" : {}
+			},
+			{
+				"id": "Drone",
+				"iid": "ee239410-5e50-11f0-b2f7-9d804c2c836d",
+				"layer": "Entities",
+				"x": 16,
+				"y": 64,
+				"width": 10,
+				"height": 10,
+				"color": 39387,
+				"customFields" : {}
+			}
 		]
 	}
 }

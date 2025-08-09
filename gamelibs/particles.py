@@ -2,8 +2,33 @@ from typing import Iterator
 import pygame
 from pygame.typing import ColorLike, Point, RectLike
 
-from gamelibs import hardware
+from gamelibs import hardware, sprite
 from random import uniform
+
+from gamelibs import interfaces
+
+
+class AnimationSprite(sprite.Sprite):
+    def __init__(
+        self,
+        level: interfaces.Level,
+        anim: interfaces.Animation,
+        rect: RectLike = (0, 0, 16, 16),
+        z: int = 0,
+    ) -> None:
+        self.anim = anim
+        super().__init__(
+            level,
+            self.anim.image,
+            rect,
+            z,
+        )
+
+    def update(self, dt: float) -> bool:
+        self.anim.update(dt)
+        self.image = self.anim.image
+        return super().update(dt) and not self.anim.done()
+
 
 class ParticleManager:
     def __init__(self) -> None:
@@ -54,13 +79,15 @@ class ParticleManager:
                 enumerate(self.rects),
             )
         )
-        list(map(
-            self._free_id,
+        list(
             map(
-                lambda x: x[0],
-                filter(lambda tup: tup[1] < self.now, enumerate(self.death_times)),
-            ),
-        ))
+                self._free_id,
+                map(
+                    lambda x: x[0],
+                    filter(lambda tup: tup[1] < self.now, enumerate(self.death_times)),
+                ),
+            )
+        )
 
     def draw(self, surface: pygame.Surface, offset: Point) -> None:
         surface.fblits(
@@ -68,12 +95,20 @@ class ParticleManager:
         )
 
 
-def splat(center: Point, size: Point, color: ColorLike, speed: float | tuple[float, float], duration: float, count: int) -> Iterator[tuple[pygame.Surface, pygame.FRect, pygame.Vector2, float]]:
+def splat(
+    center: Point,
+    size: Point,
+    color: ColorLike,
+    speed: float | tuple[float, float],
+    duration: float,
+    count: int,
+) -> Iterator[tuple[pygame.Surface, pygame.FRect, pygame.Vector2, float]]:
     def get_speed() -> float | int:
         if isinstance(speed, (float, int)):
             return speed
         else:
             return uniform(speed[0], speed[1])
+
     theta = 0
     dtheta = 360 / count
     surface = hardware.loader.create_surface(size)

@@ -212,7 +212,7 @@ class Loader(interfaces.Loader):
         if i < amount:
             names.extend((("", "") for _ in range(amount - i)))
         return names[:amount]
-    
+
     def get_save_count(self) -> int:
         if env.PYGBAG:
             paths = [pathlib.Path(i) for i in env.saves.keys()]
