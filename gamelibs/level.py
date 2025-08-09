@@ -218,6 +218,7 @@ class Level(game_state.GameState, interfaces.Level):
             )
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type in {interfaces.MapType.HOUSE, interfaces.MapType.TOPDOWN}:
+            print(entrance)
             self.player = topdown.mobile.Player(self, rect, entrance=entrance)
             self.iball = topdown.mobile.Iball(self, small_rect)
         elif map_type == interfaces.MapType.HOVERBOARD:

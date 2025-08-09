@@ -100,10 +100,10 @@ class Player(PhysicsSprite, interfaces.Player):
             "idle-left": Animation((images[9],), flip_x=True),
         }
         entrance = custom_fields.get("entrance", "normal")
-        if entrance == "board":
+        if entrance == interfaces.MapEntranceType.HOVERBOARD:
             self.state = "entrance-board"
             self.rect.right = 0
-        elif entrance == "fall":
+        elif entrance == interfaces.MapEntranceType.FALLING:
             self.state = "entrance-fall"
             self.rect.bottom = 0
         else:

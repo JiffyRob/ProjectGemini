@@ -156,7 +156,7 @@ class ScrollingBackground(sprite.Sprite, interfaces.Background):
                 )
             )
             self.state = self.STATE_SLOWDOWN
-            self.get_level().message("drones", "leave")
+            self.get_level().message("leave", "drones")
         if self.stop_timer.done():
             self.get_level().speed = 0
             if not self.finished:
