@@ -4,5 +4,6 @@
     "python.analysis.typeCheckingMode": "strict",
     "python.languageServer": "Pylance",
     "python.analysis.languageServerMode": "full",
-    "python.analysis.diagnosticMode": "workspace"
+    "python.analysis.diagnosticMode": "workspace",
+    "python.defaultInterpreterPath": "/usr/bin/python3"
 }

@@ -4,8 +4,9 @@
 #   "pygame-ce",
 #   "zengl",
 #   "numpy",
+#   "SNEK2 @ git+https://github.com/JiffyRob/SNEK2.git@main",
 # ]
-# TODO: vendor in snek2
+# ///
 
 import asyncio
 from collections import deque
